@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { X, Coins, DollarSign, Gem, ChevronRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Gem, Coins, DollarSign } from 'lucide-react';
 import { PortfolioAsset } from '../../types';
 
 interface AddCashCommoditiesModalProps {
@@ -74,6 +74,7 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
   const [selected, setSelected] = useState<AssetType | null>(null);
   const [amount, setAmount] = useState('');
   const [customPrice, setCustomPrice] = useState('');
+  const assetIdRef = useRef(0);
 
   if (!isOpen) return null;
 
@@ -89,7 +90,7 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
 
     const cfg = ASSET_CONFIG[selected];
     const asset: PortfolioAsset = {
-      coinId: `${cfg.id}-${Date.now()}`,
+      coinId: `${cfg.id}-${++assetIdRef.current}`,
       symbol: cfg.symbol,
       name: cfg.name,
       amount: parsedAmount,
@@ -130,7 +131,7 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
             </div>
           </div>
           <button onClick={handleClose} className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-[#2A2A2A] transition-colors">
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5" >✕</span>
           </button>
         </div>
 
@@ -245,7 +246,7 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
                 style={{ backgroundColor: config.color }}
               >
                 <span>Add {config.name} to Portfolio</span>
-                <ChevronRight className="w-4 h-4" />
+                <span className="w-4 h-4" >▶️</span>
               </button>
             </form>
           )}

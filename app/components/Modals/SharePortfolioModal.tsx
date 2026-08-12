@@ -1,15 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
-import {
-  X,
-  Share2,
-  Copy,
-  Check,
-  Download,
-  TrendingUp,
-  ChevronDown
-} from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { PortfolioAsset } from '../../types';
 
 interface SharePortfolioModalProps {
@@ -45,7 +37,22 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
 
   const curr = CURRENCY_CONFIG[currency];
   const convertedValue = totalValue * curr.rate;
-  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/share/portfolio` : 'https://rouge.crypto/share';
+
+  const serializeSnapshot = (value: any) => {
+    try {
+      const json = JSON.stringify(value);
+      return typeof window !== 'undefined'
+        ? window.btoa(unescape(encodeURIComponent(json)))
+        : '';
+    } catch {
+      return '';
+    }
+  };
+
+  const snapshot = serializeSnapshot({ currency, portfolio });
+  const shareUrl = typeof window !== 'undefined'
+    ? `${window.location.origin}/share/portfolio?snapshot=${encodeURIComponent(snapshot)}`
+    : `https://stream.crypto/share/portfolio?snapshot=${encodeURIComponent(snapshot)}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
@@ -56,22 +63,38 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
   const handleDownloadPDF = async () => {
     setIsDownloading(true);
 
-    // Build printable HTML and open print dialog as PDF
+    const shareTotalValue = portfolio.reduce((sum, item) => sum + item.amount * item.currentPrice * curr.rate, 0);
+    const chartColors = ['#10B981', '#8B5CF6', '#3B82F6', '#EC4899', '#F59E0B', '#14B8A6', '#0EA5E9', '#F472B6'];
+    let angleStart = 0;
+    const chartSegments = portfolio.slice(0, 6).map((item, idx) => {
+      const value = item.amount * item.currentPrice * curr.rate;
+      const percent = shareTotalValue > 0 ? value / shareTotalValue : 0;
+      const angle = percent * Math.PI * 2;
+      const x1 = 150 + 100 * Math.cos(angleStart - Math.PI / 2);
+      const y1 = 150 + 100 * Math.sin(angleStart - Math.PI / 2);
+      angleStart += angle;
+      const x2 = 150 + 100 * Math.cos(angleStart - Math.PI / 2);
+      const y2 = 150 + 100 * Math.sin(angleStart - Math.PI / 2);
+      const largeArc = angle > Math.PI ? 1 : 0;
+      return `
+        <path d="M150 150 L ${x1} ${y1} A 100 100 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${chartColors[idx % chartColors.length]}" />`;
+    }).join('');
+
     const portfolioRows = portfolio
       .slice(0, 10)
       .map(item => {
-        const val = (item.amount * item.currentPrice * curr.rate).toFixed(2);
-        const pnl = ((item.currentPrice - item.avgBuyPrice) / item.avgBuyPrice * 100).toFixed(2);
-        const alloc = totalValue > 0
-          ? ((item.amount * item.currentPrice / totalValue) * 100).toFixed(1)
+        const val = item.amount * item.currentPrice * curr.rate;
+        const pnl = ((item.currentPrice - item.avgBuyPrice) / item.avgBuyPrice * 100);
+        const alloc = shareTotalValue > 0
+          ? ((item.amount * item.currentPrice * curr.rate / shareTotalValue) * 100).toFixed(1)
           : '0';
         return `
           <tr style="border-bottom:1px solid #2E2E2E;">
             <td style="padding:10px 12px;font-weight:700;color:#fff;">${item.symbol}</td>
             <td style="padding:10px 12px;color:#9CA3AF;">${item.name}</td>
             <td style="padding:10px 12px;color:#9CA3AF;">${item.amount.toFixed(4)}</td>
-            <td style="padding:10px 12px;color:#fff;font-weight:700;">${curr.symbol}${parseFloat(val).toLocaleString()}</td>
-            <td style="padding:10px 12px;color:${parseFloat(pnl) >= 0 ? '#10B981' : '#EF4444'};font-weight:700;">${parseFloat(pnl) >= 0 ? '+' : ''}${pnl}%</td>
+            <td style="padding:10px 12px;color:#fff;font-weight:700;">${curr.symbol}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+            <td style="padding:10px 12px;color:${pnl >= 0 ? '#10B981' : '#EF4444'};font-weight:700;">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</td>
             <td style="padding:10px 12px;color:#9CA3AF;">${alloc}%</td>
           </tr>`;
       }).join('');
@@ -84,7 +107,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
 <html>
 <head>
   <meta charset="UTF-8"/>
-  <title>Rouge Portfolio Report</title>
+  <title>Stream Portfolio Report</title>
   <style>
     *{margin:0;padding:0;box-sizing:border-box;}
     body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#111;color:#fff;padding:40px;}
@@ -96,6 +119,9 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
     .metric-label{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
     .metric-value{font-size:22px;font-weight:900;color:#fff;}
     .metric-sub{font-size:12px;font-weight:700;margin-top:4px;}
+    .chart-card{background:#1A1A1A;border:1px solid #2E2E2E;border-radius:16px;padding:20px;margin-bottom:32px;text-align:center;}
+    .chart-label{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+    .chart-value{font-size:28px;font-weight:900;color:#fff;margin-bottom:14px;}
     .table-wrap{background:#1A1A1A;border:1px solid #2E2E2E;border-radius:16px;overflow:hidden;}
     table{width:100%;border-collapse:collapse;}
     thead tr{background:#212121;}
@@ -105,7 +131,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
 </head>
 <body>
   <div class="header">
-    <span class="logo">Rouge</span>
+    <span class="logo">Stream</span>
     <div style="text-align:right;">
       <div class="badge">PORTFOLIO REPORT</div>
       <div style="font-size:11px;color:#6B7280;margin-top:6px;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
@@ -116,20 +142,28 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
     <div class="metric-card">
       <div class="metric-label">Portfolio Value</div>
       <div class="metric-value">${curr.symbol}${convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <div class="metric-sub" style="color:#6B7280;">in ${currency}</div>
+      <div class="metric-sub">in ${currency}</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">All-Time Return</div>
       <div class="metric-value" style="color:${totalPnlPercent >= 0 ? '#10B981' : '#EF4444'};">${totalPnlPercent >= 0 ? '+' : ''}${totalPnlPercent.toFixed(2)}%</div>
-      <div class="metric-sub" style="color:${totalPnlUsd * curr.rate >= 0 ? '#10B981' : '#EF4444'};">
-        ${totalPnlUsd * curr.rate >= 0 ? '+' : ''}${curr.symbol}${Math.abs(totalPnlUsd * curr.rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-      </div>
+      <div class="metric-sub" style="color:${totalPnlUsd * curr.rate >= 0 ? '#10B981' : '#EF4444'};">${totalPnlUsd * curr.rate >= 0 ? '+' : ''}${curr.symbol}${Math.abs(totalPnlUsd * curr.rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
     </div>
     <div class="metric-card">
       <div class="metric-label">Holdings</div>
       <div class="metric-value">${portfolio.length}</div>
-      <div class="metric-sub" style="color:#6B7280;">Assets tracked</div>
+      <div class="metric-sub">Assets tracked</div>
     </div>
+  </div>
+
+  <div class="chart-card">
+    <div class="chart-label">Portfolio Distribution</div>
+    <div class="chart-value">Donut Graph</div>
+    <svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="150" cy="150" r="100" fill="#111" />
+      ${chartSegments}
+      <circle cx="150" cy="150" r="60" fill="#111" />
+    </svg>
   </div>
 
   <div class="table-wrap">
@@ -141,7 +175,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
     </table>
   </div>
 
-  <div class="footer">Generated by Rouge Crypto Platform · rouge.crypto · Values in ${currency} (1 USD = ${curr.rate} ${currency})</div>
+  <div class="footer">Generated by Stream Crypto Platform · stream.crypto · Values in ${currency} (1 USD = ${curr.rate} ${currency})</div>
 </body>
 </html>`;
 
@@ -166,7 +200,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#2E2E2E]">
           <div className="flex items-center space-x-3">
             <div className="w-9 h-9 rounded-xl bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center text-[#00F0FF]">
-              <Share2 className="w-5 h-5" />
+              <span className="w-5 h-5" >📤</span>
             </div>
             <div>
               <h2 className="text-base font-bold text-white">Share Portfolio</h2>
@@ -174,7 +208,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-[#2A2A2A] transition-colors">
-            <X className="w-5 h-5" />
+            <span className="w-5 h-5" >✕</span>
           </button>
         </div>
 
@@ -223,13 +257,13 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
           {/* Shareable Card Preview */}
           <div
             ref={cardRef}
-            className="bg-gradient-to-br from-[#161616] via-[#1F2937] to-[#111827] border border-[#00F0FF]/30 rounded-2xl p-5 shadow-xl space-y-4 relative overflow-hidden"
+            className="bg-[#1A1A1A] border border-[#2E2E2E] rounded-2xl p-5 shadow-xl space-y-4 relative overflow-hidden"
           >
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#00F0FF]/10 rounded-full blur-2xl pointer-events-none" />
 
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-white text-base tracking-tight">Rouge</span>
+                <span className="font-extrabold text-white text-base tracking-tight">Stream</span>
               </div>
               <span className="bg-[#EF4444]/20 text-[#EF4444] text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#EF4444]/30">
                 VERIFIED PORTFOLIO
@@ -244,7 +278,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
                 {curr.symbol}{convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </div>
               <div className={`text-xs font-extrabold mt-1 flex items-center space-x-1 ${totalPnlPercent >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
-                <TrendingUp className="w-3.5 h-3.5" />
+                <span className="w-3.5 h-3.5" >📈</span>
                 <span>{totalPnlPercent >= 0 ? '+' : ''}{totalPnlPercent.toFixed(2)}% All-Time Return</span>
               </div>
             </div>
@@ -273,7 +307,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
                   : 'bg-[#212121] border-[#2E2E2E] text-gray-200 hover:border-[#3E3E3E] hover:text-white'
               }`}
             >
-              {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+              {copied ? <span className="w-4 h-4" >✅</span> : <span className="w-4 h-4" >📋</span>}
               <span>{copied ? 'Copied!' : 'Copy Link'}</span>
             </button>
 
@@ -283,7 +317,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
               disabled={isDownloading}
               className="flex items-center justify-center space-x-2 py-3 rounded-xl font-bold text-xs bg-[#00F0FF] hover:bg-[#00D8E6] text-black transition-all shadow-md shadow-[#00F0FF]/20 disabled:opacity-60"
             >
-              <Download className={`w-4 h-4 ${isDownloading ? 'animate-bounce' : ''}`} />
+              <span className={`w-4 h-4 ${isDownloading ? 'animate-bounce' : ''}`} >⬇️</span>
               <span>{isDownloading ? 'Preparing...' : 'Download PDF'}</span>
             </button>
           </div>

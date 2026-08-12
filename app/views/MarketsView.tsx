@@ -1,16 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import {
-  Search,
-  Plus,
-  ChevronLeft,
-  ChevronRight,
-  TrendingUp,
-  TrendingDown,
-  Sparkles,
-  Loader2
-} from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { CryptoCoin } from '../types';
 import { searchCoinGecko } from '../services/coingecko';
 
@@ -19,6 +10,8 @@ interface MarketsViewProps {
   onOpenCoinModal: (coin: CryptoCoin) => void;
   onOpenTradeModalWithTicker: (symbol: string) => void;
 }
+
+type SortOption = 'marketCap' | 'change24h' | 'price' | 'volume';
 
 export const MarketsView: React.FC<MarketsViewProps> = ({
   coins,
@@ -29,26 +22,21 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
   const [searchFilter, setSearchFilter] = useState('');
   const [remoteMatches, setRemoteMatches] = useState<CryptoCoin[]>([]);
   const [isSearchingRemote, setIsSearchingRemote] = useState(false);
-  const [sortBy, setSortBy] = useState<'marketCap' | 'change24h' | 'price' | 'volume'>('marketCap');
+  const [sortBy, setSortBy] = useState<SortOption>('marketCap');
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [itemsPerPage, setItemsPerPage] = useState<number>(50);
 
   // Debounced Remote CoinGecko search across ALL 15,000+ cryptos
   useEffect(() => {
     const trimmed = searchFilter.trim();
-    if (!trimmed) {
-      setRemoteMatches([]);
-      setIsSearchingRemote(false);
-      return;
-    }
+    if (!trimmed) return;
 
     const timer = setTimeout(async () => {
       setIsSearchingRemote(true);
       const results = await searchCoinGecko(trimmed);
       setIsSearchingRemote(false);
 
-      // Convert search results into CryptoCoin objects
-      const mapped: CryptoCoin[] = results.map((r, i) => {
+      const mapped: CryptoCoin[] = results.map((r) => {
         const existing = coins.find(c => c.id === r.id);
         if (existing) return existing;
         return {
@@ -108,11 +96,6 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
     });
   }, [coins, selectedCategory, searchFilter, remoteMatches, sortBy]);
 
-  // Reset page when filters change
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchFilter, selectedCategory, sortBy, itemsPerPage]);
-
   const totalPages = Math.ceil(filteredCoins.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCoins = filteredCoins.slice(startIndex, startIndex + itemsPerPage);
@@ -129,17 +112,17 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
     <div className="space-y-6">
 
       {/* Header Info Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between bg-gradient-to-r from-[#1A1A1A] via-[#212121] to-[#1A1A1A] p-5 rounded-3xl border border-[#2E2E2E] shadow-lg gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between bg-[#212121] p-5 rounded-3xl border border-[#2E2E2E] shadow-lg gap-4">
         <div>
           <div className="flex items-center space-x-2 mb-1">
-            <Sparkles className="w-5 h-5 text-[#00F0FF]" />
+            <span className="w-5 h-5 text-[#00F0FF]" >✨</span>
             <h1 className="text-xl font-extrabold text-white">Cryptocurrency Markets</h1>
             <span className="bg-[#00F0FF]/10 text-[#00F0FF] text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-[#00F0FF]/20">
               {coins.length > 0 ? `${coins.length}+ Cryptos` : '15,000+ Cryptos'}
             </span>
           </div>
           <p className="text-xs text-gray-400">
-            Real-time live prices, 24h market metrics, and 7-day sparkline performance tracking powered by CoinGecko. Search any crypto token!
+            Real-time live prices, 24h market metrics, and 7-day sparkline performance tracking powered by Stream Market Data. Search any crypto token!
           </p>
         </div>
 
@@ -153,7 +136,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
           </div>
           <div className="h-6 w-px bg-[#2E2E2E]" />
           <div>
-            <div className="text-gray-400 text-[10px] uppercase font-bold">CoinGecko Index</div>
+            <div className="text-gray-400 text-[10px] uppercase font-bold">Stream Market Index</div>
             <div className="text-[#17C99E] font-bold font-mono">15,000+ Cryptos</div>
           </div>
         </div>
@@ -173,7 +156,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
           ].map((cat) => (
             <button
               key={cat.id}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => { setSelectedCategory(cat.id); setCurrentPage(1); }}
               className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
                 selectedCategory === cat.id
                   ? 'bg-[#17C99E] text-black shadow-md shadow-[#17C99E]/20 font-extrabold'
@@ -191,9 +174,9 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search all 15,000+ cryptos on CoinGecko..."
+              placeholder="Search all 15,000+ cryptos..."
               value={searchFilter}
-              onChange={(e) => setSearchFilter(e.target.value)}
+              onChange={(e) => { setSearchFilter(e.target.value); setCurrentPage(1); }}
               className="w-full bg-[#212121] text-white text-xs pl-10 pr-8 py-2.5 rounded-2xl border border-[#2E2E2E] focus:outline-none focus:border-[#17C99E] transition-colors"
             />
             {isSearchingRemote && (
@@ -203,7 +186,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
 
           <select
             value={sortBy}
-            onChange={(e) => setSortBy(e.target.value as any)}
+            onChange={(e) => { setSortBy(e.target.value as SortOption); setCurrentPage(1); }}
             className="bg-[#212121] text-white text-xs font-bold p-2.5 rounded-2xl border border-[#2E2E2E] focus:outline-none cursor-pointer"
           >
             <option value="marketCap">Sort by Rank / MCap</option>
@@ -283,7 +266,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-mono font-bold ${
                             isPositive ? 'bg-[#17C99E]/10 text-[#17C99E]' : 'bg-[#FF4D4D]/10 text-[#FF4D4D]'
                           }`}>
-                            {isPositive ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
+                            {isPositive ? <span className="w-3 h-3 mr-1" >📈</span> : <span className="w-3 h-3 mr-1" >📉</span>}
                             {isPositive ? '+' : ''}{coin.change24h.toFixed(2)}%
                           </span>
                         ) : (
@@ -336,7 +319,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                           }}
                           className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold px-3 py-1.5 rounded-xl transition-all flex items-center space-x-1 mx-auto text-xs shadow-sm hover:scale-105"
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <span className="w-3.5 h-3.5" >➕</span>
                           <span>Add</span>
                         </button>
                       </td>
@@ -347,9 +330,9 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-gray-400">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <Loader2 className="w-8 h-8 text-[#00F0FF] animate-spin" />
-                      <p className="font-semibold text-white text-sm">Searching CoinGecko library...</p>
-                      <p className="text-xs text-gray-400">Loading live data for "{searchFilter}"</p>
+                      <span className="w-8 h-8 text-[#00F0FF] animate-spin" >⏳</span>
+                      <p className="font-semibold text-white text-sm">Searching live market library...</p>
+                      <p className="text-xs text-gray-400">Loading live data for &quot;{searchFilter}&quot;</p>
                     </div>
                   </td>
                 </tr>
@@ -371,7 +354,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
               <span>Show:</span>
               <select
                 value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                onChange={(e) => { setItemsPerPage(Number(e.target.value)); setCurrentPage(1); }}
                 className="bg-[#212121] text-white font-mono font-bold px-2 py-1 rounded-lg border border-[#2E2E2E] focus:outline-none"
               >
                 <option value={25}>25</option>
@@ -389,7 +372,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                 disabled={currentPage === 1}
                 className="p-1.5 rounded-xl bg-[#212121] hover:bg-[#2A2A2A] text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed border border-[#2E2E2E] transition-colors"
               >
-                <ChevronLeft className="w-4 h-4" />
+                <span className="w-4 h-4" >◀️</span>
               </button>
 
               <div className="flex items-center space-x-1 px-2">
@@ -405,7 +388,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                 disabled={currentPage === totalPages}
                 className="p-1.5 rounded-xl bg-[#212121] hover:bg-[#2A2A2A] text-gray-300 disabled:opacity-30 disabled:cursor-not-allowed border border-[#2E2E2E] transition-colors"
               >
-                <ChevronRight className="w-4 h-4" />
+                <span className="w-4 h-4" >▶️</span>
               </button>
             </div>
           )}

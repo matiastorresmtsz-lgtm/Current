@@ -16,22 +16,16 @@ const ThemeContext = createContext<ThemeContextValue>({
 
 export const useTheme = () => useContext(ThemeContext);
 
+function readStoredTheme(): Theme {
+  if (typeof window === 'undefined') return 'dark';
+  const saved = localStorage.getItem('stream_theme');
+  return saved === 'light' || saved === 'dark' ? saved : 'dark';
+}
+
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>('dark');
-  const [mounted, setMounted] = useState(false);
+  const [theme, setThemeState] = useState<Theme>(readStoredTheme);
 
-  // Load from localStorage on mount (client only)
   useEffect(() => {
-    const saved = localStorage.getItem('rouge_theme') as Theme | null;
-    if (saved === 'light' || saved === 'dark') {
-      setThemeState(saved);
-    }
-    setMounted(true);
-  }, []);
-
-  // Apply class to <html> and persist
-  useEffect(() => {
-    if (!mounted) return;
     const html = document.documentElement;
     if (theme === 'light') {
       html.classList.add('light');
@@ -40,8 +34,8 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       html.classList.add('dark');
       html.classList.remove('light');
     }
-    localStorage.setItem('rouge_theme', theme);
-  }, [theme, mounted]);
+    localStorage.setItem('stream_theme', theme);
+  }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);
 

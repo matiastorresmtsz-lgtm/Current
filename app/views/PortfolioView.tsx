@@ -1,22 +1,17 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  Plus,
-  Trash2,
-  TrendingUp,
-  TrendingDown,
-  ChevronDown,
-  Lock,
-  Building2,
-  Coins,
-  Eye,
-  Pencil,
-  Share2,
-  Sparkles
-} from 'lucide-react';
+import { ChevronDown, Coins } from 'lucide-react';
 import { PortfolioAsset, CryptoCoin } from '../types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
+
+type Currency = 'USD' | 'CAD' | 'MXN';
+
+const CURRENCY_CONFIG: Record<Currency, { flag: string; symbol: string; label: string; rate: number }> = {
+  USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
+  CAD: { flag: '🇨🇦', symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
+  MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
+};
 
 interface PortfolioViewProps {
   portfolio: PortfolioAsset[];
@@ -40,7 +35,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   onOpenShareModal
 }) => {
   const [accountFilter, setAccountFilter] = useState<'All' | 'Other'>('All');
-  const [currency, setCurrency] = useState('USD');
+  const [currency, setCurrency] = useState<Currency>('USD');
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [sortBy, setSortBy] = useState('Total value');
 
   // Compute live portfolio metrics matching screenshot
@@ -48,6 +44,10 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   const totalCost = portfolio.reduce((sum, item) => sum + (item.amount * item.avgBuyPrice), 0);
   const totalPnlUsd = totalValue - totalCost;
   const totalPnlPercent = totalCost > 0 ? (totalPnlUsd / totalCost) * 100 : 0;
+  const curr = CURRENCY_CONFIG[currency];
+  const convertedValue = totalValue * curr.rate;
+  const convertedCost = totalCost * curr.rate;
+  const convertedPnlUsd = totalPnlUsd * curr.rate;
 
   // Today's return calculation (using 24h change)
   const todayReturnUsd = portfolio.reduce((sum, item) => {
@@ -55,6 +55,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
     return sum + (itemVal * (item.change24h / 100));
   }, 0);
   const todayReturnPercent = totalValue > 0 ? (todayReturnUsd / totalValue) * 100 : 0;
+  const convertedTodayReturn = todayReturnUsd * curr.rate;
 
   // Donut chart segments
   const colorsList = ['#10B981', '#8B5CF6', '#3B82F6', '#EC4899', '#F59E0B', '#14B8A6'];
@@ -91,7 +92,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             className="flex items-center space-x-1 text-gray-400 hover:text-white pb-1"
           >
             <span>Other</span>
-            <Lock className="w-3.5 h-3.5 text-gray-500" />
+            <span className="w-3.5 h-3.5 text-gray-500" >🔒</span>
           </button>
         </div>
 
@@ -101,13 +102,35 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             onClick={onOpenShareModal}
             className="flex items-center space-x-1.5 bg-[#00F0FF] hover:bg-[#00D8E6] text-black font-extrabold text-xs px-3.5 py-1.5 rounded-full transition-all shadow"
           >
-            <Share2 className="w-3.5 h-3.5" />
+            <span className="w-3.5 h-3.5" >📤</span>
             <span>Share Portfolio</span>
           </button>
 
-          <div className="bg-[#212121] border border-[#2E2E2E] px-3 py-1.5 rounded-full text-xs font-bold text-gray-200 flex items-center space-x-1.5">
-            <span>🇺🇸 USD</span>
-            <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+          <div className="relative">
+            <button
+              onClick={() => setShowCurrencyDropdown((prev) => !prev)}
+              className="bg-[#212121] border border-[#2E2E2E] px-3 py-1.5 rounded-full text-xs font-bold text-gray-200 flex items-center space-x-1.5"
+            >
+              <span>{curr.flag} {currency}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
+            </button>
+            {showCurrencyDropdown && (
+              <div className="absolute right-0 mt-2 w-44 bg-[#212121] border border-[#2E2E2E] rounded-2xl overflow-hidden shadow-xl z-20">
+                {(Object.entries(CURRENCY_CONFIG) as [Currency, typeof CURRENCY_CONFIG[Currency]][]).map(([key, cfg]) => (
+                  <button
+                    key={key}
+                    onClick={() => { setCurrency(key); setShowCurrencyDropdown(false); }}
+                    className={`w-full text-left px-4 py-3 transition-colors ${currency === key ? 'bg-[#2A2A2A]' : 'hover:bg-[#2E2E2E]'}`}
+                  >
+                    <div className="flex items-center justify-between text-sm text-white">
+                      <span>{cfg.flag} {key}</span>
+                      {currency === key && <span className="text-[#00F0FF] font-bold">✓</span>}
+                    </div>
+                    <div className="text-[10px] text-gray-400">{cfg.label}</div>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           <div className="bg-[#212121] border border-[#2E2E2E] px-3 py-1.5 rounded-full text-xs font-medium text-gray-300">
@@ -146,7 +169,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             {/* Center Label - Exact Screenshot Match */}
             <div className="absolute text-center flex flex-col items-center justify-center">
               <span className="text-3xl font-extrabold text-white tracking-tight">
-                ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {curr.symbol}{convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
               </span>
               <span className="text-xs font-semibold text-gray-400 mt-0.5">
                 Portfolio Value
@@ -167,8 +190,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                 <span>Today's Return</span>
                 <ChevronDown className="w-3.5 h-3.5" />
               </div>
-              <div className={`text-2xl font-extrabold tracking-tight ${todayReturnUsd >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
-                {todayReturnUsd >= 0 ? '+' : ''}${todayReturnUsd.toFixed(2)}
+              <div className={`text-2xl font-extrabold tracking-tight ${convertedTodayReturn >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                {convertedTodayReturn >= 0 ? '+' : ''}{curr.symbol}{convertedTodayReturn.toFixed(2)}
               </div>
               <div className={`text-xs font-bold mt-1 ${todayReturnPercent >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
                 {todayReturnPercent >= 0 ? '+' : ''}{todayReturnPercent.toFixed(2)}% <span className="text-gray-400 font-normal">Today</span>
@@ -178,8 +201,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             {/* All-Time Return Card */}
             <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-5 shadow-xl">
               <div className="text-xs font-semibold text-gray-400 mb-2">All-Time Return</div>
-              <div className={`text-2xl font-extrabold tracking-tight ${totalPnlUsd >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
-                {totalPnlUsd >= 0 ? '+' : ''}${totalPnlUsd.toFixed(2)}
+              <div className={`text-2xl font-extrabold tracking-tight ${convertedPnlUsd >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                {convertedPnlUsd >= 0 ? '+' : ''}{curr.symbol}{convertedPnlUsd.toFixed(2)}
               </div>
               <div className={`text-xs font-bold mt-1 ${totalPnlPercent >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
                 {totalPnlPercent >= 0 ? '+' : ''}{totalPnlPercent.toFixed(2)}% <span className="text-gray-400 font-normal">All time</span>
@@ -198,7 +221,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                 className="flex flex-col items-center group cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-[#14B8A6]/20 group-hover:bg-[#14B8A6]/30 flex items-center justify-center text-[#14B8A6] mb-2 transition-colors">
-                  <Building2 className="w-5 h-5" />
+                  <span className="w-5 h-5" >🏢</span>
                 </div>
                 <span className="text-[11px] font-medium text-gray-300 leading-tight">Add Investments</span>
               </button>
@@ -220,7 +243,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                 className="flex flex-col items-center group cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-[#8B5CF6]/20 group-hover:bg-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] mb-2 transition-colors">
-                  <Eye className="w-5 h-5" />
+                  <span className="w-5 h-5" >👁️</span>
                 </div>
                 <span className="text-[11px] font-medium text-gray-300 leading-tight">Holding visibility</span>
               </button>
@@ -231,7 +254,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                 className="flex flex-col items-center group cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-[#F97316]/20 group-hover:bg-[#F97316]/30 flex items-center justify-center text-[#F97316] mb-2 transition-colors">
-                  <Pencil className="w-5 h-5" />
+                  <span className="w-5 h-5" >✏️</span>
                 </div>
                 <span className="text-[11px] font-medium text-gray-300 leading-tight">Edit Portfolio</span>
               </button>
@@ -271,11 +294,11 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             </thead>
             <tbody className="divide-y divide-[#2E2E2E]">
               {portfolio.map((item) => {
-                const currentVal = item.amount * item.currentPrice;
-                const allocPct = totalValue > 0 ? ((currentVal / totalValue) * 100).toFixed(2) : '0.00';
+                const currentVal = item.amount * item.currentPrice * curr.rate;
+                const allocPct = convertedValue > 0 ? ((currentVal / convertedValue) * 100).toFixed(2) : '0.00';
                 const todayReturn = currentVal * (item.change24h / 100);
-                const allTimePnl = currentVal - (item.amount * item.avgBuyPrice);
-                const allTimePnlPct = (item.amount * item.avgBuyPrice) > 0 ? (allTimePnl / (item.amount * item.avgBuyPrice)) * 100 : 0;
+                const allTimePnl = currentVal - (item.amount * item.avgBuyPrice * curr.rate);
+                const allTimePnlPct = (item.amount * item.avgBuyPrice) > 0 ? (allTimePnl / (item.amount * item.avgBuyPrice * curr.rate)) * 100 : 0;
                 const matchedCoin = coins.find(c => c.symbol.toUpperCase() === item.symbol.toUpperCase());
 
                 return (
@@ -302,21 +325,21 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                       </div>
                     </td>
 
-                    {/* % of portfolio */}
+                            {/* % of portfolio */}
                     <td className="py-3.5 px-3 text-center font-mono font-bold text-gray-200">
                       {allocPct}%
                     </td>
 
-                    {/* Position ($ & shares) */}
+                    {/* Position ({currency} & shares) */}
                     <td className="py-3.5 px-3 text-right">
-                      <div className="font-bold text-white font-mono">${currentVal.toFixed(2)}</div>
+                      <div className="font-bold text-white font-mono">{curr.symbol}{currentVal.toFixed(2)}</div>
                       <div className="text-[11px] text-gray-400 font-mono">{item.amount.toFixed(2)} shares</div>
                     </td>
 
                     {/* Today's Return */}
                     <td className="py-3.5 px-3 text-right font-mono">
                       <div className={`font-bold ${todayReturn >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
-                        {todayReturn >= 0 ? '+' : ''}${todayReturn.toFixed(2)}
+                        {todayReturn >= 0 ? '+' : ''}{curr.symbol}{todayReturn.toFixed(2)}
                       </div>
                       <div className={`text-[11px] font-bold ${item.change24h >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
                         {item.change24h >= 0 ? '+' : ''}{item.change24h.toFixed(2)}%
@@ -326,7 +349,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                     {/* All-Time Return */}
                     <td className="py-3.5 px-3 text-right font-mono">
                       <div className={`font-bold ${allTimePnl >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
-                        {allTimePnl >= 0 ? '+' : ''}${allTimePnl.toFixed(2)}
+                        {allTimePnl >= 0 ? '+' : ''}{curr.symbol}{allTimePnl.toFixed(2)}
                       </div>
                       <div className={`text-[11px] font-bold ${allTimePnlPct >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
                         {allTimePnlPct >= 0 ? '+' : ''}{allTimePnlPct.toFixed(2)}%
@@ -340,7 +363,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                         title="Delete asset"
                         className="text-gray-500 hover:text-[#EF4444] p-1.5 rounded-lg hover:bg-[#161616] transition-colors"
                       >
-                        <Trash2 className="w-4 h-4" />
+                        <span className="w-4 h-4" >🗑️</span>
                       </button>
                     </td>
 

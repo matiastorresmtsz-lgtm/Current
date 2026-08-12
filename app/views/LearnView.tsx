@@ -1,18 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  BookOpen,
-  Award,
-  CheckCircle2,
-  Clock,
-  Play,
-  ChevronRight,
-  X,
-  Sparkles,
-  ArrowRight,
-  Shield
-} from 'lucide-react';
+import { useUser, SignInButton } from '@clerk/nextjs';
 import { LearnCourse, LearnLesson } from '../types';
 
 interface LearnViewProps {
@@ -20,11 +9,47 @@ interface LearnViewProps {
 }
 
 export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
+  const { isSignedIn } = useUser();
   const [completedMap, setCompletedMap] = useState<Record<string, boolean>>({
     'course-1': true
   });
   const [activeCourse, setActiveCourse] = useState<LearnCourse | null>(null);
   const [activeLessonIndex, setActiveLessonIndex] = useState(0);
+
+  if (!isSignedIn) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <div className="text-xs font-bold text-[#00F0FF] uppercase tracking-wider mb-2">
+            <span>Stream Academy</span>
+          </div>
+          <h2 className="text-3xl sm:text-4xl font-extrabold text-white">Interactive Crypto Courses</h2>
+          <p className="text-sm text-gray-400 mt-1 max-w-xl">
+            Learn asset allocation, cold storage security, and market cycles through short interactive lessons.
+          </p>
+        </div>
+
+        <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center sm:text-left">
+            <div className="inline-flex items-center space-x-2 bg-[#00F0FF]/10 text-[#00F0FF] text-xs font-extrabold px-3 py-1 rounded-full border border-[#00F0FF]/20">
+              <span>🎓</span>
+              <span>Sign In Required for Courses</span>
+            </div>
+            <h3 className="text-xl font-extrabold text-white">Unlock Stream Academy & Earn XP</h3>
+            <p className="text-xs text-gray-300 max-w-xl">
+              Sign in to track your course progress, complete quizzes, earn XP badges, and master crypto investing.
+            </p>
+          </div>
+
+          <SignInButton mode="modal">
+            <button className="bg-[#00F0FF] hover:bg-[#00D0FF] text-black font-extrabold text-xs px-6 py-3 rounded-2xl transition-all shadow-lg shadow-[#00F0FF]/20 shrink-0">
+              Sign In to Access Courses
+            </button>
+          </SignInButton>
+        </div>
+      </div>
+    );
+  }
 
   const toggleCourseComplete = (id: string) => {
     setCompletedMap(prev => ({ ...prev, [id]: !prev[id] }));
@@ -42,10 +67,10 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
     <div className="space-y-6">
 
       {/* Header Banner */}
-      <div className="bg-gradient-to-r from-[#212121] via-[#1E293B] to-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
+      <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
         <div>
           <div className="flex items-center space-x-2 text-xs font-bold text-[#00F0FF] uppercase tracking-wider mb-2">
-            <BookOpen className="w-4 h-4" />
+            <span className="w-4 h-4" >📖</span>
             <span>Stream Academy</span>
           </div>
           <h2 className="text-2xl font-extrabold text-white">Interactive Mini-Courses</h2>
@@ -56,7 +81,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
 
         <div className="bg-[#161616] border border-[#2E2E2E] p-4 rounded-2xl flex items-center space-x-4 shrink-0">
           <div className="w-12 h-12 rounded-xl bg-[#00F0FF]/10 border border-[#00F0FF]/30 flex items-center justify-center text-[#00F0FF]">
-            <Award className="w-7 h-7" />
+            <span className="w-7 h-7" >🏅</span>
           </div>
           <div>
             <div className="text-[10px] font-bold text-gray-400 uppercase">ACADEMY SCORE</div>
@@ -83,7 +108,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                     alt={course.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#212121] via-transparent to-transparent" />
+                  <div className="absolute inset-0 bg-black/30" />
 
                   <span className="absolute top-3 left-3 bg-[#161616]/80 backdrop-blur-md text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full border border-[#2E2E2E]">
                     {course.level}
@@ -99,7 +124,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                     <span className="text-[#00F0FF] font-bold">{course.category}</span>
                     <span>•</span>
                     <span className="flex items-center space-x-1">
-                      <Clock className="w-3 h-3" />
+                      <span className="w-3 h-3" >🕒</span>
                       <span>{course.duration}</span>
                     </span>
                   </div>
@@ -120,7 +145,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                     onClick={() => toggleCourseComplete(course.id)}
                     className="flex items-center space-x-2 text-xs font-bold text-[#10B981]"
                   >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <span className="w-4 h-4" >✅</span>
                     <span>Completed</span>
                   </button>
                 ) : (
@@ -131,7 +156,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                     }}
                     className="flex items-center space-x-2 bg-[#00F0FF] hover:bg-[#00D8E6] text-black text-xs font-extrabold px-4 py-2 rounded-xl transition-all shadow"
                   >
-                    <Play className="w-3.5 h-3.5 fill-black" />
+                    <span className="w-3.5 h-3.5 fill-black" >▶️</span>
                     <span>Start Mini-Course</span>
                   </button>
                 )}
@@ -150,7 +175,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
               onClick={() => setActiveCourse(null)}
               className="absolute top-5 right-5 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-[#2A2A2A]"
             >
-              <X className="w-5 h-5" />
+              <span className="w-5 h-5" >✕</span>
             </button>
 
             <div className="flex items-center space-x-2 text-xs font-bold text-[#00F0FF] uppercase mb-2">
@@ -197,7 +222,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                       className="bg-[#00F0FF] hover:bg-[#00D8E6] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all flex items-center space-x-1.5 shadow"
                     >
                       <span>Next Lesson</span>
-                      <ArrowRight className="w-4 h-4" />
+                      <span className="w-4 h-4" >➡️</span>
                     </button>
                   ) : (
                     <button
@@ -207,7 +232,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                       }}
                       className="bg-[#10B981] hover:bg-[#059669] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all flex items-center space-x-1.5 shadow"
                     >
-                      <CheckCircle2 className="w-4 h-4" />
+                      <span className="w-4 h-4" >✅</span>
                       <span>Complete Mini-Course (+{activeCourse.xpReward} XP)</span>
                     </button>
                   )}

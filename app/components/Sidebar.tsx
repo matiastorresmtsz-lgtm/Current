@@ -13,7 +13,8 @@ import {
   GraduationCap,
   PieChart,
   Compass,
-  Coins
+  Coins,
+  Trophy
 } from 'lucide-react';
 import { NavTab } from '../types';
 
@@ -33,6 +34,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const mainNavItems = [
     { id: 'portfolio', label: 'Portfolio', icon: RefreshCw, badge: null },
     { id: 'markets', label: 'Markets', icon: BarChart3, badge: null },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, badge: null },
     { id: 'learn', label: 'Learn', icon: BookOpen, badge: null },
     { id: 'insights', label: 'Insights', icon: Zap, badge: null },
   ] as const;
@@ -87,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <span className="flex items-center space-x-1.5">
               <span>Topics</span>
             </span>
-            {topicsOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+            {topicsOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <span className="w-3.5 h-3.5" >▶️</span>}
           </button>
 
           {topicsOpen && (
@@ -125,7 +127,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
               : 'text-gray-300 hover:text-white hover:bg-[#212121]'
           }`}
         >
-          <Settings className={`w-4 h-4 ${activeTab === 'settings' ? 'text-[#17C99E]' : 'text-gray-400'}`} />
+          <span className={`w-4 h-4 ${activeTab === 'settings' ? 'text-[#17C99E]' : 'text-gray-400'}`} >⚙️</span>
           <span>Settings</span>
         </button>
       </div>

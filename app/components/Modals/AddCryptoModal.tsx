@@ -1,9 +1,22 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, Plus, Search, Loader2 } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { CryptoCoin, PortfolioAsset } from '../../types';
 import { searchCoinGecko } from '../../services/coingecko';
+
+type SearchResult = { id: string; symbol: string; name: string; rank: number; icon: string };
+type DisplayOption = SearchResult | CryptoCoin;
+
+const ASSET_COLORS = ['#17C99E', '#3B82F6', '#EC4899', '#F59E0B', '#8B5CF6', '#10B981', '#6366F1', '#00F0FF'];
+
+function colorForSymbol(symbol: string): string {
+  let hash = 0;
+  for (let i = 0; i < symbol.length; i += 1) {
+    hash = symbol.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return ASSET_COLORS[Math.abs(hash) % ASSET_COLORS.length];
+}
 
 interface AddCryptoModalProps {
   isOpen: boolean;
@@ -20,22 +33,19 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
 }) => {
   const [selectedCoinId, setSelectedCoinId] = useState(coins[0]?.id || 'bitcoin');
   const [searchFilter, setSearchFilter] = useState('');
-  const [searchResults, setSearchResults] = useState<Array<{ id: string; symbol: string; name: string; rank: number; icon: string }>>([]);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [amount, setAmount] = useState('1.0');
   const [buyPrice, setBuyPrice] = useState('');
 
   // Remote CoinGecko search debounce effect
   useEffect(() => {
-    if (!searchFilter.trim()) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
+    const trimmed = searchFilter.trim();
+    if (!trimmed) return;
 
     const timer = setTimeout(async () => {
       setIsSearching(true);
-      const results = await searchCoinGecko(searchFilter);
+      const results = await searchCoinGecko(trimmed);
       setSearchResults(results);
       setIsSearching(false);
 
@@ -65,8 +75,7 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
     const parsedAmount = parseFloat(amount);
     if (!parsedAmount || parsedAmount <= 0) return;
 
-    const colors = ['#17C99E', '#3B82F6', '#EC4899', '#F59E0B', '#8B5CF6', '#10B981', '#6366F1', '#00F0FF'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    const assetColor = colorForSymbol(currentSymbol);
 
     const newAsset: PortfolioAsset = {
       coinId: selectedCoinId,
@@ -77,7 +86,7 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
       currentPrice,
       change24h: localMatch?.change24h || 0,
       allocationPercent: 0,
-      color: randomColor
+      color: assetColor
     };
 
     onAddHolding(newAsset);
@@ -88,7 +97,7 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
   };
 
   // Combine local coins and remote search matches
-  const displayOptions = searchFilter.trim() !== ''
+  const displayOptions: DisplayOption[] = searchFilter.trim() !== ''
     ? searchResults.length > 0
       ? searchResults
       : coins.filter(c => c.name.toLowerCase().includes(searchFilter.toLowerCase()) || c.symbol.toLowerCase().includes(searchFilter.toLowerCase()))
@@ -103,26 +112,26 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
           onClick={onClose}
           className="absolute top-5 right-5 text-gray-400 hover:text-white p-1 rounded-lg hover:bg-[#2A2A2A]"
         >
-          <X className="w-5 h-5" />
+          <span className="w-5 h-5" >✕</span>
         </button>
 
         {/* Header */}
         <div className="flex items-center space-x-2.5 mb-4 shrink-0">
           <div className="w-9 h-9 rounded-xl bg-[#17C99E]/10 border border-[#17C99E]/30 flex items-center justify-center text-[#17C99E]">
-            <Plus className="w-5 h-5" />
+            <span className="w-5 h-5" >➕</span>
           </div>
           <div>
             <h2 className="text-lg font-bold text-white">Add Crypto Holding</h2>
-            <p className="text-xs text-gray-400">Search all 15,000+ cryptos on CoinGecko</p>
+            <p className="text-xs text-gray-400">Search all 15,000+ cryptos live</p>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 overflow-y-auto pr-1">
 
-          {/* Search Bar across ALL CoinGecko coins */}
+          {/* Search Bar across ALL coins */}
           <div>
             <label className="block text-xs font-semibold text-gray-400 mb-1.5 uppercase">
-              Search Cryptocurrency (Every single CoinGecko token)
+              Search Cryptocurrency
             </label>
 
             <div className="relative mb-2">
@@ -150,12 +159,14 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
               }}
               className="w-full bg-[#161616] text-white font-bold text-sm p-3 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-[#17C99E] max-h-36"
             >
-              {displayOptions.slice(0, 200).map((c: any) => (
+              {displayOptions.slice(0, 200).map((c) => {
+                const price = 'price' in c ? c.price : undefined;
+                return (
                 <option key={c.id} value={c.id}>
                   #{c.rank || '?'} {c.name} (${(c.symbol || '').toUpperCase()})
-                  {c.price ? ` — $${c.price < 1 ? c.price.toFixed(6) : c.price.toLocaleString()}` : ''}
+                  {price ? ` — $${price < 1 ? price.toFixed(6) : price.toLocaleString()}` : ''}
                 </option>
-              ))}
+              );})}
             </select>
           </div>
 

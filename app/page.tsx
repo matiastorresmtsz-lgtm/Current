@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { NavTab, CryptoCoin, PortfolioAsset } from './types';
 import { fetchTopCryptos } from './services/coingecko';
 import {
@@ -18,6 +19,7 @@ import { RightSidebar } from './components/RightSidebar';
 // View imports
 import { PortfolioView } from './views/PortfolioView';
 import { MarketsView } from './views/MarketsView';
+import { LeaderboardView } from './views/LeaderboardView';
 import { LearnView } from './views/LearnView';
 import { InsightsView } from './views/InsightsView';
 import { SettingsView } from './views/SettingsView';
@@ -33,10 +35,36 @@ import { SharePortfolioModal } from './components/Modals/SharePortfolioModal';
 
 const PORTFOLIO_STORAGE_KEY = 'stream_crypto_portfolio_v1';
 
+function readStoredPortfolio(): PortfolioAsset[] {
+  if (typeof window === 'undefined') return INITIAL_PORTFOLIO;
+  try {
+    const saved = localStorage.getItem(PORTFOLIO_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : INITIAL_PORTFOLIO;
+  } catch {
+    return INITIAL_PORTFOLIO;
+  }
+}
+
 export default function Home() {
+  const { isSignedIn } = useUser();
+  const { openSignIn } = useClerk();
+
   const [activeTab, setActiveTab] = useState<NavTab>('portfolio');
   const [coins, setCoins] = useState<CryptoCoin[]>(INITIAL_COINS);
-  const [portfolio, setPortfolio] = useState<PortfolioAsset[]>([]);
+  const [portfolio, setPortfolio] = useState<PortfolioAsset[]>(readStoredPortfolio);
+
+  // Auth Action Interceptor
+  const handleRequireAuthAction = (action: () => void) => {
+    if (!isSignedIn) {
+      if (openSignIn) {
+        openSignIn();
+      } else {
+        alert('Please sign in to add portfolio assets or access active trading features.');
+      }
+      return;
+    }
+    action();
+  };
 
   // Modals state
   const [isAddCryptoOpen, setIsAddCryptoOpen] = useState(false);
@@ -47,29 +75,29 @@ export default function Home() {
   const [selectedCoinDetail, setSelectedCoinDetail] = useState<CryptoCoin | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Load portfolio from LocalStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem(PORTFOLIO_STORAGE_KEY);
-      if (saved) {
-        setPortfolio(JSON.parse(saved));
-      } else {
-        setPortfolio(INITIAL_PORTFOLIO);
-      }
-    } catch (err) {
-      setPortfolio(INITIAL_PORTFOLIO);
-    }
-  }, []);
-
   // Save portfolio to LocalStorage
   const updateAndSavePortfolio = (newPortfolio: PortfolioAsset[]) => {
     setPortfolio(newPortfolio);
     try {
       localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(newPortfolio));
-    } catch (e) {
+    } catch {
       // quota fallback
     }
   };
+
+  const pricedPortfolio = useMemo(() => {
+    return portfolio.map((asset) => {
+      const match = coins.find((c) => c.symbol.toUpperCase() === asset.symbol.toUpperCase());
+      if (match) {
+        return {
+          ...asset,
+          currentPrice: match.price,
+          change24h: match.change24h,
+        };
+      }
+      return asset;
+    });
+  }, [portfolio, coins]);
 
   // Fetch top 500 real-time market cryptos from CoinGecko API proxy
   useEffect(() => {
@@ -84,21 +112,6 @@ export default function Home() {
     const interval = setInterval(loadCoins, 60000); // 60s background sync
     return () => clearInterval(interval);
   }, []);
-
-  // Update portfolio current prices when market prices change
-  useEffect(() => {
-    setPortfolio(prevP => prevP.map(asset => {
-      const match = coins.find(c => c.symbol.toUpperCase() === asset.symbol.toUpperCase());
-      if (match) {
-        return {
-          ...asset,
-          currentPrice: match.price,
-          change24h: match.change24h
-        };
-      }
-      return asset;
-    }));
-  }, [coins]);
 
   // Handlers for adding/removing portfolio holdings
   const handleAddHolding = (newAsset: PortfolioAsset) => {
@@ -130,8 +143,8 @@ export default function Home() {
   };
 
   // Metrics for share modal
-  const totalValue = portfolio.reduce((sum, item) => sum + (item.amount * item.currentPrice), 0);
-  const totalCost = portfolio.reduce((sum, item) => sum + (item.amount * item.avgBuyPrice), 0);
+  const totalValue = pricedPortfolio.reduce((sum, item) => sum + (item.amount * item.currentPrice), 0);
+  const totalCost = pricedPortfolio.reduce((sum, item) => sum + (item.amount * item.avgBuyPrice), 0);
   const totalPnlUsd = totalValue - totalCost;
   const totalPnlPercent = totalCost > 0 ? (totalPnlUsd / totalCost) * 100 : 0;
 
@@ -141,11 +154,11 @@ export default function Home() {
       {/* Top Navigation Navbar */}
       <Navbar
         coins={coins}
-        onOpenAddCryptoModal={() => setIsAddCryptoOpen(true)}
+        onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
         onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
         onSelectTab={(tab) => setActiveTab(tab)}
         onOpenShareModal={() => setIsShareOpen(true)}
-        holdingsCount={portfolio.length}
+        holdingsCount={pricedPortfolio.length}
       />
 
       {/* Main Body Content Layout */}
@@ -155,7 +168,7 @@ export default function Home() {
         <Sidebar
           activeTab={activeTab}
           onSelectTab={(tab) => setActiveTab(tab)}
-          onOpenAddCryptoModal={() => setIsAddCryptoOpen(true)}
+          onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
           onOpenSettingsModal={() => setIsSettingsOpen(true)}
         />
 
@@ -163,10 +176,10 @@ export default function Home() {
         <main className="flex-1 min-w-0 py-3">
           {activeTab === 'portfolio' && (
             <PortfolioView
-              portfolio={portfolio}
+              portfolio={pricedPortfolio}
               coins={coins}
-              onOpenAddCryptoModal={() => setIsAddCryptoOpen(true)}
-              onOpenAddCommoditiesModal={() => setIsAddCommoditiesOpen(true)}
+              onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
+              onOpenAddCommoditiesModal={() => handleRequireAuthAction(() => setIsAddCommoditiesOpen(true))}
               onOpenVisibilityModal={() => setIsVisibilityOpen(true)}
               onRemoveHolding={handleRemoveHolding}
               onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
@@ -178,7 +191,7 @@ export default function Home() {
             <MarketsView
               coins={coins}
               onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
-              onOpenTradeModalWithTicker={() => setIsAddCryptoOpen(true)}
+              onOpenTradeModalWithTicker={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
             />
           )}
 
@@ -188,10 +201,17 @@ export default function Home() {
             />
           )}
 
+          {activeTab === 'leaderboard' && (
+            <LeaderboardView
+              portfolio={pricedPortfolio}
+              coins={coins}
+            />
+          )}
+
           {activeTab === 'insights' && (
             <InsightsView
               whales={WHALE_TRANSACTIONS}
-              portfolio={portfolio}
+              portfolio={pricedPortfolio}
               coins={coins}
             />
           )}
@@ -210,11 +230,13 @@ export default function Home() {
         </main>
 
         {/* Right Sidebar Widgets */}
-        <RightSidebar
-          coins={coins}
-          onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
-          onOpenAddCryptoModal={() => setIsAddCryptoOpen(true)}
-        />
+        {activeTab !== 'settings' && (
+          <RightSidebar
+            coins={coins}
+            onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
+            onOpenAddCryptoModal={() => setIsAddCryptoOpen(true)}
+          />
+        )}
 
       </div>
 
@@ -229,7 +251,7 @@ export default function Home() {
       <SharePortfolioModal
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
-        portfolio={portfolio}
+        portfolio={pricedPortfolio}
         totalValue={totalValue}
         totalPnlPercent={totalPnlPercent}
       />
@@ -237,8 +259,6 @@ export default function Home() {
       <CoinDetailModal
         coin={selectedCoinDetail}
         onClose={() => setSelectedCoinDetail(null)}
-        allCoins={coins}
-        posts={[]}
         onOpenTradeModalWithTicker={() => setIsAddCryptoOpen(true)}
       />
 

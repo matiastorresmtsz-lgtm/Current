@@ -1,15 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  Search,
-  Bell,
-  X,
-  Plus,
-  Waves,
-  Share2,
-  Loader2
-} from 'lucide-react';
+import { Search } from 'lucide-react';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { CryptoCoin, NavTab } from '../types';
 import { searchCoinGecko } from '../services/coingecko';
@@ -33,7 +25,6 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<CryptoCoin[]>([]);
-  const [isSearching, setIsSearching] = useState(false);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(2);
@@ -42,18 +33,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   // Dynamic search across all 15,000+ cryptos on CoinGecko
   useEffect(() => {
     const query = searchQuery.trim();
-    if (!query) {
-      setSearchResults([]);
-      setIsSearching(false);
-      return;
-    }
+    if (!query) return;
 
     const timer = setTimeout(async () => {
-      setIsSearching(true);
       const results = await searchCoinGecko(query);
-      setIsSearching(false);
 
-      const mapped: CryptoCoin[] = results.map((r, i) => {
+      const mapped: CryptoCoin[] = results.map((r) => {
         const existing = coins.find(c => c.id === r.id);
         if (existing) return existing;
         return {
@@ -119,10 +104,10 @@ export const Navbar: React.FC<NavbarProps> = ({
           onClick={() => onSelectTab('portfolio')}
           className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
         >
-          {/* Flowing River Gradient Token */}
-          <div className="w-9 h-9 rounded-2xl bg-gradient-to-tr from-[#0099FF] via-[#00F0FF] to-[#10B981] p-0.5 shadow-md shadow-[#0099FF]/20 group-hover:scale-105 transition-transform">
+          {/* Stream Logo Token */}
+          <div className="w-9 h-9 rounded-2xl bg-[#1A3A5C] border border-[#2E2E2E] p-0.5 shadow-md group-hover:scale-105 transition-transform">
             <div className="w-full h-full bg-[#161616] rounded-[14px] flex items-center justify-center">
-              <Waves className="w-5 h-5 text-[#00F0FF] animate-pulse" />
+              <span className="w-5 h-5 text-[#00F0FF] animate-pulse" >🌊</span>
             </div>
           </div>
           <div className="flex flex-col">
@@ -150,7 +135,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 onClick={() => setSearchQuery('')}
                 className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
               >
-                <X className="w-4 h-4" />
+                <span className="w-4 h-4" >✕</span>
               </button>
             )}
           </div>
@@ -192,7 +177,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 ))
               ) : (
                 <div className="p-4 text-center text-sm text-gray-400">
-                  No coins found matching "{searchQuery}"
+                  No coins found matching &quot;{searchQuery}&quot;
                 </div>
               )}
             </div>
@@ -205,9 +190,9 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Add Holding Action Button */}
           <button
             onClick={onOpenAddCryptoModal}
-            className="flex items-center space-x-1.5 bg-gradient-to-r from-[#0099FF] to-[#00F0FF] hover:opacity-90 text-black font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow-md shadow-[#0099FF]/20"
+            className="flex items-center space-x-1.5 bg-[#00F0FF] hover:bg-[#00D0DD] text-black font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow"
           >
-            <Plus className="w-4 h-4 text-black" />
+            <span className="w-4 h-4 text-black" >➕</span>
             <span className="hidden sm:inline">Add Holding</span>
           </button>
 
@@ -217,7 +202,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             title="Share Portfolio"
             className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#00F0FF] border border-[#2E2E2E] px-3 py-2 rounded-xl text-xs font-bold transition-colors"
           >
-            <Share2 className="w-4 h-4" />
+            <span className="w-4 h-4" >📤</span>
             <span className="hidden sm:inline">Share</span>
           </button>
 
@@ -231,7 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Notifications"
               className="w-10 h-10 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-full flex items-center justify-center transition-colors relative"
             >
-              <Bell className="w-5 h-5" />
+              <span className="w-5 h-5" >🔔</span>
               {unreadNotifications > 0 && (
                 <span className="absolute -top-1 -right-1 bg-[#00F0FF] text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
                   {unreadNotifications}
@@ -245,7 +230,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className="flex items-center justify-between pb-3 border-b border-[#2E2E2E]">
                   <span className="font-bold text-white text-sm">Notifications</span>
                   <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-white">
-                    <X className="w-4 h-4" />
+                    <span className="w-4 h-4" >✕</span>
                   </button>
                 </div>
                 <div className="divide-y divide-[#2E2E2E] max-h-72 overflow-y-auto">
@@ -280,7 +265,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="bg-gradient-to-r from-[#0099FF] to-[#00F0FF] text-black font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow-sm">
+                <button className="bg-[#00F0FF] hover:bg-[#00D0DD] text-black font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow">
                   Sign Up
                 </button>
               </SignUpButton>

@@ -1,21 +1,8 @@
 'use client';
 
 import React, { useMemo, useState } from 'react';
-import {
-  Gauge,
-  Star,
-  ShieldCheck,
-  PieChart,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle2,
-  XCircle,
-  Info,
-  ChevronDown,
-  ChevronUp,
-  Lightbulb,
-  Rocket
-} from 'lucide-react';
+import { useUser, SignInButton } from '@clerk/nextjs';
+import { PieChart } from 'lucide-react';
 import { WhaleTransaction, PortfolioAsset, CryptoCoin } from '../types';
 
 interface InsightsViewProps {
@@ -158,7 +145,7 @@ function computePortfolioRating(
       label: 'Profitability',
       score: profitScore,
       weight: 0.25,
-      icon: <TrendingUp className="w-4 h-4" />,
+      icon: <span className="w-4 h-4" >📈</span>,
       status: profitScore >= 60 ? 'good' : profitScore >= 40 ? 'warn' : 'bad',
       description:
         totalCost === 0
@@ -181,7 +168,7 @@ function computePortfolioRating(
       label: 'Volatility Control',
       score: riskScore,
       weight: 0.20,
-      icon: <AlertTriangle className="w-4 h-4" />,
+      icon: <span className="w-4 h-4" >⚠️</span>,
       status: riskScore >= 70 ? 'good' : riskScore >= 45 ? 'warn' : 'bad',
       description:
         n === 0
@@ -204,7 +191,7 @@ function computePortfolioRating(
       label: 'Asset Mix',
       score: categoryScore,
       weight: 0.15,
-      icon: <ShieldCheck className="w-4 h-4" />,
+      icon: <span className="w-4 h-4" >🛡️</span>,
       status: categoryScore >= 70 ? 'good' : categoryScore >= 45 ? 'warn' : 'bad',
       description:
         n === 0
@@ -227,7 +214,7 @@ function computePortfolioRating(
       label: 'Position Sizing',
       score: sizingScore,
       weight: 0.10,
-      icon: <Star className="w-4 h-4" />,
+      icon: <span className="w-4 h-4" >⭐</span>,
       status: sizingScore >= 70 ? 'good' : sizingScore >= 45 ? 'warn' : 'bad',
       description:
         n === 0
@@ -264,9 +251,9 @@ const getRatingMeta = (score: number) => {
 };
 
 const statusIcon = (s: 'good' | 'warn' | 'bad') => {
-  if (s === 'good') return <CheckCircle2 className="w-4 h-4 text-[#10B981] shrink-0" />;
-  if (s === 'warn') return <Info className="w-4 h-4 text-[#EAB308] shrink-0" />;
-  return <XCircle className="w-4 h-4 text-[#EF4444] shrink-0" />;
+  if (s === 'good') return <span className="w-4 h-4 text-[#10B981] shrink-0" >✅</span>;
+  if (s === 'warn') return <span className="w-4 h-4 text-[#EAB308] shrink-0" >ℹ️</span>;
+  return <span className="w-4 h-4 text-[#EF4444] shrink-0">✕</span>;
 };
 
 const statusBar = (score: number) => {
@@ -284,6 +271,7 @@ const statusBar = (score: number) => {
 
 // ---------- Component ----------
 export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) => {
+  const { isSignedIn } = useUser();
   const [expandedFactor, setExpandedFactor] = useState<string | null>(null);
   const fg = getFearGreedLabel(FEAR_GREED);
   const { total, factors } = useMemo(
@@ -292,6 +280,39 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
   );
   const meta = getRatingMeta(total);
 
+  if (!isSignedIn) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <div className="text-xs uppercase tracking-[0.3em] text-[#17C99E] font-extrabold">Market Intelligence</div>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white">Portfolio Analytics & AI Insights</h1>
+          <p className="mt-1 text-sm text-gray-400 max-w-xl">
+            Real-time portfolio health ratings, risk scoring, category diversification, and whale activity tracking.
+          </p>
+        </div>
+
+        <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
+          <div className="space-y-2 text-center sm:text-left">
+            <div className="inline-flex items-center space-x-2 bg-[#17C99E]/10 text-[#17C99E] text-xs font-extrabold px-3 py-1 rounded-full border border-[#17C99E]/20">
+              <span>📊</span>
+              <span>Sign In Required for Market Insights</span>
+            </div>
+            <h2 className="text-xl font-extrabold text-white">Unlock Live Portfolio Ratings & Analytics</h2>
+            <p className="text-xs text-gray-300 max-w-xl">
+              Sign in to analyze your portfolio health, get personalized diversification advice, and track whale movements.
+            </p>
+          </div>
+
+          <SignInButton mode="modal">
+            <button className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-6 py-3 rounded-2xl transition-all shadow-lg shadow-[#17C99E]/20 shrink-0">
+              Sign In to View Insights
+            </button>
+          </SignInButton>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
 
@@ -299,10 +320,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
         {/* ── Fear & Greed Index ── */}
-        <div className="bg-[#14181D] border border-[#242B35] rounded-3xl p-6 shadow-xl relative overflow-hidden">
+        <div className="bg-[#242424] border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center space-x-2">
-              <Gauge className="w-5 h-5 text-[#FF2E55]" />
+              <span className="w-5 h-5 text-[#FF2E55]" >📊</span>
               <h3 className="font-extrabold text-white text-base">Crypto Fear &amp; Greed</h3>
             </div>
             <span className="text-xs text-gray-400 font-mono">Updated 10m ago</span>
@@ -313,7 +334,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
             <div className="relative w-32 h-32 flex items-center justify-center shrink-0">
               <svg className="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
                 <path
-                  strokeWidth="3.5" stroke="#242B35" fill="none"
+                  strokeWidth="3.5" stroke="#2E2E2E" fill="none"
                   d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
                 />
                 <path
@@ -336,9 +357,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                   <span>Extreme Fear</span>
                   <span>Extreme Greed</span>
                 </div>
-                <div className="relative h-2 rounded-full overflow-hidden" style={{
-                  background: 'linear-gradient(to right, #635b5b, #F97316, #EAB308, #22C55E, #10B981)'
-                }}>
+                <div className="relative h-2 rounded-full overflow-hidden bg-[#2E2E2E]">
                   <div
                     className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-lg"
                     style={{ left: `${FEAR_GREED}%`, transform: 'translate(-50%, -50%)', backgroundColor: fg.color }}
@@ -359,13 +378,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
         </div>
 
         {/* ── Portfolio Rating Summary Card ── */}
-        <div className={`bg-gradient-to-br ${meta.bg} border ${meta.ring} rounded-3xl p-6 shadow-xl relative overflow-hidden`}>
-          {/* Glow blur */}
-          <div className="absolute -top-6 -right-6 w-32 h-32 rounded-full blur-2xl opacity-30" style={{ backgroundColor: meta.color }} />
-
+        <div className="bg-[#242424] border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center space-x-2">
-              <Star className="w-5 h-5" style={{ color: meta.color }} />
+              <span className="w-5 h-5" style={{ color: meta.color }} >⭐</span>
               <h3 className="font-extrabold text-white text-base">Portfolio Rating</h3>
             </div>
             <span
@@ -420,10 +436,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
       </div>
 
       {/* ── Detailed Factor Breakdown ── */}
-      <div className="bg-[#14181D] border border-[#242B35] rounded-3xl p-6 shadow-xl">
-        <div className="flex items-center justify-between mb-5 pb-3 border-b border-[#242B35]">
+      <div className="bg-[#242424] border border-white/10 rounded-3xl p-6 shadow-xl">
+        <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
           <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-5 h-5 text-[#17C99E]" />
+            <span className="w-5 h-5 text-[#17C99E]" >🛡️</span>
             <h3 className="font-extrabold text-white text-base">Portfolio Health Breakdown</h3>
           </div>
           <div className="flex items-center space-x-1.5">
@@ -444,88 +460,69 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
             const hasTips = f.tips.length > 0;
             const factorColor = f.status === 'good' ? '#10B981' : f.status === 'warn' ? '#EAB308' : '#EF4444';
             return (
-              <div key={f.key} className="bg-[#0B0E11] border border-[#242B35] rounded-2xl overflow-hidden">
-
-                {/* Factor Header Row */}
+              <div key={f.key} className="bg-[#242424] border border-white/10 rounded-2xl overflow-hidden">
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-2.5">
-                    <div className="flex items-center space-x-2.5">
-                      <div
-                        className="w-8 h-8 rounded-xl flex items-center justify-center shrink-0"
-                        style={{ backgroundColor: factorColor + '18', color: factorColor }}
-                      >
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: factorColor + '18', color: factorColor }}>
                         {f.icon}
                       </div>
                       <div>
                         <div className="text-sm font-extrabold text-white">{f.label}</div>
-                        <div className="text-[10px] text-gray-500 font-medium">
-                          Weight: {Math.round(f.weight * 100)}% of overall score
-                        </div>
+                        <div className="text-[11px] text-gray-400">Weight: {Math.round(f.weight * 100)}%</div>
                       </div>
                     </div>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center gap-3">
                       {statusIcon(f.status)}
-                      <span className="text-lg font-black" style={{ color: factorColor }}>{f.score}</span>
-                      <span className="text-gray-500 text-xs">/100</span>
+                      <div className="text-sm font-black" style={{ color: factorColor }}>{f.score}</div>
+                      <div className="text-xs text-gray-400">/100</div>
                     </div>
                   </div>
 
-                  {/* Progress Bar */}
-                  <div className="h-2 bg-[#1A1F26] rounded-full overflow-hidden mb-2.5">
-                    <div
-                      className="h-full rounded-full transition-all duration-700"
-                      style={{ width: `${f.score}%`, backgroundColor: factorColor }}
-                    />
+                  <div className="mt-4">
+                    <div className="h-2 rounded-full bg-[#1A1F26] overflow-hidden">
+                      <div className="h-full rounded-full" style={{ width: `${f.score}%`, backgroundColor: factorColor }} />
+                    </div>
                   </div>
 
-                  {/* Status Description */}
-                  <p className="text-[11px] text-gray-400 leading-relaxed">{f.description}</p>
+                  <p className="mt-4 text-[11px] text-gray-400 leading-relaxed">{f.description}</p>
 
-                  {/* How to Improve toggle — only when not perfect */}
                   {hasTips && (
                     <button
                       onClick={() => setExpandedFactor(isExpanded ? null : f.key)}
-                      className="mt-3 flex items-center space-x-1.5 text-[11px] font-bold transition-colors group"
-                      style={{ color: isExpanded ? factorColor : '#6B7280' }}
+                      className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold text-gray-200"
                     >
-                      <Lightbulb className="w-3.5 h-3.5 group-hover:text-yellow-400 transition-colors" />
-                      <span className="group-hover:text-yellow-400 transition-colors">How to Improve</span>
-                      {isExpanded
-                        ? <ChevronUp className="w-3.5 h-3.5" />
-                        : <ChevronDown className="w-3.5 h-3.5" />}
+                      <span className="w-4 h-4 text-[#EAB308]" >💡</span>
+                      <span>{isExpanded ? 'Hide tips' : 'How to improve'}</span>
                     </button>
                   )}
+
                   {f.status === 'good' && (
-                    <div className="mt-3 flex items-center space-x-1.5 text-[11px] font-bold text-[#10B981]">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
+                    <div className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold text-[#10B981]">
+                      <span className="w-4 h-4" >✅</span>
                       <span>Looking great — no action needed right now.</span>
                     </div>
                   )}
                 </div>
 
-                {/* Expandable Tips Panel */}
                 {isExpanded && hasTips && (
-                  <div className="border-t border-[#242B35] bg-[#0D1117] px-4 py-4">
-                    <div className="flex items-center space-x-1.5 mb-3">
-                      <Rocket className="w-3.5 h-3.5 text-yellow-400" />
-                      <span className="text-[11px] font-extrabold text-yellow-400 uppercase tracking-wide">Improvement Steps</span>
+                  <div className="border-t border-white/10 bg-[#242424] px-4 py-4">
+                    <div className="flex items-center gap-2 mb-3 text-[11px] uppercase tracking-[0.2em] text-[#EAB308] font-bold">
+                      <span className="w-4 h-4" >🚀</span>
+                      <span>Improvement Steps</span>
                     </div>
                     <ul className="space-y-2">
                       {f.tips.map((tip, i) => (
-                        <li key={i} className="flex items-start space-x-2.5">
-                          <span
-                            className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black mt-0.5"
-                            style={{ backgroundColor: factorColor + '20', color: factorColor }}
-                          >
+                        <li key={i} className="flex items-start gap-2.5 text-[11px] text-gray-300">
+                          <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black mt-0.5" style={{ backgroundColor: factorColor + '20', color: factorColor }}>
                             {i + 1}
                           </span>
-                          <span className="text-[11px] text-gray-300 leading-relaxed">{tip}</span>
+                          <span>{tip}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
-
               </div>
             );
           })}
@@ -535,7 +532,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
         {factors.some(f => f.tips.length > 0) && (
           <div className="mt-4 bg-blue border border-white/20 rounded-2xl p-5">
             <div className="flex items-center space-x-2 mb-4">
-              <Rocket className="w-4 h-4 text-yellow-400" />
+              <span className="w-4 h-4 text-yellow-400" >🚀</span>
               <h4 className="text-sm font-extrabold text-white">Your Full Improvement Plan</h4>
               <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-500/30 ml-auto">
                 {factors.filter(f => f.tips.length > 0).length} areas to work on
@@ -569,7 +566,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
 
         {portfolio.length === 0 && (
           <div className="mt-4 text-center py-6 text-gray-500 text-sm">
-            <Star className="w-8 h-8 mx-auto mb-2 opacity-30" />
+            <span className="w-8 h-8 mx-auto mb-2 opacity-30" >⭐</span>
             Add holdings to your portfolio to get a personalized rating.
           </div>
         )}

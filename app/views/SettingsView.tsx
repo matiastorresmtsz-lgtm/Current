@@ -1,27 +1,15 @@
 'use client';
 
 import React, { useState } from 'react';
-import {
-  User,
-  Lock,
-  Mail,
-  LogOut,
-  Trash2,
-  Sun,
-  Moon,
-  Shield,
-  Bell,
-  Slash,
-  Check,
-  Edit3,
-  Sparkles,
-  Camera
-} from 'lucide-react';
 import { useUser, useClerk } from '@clerk/nextjs';
+import { User, Moon } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
+import { useAppSettings, AVAILABLE_COUNTRIES } from '../context/AppSettingsContext';
 
 export const SettingsView: React.FC = () => {
-  const [activeSection, setActiveSection] = useState<'account' | 'display' | 'general' | 'blocked'>('account');
-  const [themeMode, setThemeMode] = useState<'dark' | 'light'>('dark');
+  const [activeSection, setActiveSection] = useState<'account' | 'display'>('account');
+  const { theme, setTheme } = useTheme();
+  const { country, setCountry } = useAppSettings();
 
   // Clerk Auth integration
   const { isSignedIn, user } = useUser();
@@ -32,7 +20,7 @@ export const SettingsView: React.FC = () => {
   const [fullName, setFullName] = useState(user?.fullName || 'Matias Torres');
   const [username, setUsername] = useState(user?.username || 'matiastorres');
   const [email, setEmail] = useState(user?.primaryEmailAddress?.emailAddress || 'matiasttorres@gmail.com');
-  const [bio, setBio] = useState('Crypto trader & long-term investor building my portfolio on Rouge Crypto.');
+  const [bio, setBio] = useState('Crypto trader & long-term investor building my portfolio on Stream.');
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
@@ -161,28 +149,39 @@ export const SettingsView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Log out Item */}
+              {/* Regional Profile Badge */}
               <div className="py-4">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">😮</span>
-                      <h3 className="text-sm font-bold text-white">Log out</h3>
+                      <span className="text-base">🌐</span>
+                      <h3 className="text-sm font-bold text-white">Profile Flag / Region</h3>
                     </div>
                     <p className="text-xs text-gray-400">
-                      Log out of your account on this device.
+                      Select your flag icon displayed on the 1 Global International Leaderboard.
                     </p>
                   </div>
-                  <button
-                    onClick={() => isSignedIn ? signOut() : alert('You are logged out')}
-                    className="bg-transparent hover:bg-[#FF4D4D]/10 text-[#FF4D4D] text-xs font-bold px-5 py-2 rounded-full border border-[#FF4D4D]/40 transition-all shrink-0"
-                  >
-                    Sign Out
-                  </button>
+                  <div className="w-full max-w-[220px]">
+                    <select
+                      value={country}
+                      onChange={(e) => setCountry(e.target.value as any)}
+                      className="w-full bg-[#212121] border border-[#2E2E2E] rounded-2xl px-4 py-3 text-sm text-white outline-none"
+                    >
+                      {AVAILABLE_COUNTRIES.map((option) => (
+                        <option
+                          key={option.code}
+                          value={option.code}
+                          className="bg-[#0B0E11] text-white"
+                        >
+                          {option.emoji} {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               </div>
 
-              {/* Delete Account Item */}
+              {/* Log out Item */}
               <div className="py-4 last:pb-0">
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
@@ -220,39 +219,34 @@ export const SettingsView: React.FC = () => {
                 <h3 className="text-sm font-bold text-white">Appearance</h3>
               </div>
 
-              {/* Light vs Dark Theme Selection Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-
-                {/* Light Mode Selection Card */}
                 <div
-                  onClick={() => setThemeMode('light')}
+                  onClick={() => setTheme('light')}
                   className={`p-5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center space-y-3 ${
-                    themeMode === 'light'
+                    theme === 'light'
                       ? 'bg-white text-black border-[#17C99E] ring-2 ring-[#17C99E]'
                       : 'bg-[#161616] text-gray-400 border-[#2E2E2E] hover:border-gray-500'
                   }`}
                 >
                   <div className="w-12 h-12 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-500">
-                    <Sun className="w-6 h-6" />
+                    <span className="w-6 h-6" >☀️</span>
                   </div>
                   <span className="text-xs font-extrabold">Light Mode</span>
                 </div>
 
-                {/* Dark Mode Selection Card - Matching Active Highlight */}
                 <div
-                  onClick={() => setThemeMode('dark')}
+                  onClick={() => setTheme('dark')}
                   className={`p-5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center space-y-3 ${
-                    themeMode === 'dark'
+                    theme === 'dark'
                       ? 'bg-[#161616] text-white border-[#17C99E] ring-2 ring-[#17C99E] shadow-lg shadow-[#17C99E]/10'
                       : 'bg-[#161616] text-gray-400 border-[#2E2E2E] hover:border-gray-500'
                   }`}
                 >
                   <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400">
-                    <Moon className="w-6 h-6" />
+                    <span className="w-6 h-6" >🌙</span>
                   </div>
                   <span className="text-xs font-extrabold">Dark Mode</span>
                 </div>
-
               </div>
             </div>
           </div>
@@ -268,9 +262,7 @@ export const SettingsView: React.FC = () => {
 
             {[
               { id: 'account', label: 'Account', icon: User },
-              { id: 'display', label: 'Display', icon: Moon },
-              { id: 'general', label: 'General', icon: Bell },
-              { id: 'blocked', label: 'Blocked users', icon: Slash }
+              { id: 'display', label: 'Display', icon: Moon }
             ].map((item) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;

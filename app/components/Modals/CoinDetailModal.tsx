@@ -1,21 +1,13 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import {
-  X,
-  TrendingUp,
-  Plus,
-  Loader2
-} from 'lucide-react';
-import { ChartPoint, CryptoCoin, Post } from '../../types';
+import { ChartPoint, CryptoCoin } from '../../types';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { fetchCoinChart } from '../../services/coingecko';
 
 interface CoinDetailModalProps {
   coin: CryptoCoin | null;
   onClose: () => void;
-  allCoins: CryptoCoin[];
-  posts: Post[];
   onOpenTradeModalWithTicker: (symbol: string) => void;
 }
 
@@ -40,11 +32,10 @@ const timeframeOptions: TimeframeMap = {
 export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
   coin,
   onClose,
-  allCoins,
   onOpenTradeModalWithTicker
 }) => {
   const [timeframe, setTimeframe] = useState<TimeframeLabel>('1D');
-  const [chartData, setChartData] = useState<ChartPoint[]>([]);
+  const [fetchedChart, setFetchedChart] = useState<ChartPoint[]>([]);
   const [isLoadingChart, setIsLoadingChart] = useState<boolean>(false);
 
   useEffect(() => {
@@ -52,15 +43,12 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
 
     let isMounted = true;
 
-    // Set initial fallback chart data if available (1D default)
-    setChartData(coin.chartData1D || []);
-
     const loadDynamicChart = async () => {
       setIsLoadingChart(true);
       const query = timeframeOptions[timeframe].query;
       const data = await fetchCoinChart(coin.id, query);
       if (isMounted) {
-        if (data.chartData.length > 0) setChartData(data.chartData);
+        setFetchedChart(data.chartData);
         setIsLoadingChart(false);
       }
     };
@@ -74,7 +62,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
 
   if (!coin) return null;
 
-  const currentChartData = chartData;
+  const currentChartData = fetchedChart.length > 0 ? fetchedChart : (coin.chartData1D || []);
   const isPositive = coin.change24h >= 0;
 
   const formatUsd = (num: number) => {
@@ -88,15 +76,13 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
       <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 shadow-2xl relative">
 
-        {/* Close Button */}
         <button
           onClick={onClose}
           className="absolute top-5 right-5 text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-[#2A2A2A]"
         >
-          <X className="w-5 h-5" />
+          <span className="w-5 h-5" >✕</span>
         </button>
 
-        {/* Header */}
         <div className="flex items-center space-x-4 mb-6">
           {coin.icon ? (
             <img src={coin.icon} alt={coin.name} className="w-12 h-12 rounded-full ring-2 ring-[#00F0FF]" />
@@ -134,11 +120,10 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Chart Header Controls */}
         <div className="flex items-center justify-between mb-3 bg-[#161616] p-2 rounded-xl border border-[#2E2E2E]">
           <div className="flex items-center space-x-2 px-2">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Interactive Price Chart</span>
-            {isLoadingChart && <Loader2 className="w-3.5 h-3.5 text-[#00F0FF] animate-spin" />}
+            {isLoadingChart && <span className="w-3.5 h-3.5 text-[#00F0FF] animate-spin" >⏳</span>}
           </div>
           <div className="flex flex-wrap gap-1">
             {Object.keys(timeframeOptions).map((tf) => (
@@ -157,7 +142,6 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Recharts Area Graph */}
         <div className="h-64 w-full bg-[#161616] rounded-2xl p-4 border border-[#2E2E2E] mb-6 relative flex items-center justify-center">
           {currentChartData.length > 0 ? (
             <ResponsiveContainer width="100%" height="100%">
@@ -185,13 +169,12 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
             </ResponsiveContainer>
           ) : (
             <div className="flex flex-col items-center justify-center space-y-2 text-gray-500">
-              <Loader2 className="w-6 h-6 animate-spin text-[#00F0FF]" />
+              <span className="w-6 h-6 animate-spin text-[#00F0FF]" >⏳</span>
               <span className="text-xs">Loading Live Historical Data...</span>
             </div>
           )}
         </div>
 
-        {/* Key Statistics Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="bg-[#161616] p-3 rounded-xl border border-[#2E2E2E]">
             <div className="text-[10px] font-bold text-gray-400 uppercase">Market Cap</div>
@@ -216,7 +199,6 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Action Button */}
         <button
           onClick={() => {
             onClose();
@@ -224,7 +206,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
           }}
           className="w-full bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-sm py-3 rounded-xl shadow-lg transition-all flex items-center justify-center space-x-2"
         >
-          <Plus className="w-4 h-4" />
+          <span className="w-4 h-4" >➕</span>
           <span>Add ${coin.symbol} to Portfolio</span>
         </button>
 
