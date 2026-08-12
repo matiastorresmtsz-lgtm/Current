@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { PortfolioAsset } from '../../types';
@@ -11,8 +11,7 @@ const CURRENCY_CONFIG: Record<string, { flag: string; symbol: string; label: str
   MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
 };
 
-export default function SharePortfolioPage() {
-  const searchParams = useSearchParams();
+function SharePortfolioContent() {  const searchParams = useSearchParams();
   const initialCurrency = (searchParams?.get('currency') || 'USD').toUpperCase();
   const [portfolio, setPortfolio] = useState<PortfolioAsset[]>([]);
   const [displayCurrency, setDisplayCurrency] = useState<string>(initialCurrency);
@@ -181,5 +180,21 @@ export default function SharePortfolioPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SharePortfolioPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#111827] text-white flex items-center justify-center px-4 py-10">
+          <div className="rounded-3xl border border-white/10 bg-[#0B1120]/80 p-8 text-center">
+            <p className="text-gray-300">Loading shared portfolio...</p>
+          </div>
+        </div>
+      }
+    >
+      <SharePortfolioContent />
+    </Suspense>
   );
 }

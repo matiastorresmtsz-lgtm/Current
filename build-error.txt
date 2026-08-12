@@ -1,0 +1,71 @@
+
+> rouge@0.1.0 build
+> next build
+
+▲ Next.js 16.3.0 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 52ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 620ms
+  Running TypeScript ...
+  Finished TypeScript in 761ms ...
+  Collecting page data using 9 workers ...
+  Generating static pages using 9 workers (0/9) ...
+  Generating static pages using 9 workers (2/9) 
+  Generating static pages using 9 workers (4/9) 
+  Generating static pages using 9 workers (6/9) 
+⨯ useSearchParams() should be wrapped in a suspense boundary at page "/share/portfolio". Read more: https://nextjs.org/docs/messages/missing-suspense-with-csr-bailout
+    at Object.X (/Users/matiastorres/Rouge/.next/server/chunks/ssr/node_modules_next_1v1tkgs._.js:141:3038)
+    at q (/Users/matiastorres/Rouge/.next/server/chunks/ssr/node_modules_next_1v1tkgs._.js:1:8425)
+    at /Users/matiastorres/Rouge/.next/server/chunks/ssr/app_share_portfolio_page_tsx_1qrdi7d._.js:1:393
+    at al (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:85944)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87760)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at au (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:86296)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87805)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106280)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at aS (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:114685)
+    at ap (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:111684)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109897)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:100962)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:105898)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at au (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:86296)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87805)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at aS (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:114685)
+    at ap (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:111684)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109897)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87724)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at au (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:86296)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87805)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:100962)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at au (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:86296)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87805)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:100962)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+    at af (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:106940)
+    at au (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:86296)
+    at ac (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:87805)
+    at ah (/Users/matiastorres/Rouge/node_modules/next/dist/compiled/next-server/app-page-turbo.runtime.prod.js:2:109623)
+Error occurred prerendering page "/share/portfolio". Read more: https://nextjs.org/docs/messages/prerender-error
+Export encountered an error on /share/portfolio/page: /share/portfolio, exiting the build.
+⨯ Next.js build worker exited with code: 1 and signal: null
