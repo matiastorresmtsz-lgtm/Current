@@ -22,6 +22,7 @@ import { MarketsView } from './views/MarketsView';
 import { LeaderboardView } from './views/LeaderboardView';
 import { LearnView } from './views/LearnView';
 import { InsightsView } from './views/InsightsView';
+import { AboutView } from './views/AboutView';
 import { SettingsView } from './views/SettingsView';
 import { TopicView } from './views/TopicView';
 
@@ -33,7 +34,7 @@ import { CoinDetailModal } from './components/Modals/CoinDetailModal';
 import { SettingsModal } from './components/Modals/SettingsModal';
 import { SharePortfolioModal } from './components/Modals/SharePortfolioModal';
 
-const PORTFOLIO_STORAGE_KEY = 'stream_crypto_portfolio_v1';
+const PORTFOLIO_STORAGE_KEY = 'current_crypto_portfolio_v1';
 
 function readStoredPortfolio(): PortfolioAsset[] {
   if (typeof window === 'undefined') return INITIAL_PORTFOLIO;
@@ -149,7 +150,7 @@ export default function Home() {
   const totalPnlPercent = totalCost > 0 ? (totalPnlUsd / totalCost) * 100 : 0;
 
   return (
-    <div className="min-h-screen bg-[#161616] text-gray-100 flex flex-col font-sans selection:bg-[#00F0FF] selection:text-black">
+    <div className="min-h-screen bg-[#161616] text-gray-100 flex flex-col font-sans selection:bg-[#17C99E] selection:text-black">
 
       {/* Top Navigation Navbar */}
       <Navbar
@@ -218,6 +219,10 @@ export default function Home() {
 
           {activeTab === 'settings' && (
             <SettingsView />
+          )}
+
+          {activeTab === 'about' && (
+            <AboutView />
           )}
 
           {activeTab.startsWith('topic-') && (

@@ -99,20 +99,20 @@ export const Navbar: React.FC<NavbarProps> = ({
     <header className="sticky top-0 z-40 w-full bg-[#161616]/95 backdrop-blur-md border-b border-[#2E2E2E]">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
-        {/* Brand Logo - Stream River Logo */}
+        {/* Brand Logo - Current River Logo */}
         <div
           onClick={() => onSelectTab('portfolio')}
           className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
         >
-          {/* Stream Logo Token */}
+          {/* Current Logo Token */}
           <div className="w-9 h-9 rounded-2xl bg-[#1A3A5C] border border-[#2E2E2E] p-0.5 shadow-md group-hover:scale-105 transition-transform">
             <div className="w-full h-full bg-[#161616] rounded-[14px] flex items-center justify-center">
-              <span className="w-5 h-5 text-[#00F0FF] animate-pulse" >🌊</span>
+              <span className="w-5 h-5 text-[#17C99E] animate-pulse" >🌊</span>
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="font-extrabold text-2xl tracking-tight text-white group-hover:text-[#00F0FF] transition-colors">
-              stream
+            <span className="font-extrabold text-2xl tracking-tight text-white group-hover:text-[#17C99E] transition-colors">
+              current
             </span>
           </div>
         </div>
@@ -123,12 +123,12 @@ export const Navbar: React.FC<NavbarProps> = ({
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Search Stream (BTC, ETH, SOL...)"
+              placeholder="Search Current (BTC, ETH, SOL...)"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-              className="w-full bg-[#242424] text-gray-100 placeholder-gray-400 pl-11 pr-9 py-2.5 rounded-full border border-transparent focus:border-[#00F0FF]/50 focus:outline-none text-sm transition-all"
+              className="w-full bg-[#242424] text-gray-100 placeholder-gray-400 pl-11 pr-9 py-2.5 rounded-full border border-transparent focus:border-[#17C99E]/50 focus:outline-none text-sm transition-all"
             />
             {searchQuery && (
               <button
@@ -190,7 +190,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Add Holding Action Button */}
           <button
             onClick={onOpenAddCryptoModal}
-            className="flex items-center space-x-1.5 bg-[#00F0FF] hover:bg-[#00D0DD] text-black font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow"
+            className="flex items-center space-x-1.5 bg-[#212121] hover:bg-[#2A2A2A] text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow"
           >
             <span className="w-4 h-4 text-black" >➕</span>
             <span className="hidden sm:inline">Add Holding</span>
@@ -200,7 +200,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onOpenShareModal}
             title="Share Portfolio"
-            className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#00F0FF] border border-[#2E2E2E] px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+            className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-xl text-xs font-bold transition-colors"
           >
             <span className="w-4 h-4" >📤</span>
             <span className="hidden sm:inline">Share</span>
@@ -218,7 +218,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <span className="w-5 h-5" >🔔</span>
               {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#00F0FF] text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-[#17C99E] text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
                   {unreadNotifications}
                 </span>
               )}
@@ -236,7 +236,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <div className="divide-y divide-[#2E2E2E] max-h-72 overflow-y-auto">
                   {notifications.map((n) => (
                     <div key={n.id} className="py-3 px-1 hover:bg-[#242424] rounded-lg transition-colors">
-                      <div className="flex items-center justify-between text-xs font-semibold text-[#00F0FF]">
+                      <div className="flex items-center justify-between text-xs font-semibold text-[#17C99E]">
                         <span>{n.title}</span>
                         <span className="text-[10px] text-gray-400">{n.time}</span>
                       </div>
@@ -265,7 +265,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="bg-[#00F0FF] hover:bg-[#00D0DD] text-black font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow">
+                <button className="bg-[#212121] hover:bg-[#2A2A2A] text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow">
                   Sign Up
                 </button>
               </SignUpButton>

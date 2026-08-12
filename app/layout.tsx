@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Stream — Smart Crypto Portfolio & Market Intelligence",
-  description: "Track your crypto portfolio, market analytics, and interactive learning powered by Stream.",
+  title: "Current — Smart Crypto Portfolio & Market Intelligence",
+  description: "Track your crypto portfolio, market analytics, and interactive learning powered by Current.",
 };
 
 export default function RootLayout({

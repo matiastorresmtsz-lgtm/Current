@@ -18,7 +18,7 @@ export const useTheme = () => useContext(ThemeContext);
 
 function readStoredTheme(): Theme {
   if (typeof window === 'undefined') return 'dark';
-  const saved = localStorage.getItem('stream_theme');
+  const saved = localStorage.getItem('current_theme') ?? localStorage.getItem('stream_theme');
   return saved === 'light' || saved === 'dark' ? saved : 'dark';
 }
 
@@ -34,7 +34,7 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       html.classList.add('dark');
       html.classList.remove('light');
     }
-    localStorage.setItem('stream_theme', theme);
+    localStorage.setItem('current_theme', theme);
   }, [theme]);
 
   const setTheme = (t: Theme) => setThemeState(t);

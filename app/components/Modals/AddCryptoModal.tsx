@@ -8,7 +8,7 @@ import { searchCoinGecko } from '../../services/coingecko';
 type SearchResult = { id: string; symbol: string; name: string; rank: number; icon: string };
 type DisplayOption = SearchResult | CryptoCoin;
 
-const ASSET_COLORS = ['#17C99E', '#3B82F6', '#EC4899', '#F59E0B', '#8B5CF6', '#10B981', '#6366F1', '#00F0FF'];
+const ASSET_COLORS = ['#17C99E', '#3B82F6', '#EC4899', '#F59E0B', '#8B5CF6', '#10B981', '#6366F1', '#10B981'];
 
 function colorForSymbol(symbol: string): string {
   let hash = 0;

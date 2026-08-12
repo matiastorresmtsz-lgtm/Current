@@ -61,7 +61,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
       const currentUserEntry: LeaderboardEntry = {
         id: user.id || 'user-current',
         rank: 1,
-        username: user.fullName || user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'You (Stream Trader)',
+        username: user.fullName || user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'You (Current Trader)',
         avatar: user.imageUrl || '',
         region: userCountryObj.label,
         flag: userCountryObj.emoji,
@@ -82,9 +82,9 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
       <div className="space-y-6">
         <div>
           <div className="text-xs uppercase tracking-widest text-[#17C99E] font-bold">Leaderboard</div>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white">Stream Global Leaderboard</h1>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white">Current Global Leaderboard</h1>
           <p className="mt-1 text-xs sm:text-sm text-gray-400 max-w-2xl">
-            Live rankings of verified Stream traders sorted by real-time portfolio value.
+            Live rankings of verified Current traders sorted by real-time portfolio value.
           </p>
         </div>
 
@@ -96,7 +96,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
             </div>
             <h2 className="text-xl font-extrabold text-white">Join the Live Leaderboard</h2>
             <p className="text-xs text-gray-400 max-w-xl">
-              Sign in to Stream to track your real portfolio performance, rank on the international leaderboard, and view active account metrics.
+              Sign in to Current to track your real portfolio performance, rank on the international leaderboard, and view active account metrics.
             </p>
           </div>
 
@@ -116,7 +116,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <div className="text-xs uppercase tracking-widest text-[#17C99E] font-extrabold">Leaderboard</div>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white">Stream Global Leaderboard</h1>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white">Current Global Leaderboard</h1>
           <p className="mt-1 text-xs sm:text-sm text-gray-400 max-w-2xl">
             Live performance rankings computed from real authenticated user portfolios.
           </p>

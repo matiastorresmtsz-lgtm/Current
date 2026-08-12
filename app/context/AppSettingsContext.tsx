@@ -31,7 +31,8 @@ export const useAppSettings = () => useContext(AppSettingsContext);
 
 function readStoredCountry(): CountryCode {
   if (typeof window === 'undefined') return 'US';
-  const saved = localStorage.getItem('stream_user_country') as CountryCode | null;
+  const saved = (localStorage.getItem('current_user_country') as CountryCode | null)
+    || (localStorage.getItem('stream_user_country') as CountryCode | null);
   return saved && AVAILABLE_COUNTRIES.some((c) => c.code === saved) ? saved : 'US';
 }
 
@@ -39,7 +40,7 @@ export const AppSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ c
   const [country, setCountryState] = useState<CountryCode>(readStoredCountry);
 
   useEffect(() => {
-    localStorage.setItem('stream_user_country', country);
+    localStorage.setItem('current_user_country', country);
   }, [country]);
 
   const setCountry = (value: CountryCode) => setCountryState(value);

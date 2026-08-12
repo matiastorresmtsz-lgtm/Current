@@ -190,7 +190,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
           <h2 className="text-lg font-extrabold text-white flex items-center space-x-2">
             <span>Latest {config.title} News</span>
             <span className="bg-[#17C99E]/10 text-[#17C99E] text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-[#17C99E]/30">
-              Live Market Stream
+              Live Market Feed
             </span>
           </h2>
         </div>
@@ -198,7 +198,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
         {isLoading ? (
           <div className="py-16 bg-[#212121] border border-[#2E2E2E] rounded-3xl flex flex-col items-center justify-center space-y-3">
             <span className="w-8 h-8 text-[#17C99E] animate-spin" >⏳</span>
-            <span className="text-xs text-gray-400 font-medium">Fetching topic news stream...</span>
+            <span className="text-xs text-gray-400 font-medium">Fetching topic news feed...</span>
           </div>
         ) : news.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">

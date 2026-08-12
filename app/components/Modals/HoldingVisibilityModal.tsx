@@ -122,7 +122,7 @@ export const HoldingVisibilityModal: React.FC<HoldingVisibilityModalProps> = ({
             <span className="w-4 h-4 text-gray-400 shrink-0 mt-0.5" >🛡️</span>
             <p className="text-[11px] text-gray-400 leading-relaxed">
               {selected
-                ? 'Your portfolio value, holdings, and returns are visible to other Stream users and the public shareable link.'
+                ? 'Your portfolio value, holdings, and returns are visible to other Current users and the public shareable link.'
                 : 'Your portfolio is hidden from public view. Only total value summaries are shown when sharing.'}
             </p>
           </div>

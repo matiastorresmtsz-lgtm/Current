@@ -95,7 +95,7 @@ function SharePortfolioContent() {
         <div className="rounded-[32px] border border-white/10 bg-[#0B1120]/80 p-8 shadow-2xl backdrop-blur-xl">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <div className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Stream Portfolio Share</div>
+              <div className="text-sm uppercase tracking-[0.35em] text-cyan-300/70">Current Portfolio Share</div>
               <h1 className="mt-3 text-4xl font-extrabold tracking-tight">Your public portfolio snapshot</h1>
               <p className="max-w-2xl mt-3 text-sm text-gray-300">View the current holdings and portfolio performance in {curr.label}.</p>
             </div>

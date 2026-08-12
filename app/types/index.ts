@@ -4,6 +4,7 @@ export type NavTab =
   | 'leaderboard'
   | 'learn'
   | 'insights'
+  | 'about'
   | 'ai'
   | 'settings'
   | 'topic-etfs'

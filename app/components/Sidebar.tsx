@@ -37,6 +37,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy, badge: null },
     { id: 'learn', label: 'Learn', icon: BookOpen, badge: null },
     { id: 'insights', label: 'Insights', icon: Zap, badge: null },
+    { id: 'about', label: 'About', icon: BookOpen, badge: null },
   ] as const;
 
   const topics = [
@@ -62,12 +63,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => onSelectTab(item.id as NavTab)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${
                   isActive
-                    ? 'bg-[#0D304D] text-[#00F0FF] font-extrabold shadow-sm border border-[#00F0FF]/30'
+                    ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
                     : 'text-gray-300 hover:text-white hover:bg-[#212121]'
                 }`}
               >
                 <div className="flex items-center space-x-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#00F0FF]' : 'text-gray-400'}`} />
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#17C99E]' : 'text-gray-400'}`} />
                   <span>{item.label}</span>
                 </div>
                 {item.badge && (

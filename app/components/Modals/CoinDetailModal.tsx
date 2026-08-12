@@ -85,9 +85,9 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
 
         <div className="flex items-center space-x-4 mb-6">
           {coin.icon ? (
-            <img src={coin.icon} alt={coin.name} className="w-12 h-12 rounded-full ring-2 ring-[#00F0FF]" />
+            <img src={coin.icon} alt={coin.name} className="w-12 h-12 rounded-full ring-2 ring-[#17C99E]" />
           ) : (
-            <div className="w-12 h-12 rounded-full bg-[#2A2A2A] ring-2 ring-[#00F0FF] flex items-center justify-center text-[#00F0FF] font-extrabold text-lg">
+            <div className="w-12 h-12 rounded-full bg-[#2A2A2A] ring-2 ring-[#17C99E] flex items-center justify-center text-[#17C99E] font-extrabold text-lg">
               {coin.symbol.substring(0, 2)}
             </div>
           )}
@@ -95,7 +95,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
           <div>
             <div className="flex items-center space-x-2">
               <h2 className="text-2xl font-extrabold text-white">{coin.name}</h2>
-              <span className="text-sm font-bold text-[#00F0FF] bg-[#00F0FF]/10 px-2 py-0.5 rounded border border-[#00F0FF]/30 font-mono">
+              <span className="text-sm font-bold text-[#17C99E] bg-[#17C99E]/10 px-2 py-0.5 rounded border border-[#17C99E]/30 font-mono">
                 ${coin.symbol}
               </span>
               {coin.rank && (
@@ -123,7 +123,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
         <div className="flex items-center justify-between mb-3 bg-[#161616] p-2 rounded-xl border border-[#2E2E2E]">
           <div className="flex items-center space-x-2 px-2">
             <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">Interactive Price Chart</span>
-            {isLoadingChart && <span className="w-3.5 h-3.5 text-[#00F0FF] animate-spin" >⏳</span>}
+            {isLoadingChart && <span className="w-3.5 h-3.5 text-[#17C99E] animate-spin" >⏳</span>}
           </div>
           <div className="flex flex-wrap gap-1">
             {Object.keys(timeframeOptions).map((tf) => (
@@ -132,7 +132,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
                 onClick={() => setTimeframe(tf as TimeframeLabel)}
                 className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${
                   timeframe === tf
-                    ? 'bg-[#00F0FF] text-black shadow-md font-extrabold'
+                    ? 'bg-[#17C99E] text-black shadow-md font-extrabold'
                     : 'text-gray-400 hover:text-white'
                 }`}
               >
@@ -169,7 +169,7 @@ export const CoinDetailModal: React.FC<CoinDetailModalProps> = ({
             </ResponsiveContainer>
           ) : (
             <div className="flex flex-col items-center justify-center space-y-2 text-gray-500">
-              <span className="w-6 h-6 animate-spin text-[#00F0FF]" >⏳</span>
+              <span className="w-6 h-6 animate-spin text-[#17C99E]" >⏳</span>
               <span className="text-xs">Loading Live Historical Data...</span>
             </div>
           )}

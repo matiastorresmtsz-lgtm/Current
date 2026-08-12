@@ -20,7 +20,7 @@ export const SettingsView: React.FC = () => {
   const [fullName, setFullName] = useState(user?.fullName || 'Matias Torres');
   const [username, setUsername] = useState(user?.username || 'matiastorres');
   const [email, setEmail] = useState(user?.primaryEmailAddress?.emailAddress || 'matiasttorres@gmail.com');
-  const [bio, setBio] = useState('Crypto trader & long-term investor building my portfolio on Stream.');
+  const [bio, setBio] = useState('Crypto trader & long-term investor building my portfolio on Current.');
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();

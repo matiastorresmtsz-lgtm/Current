@@ -31,7 +31,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="flex items-center justify-between pb-4 border-b border-[#242B35]">
           <div className="flex items-center space-x-2">
             <span className="w-5 h-5 text-[#FF2E55]" >⚙️</span>
-            <h2 className="text-lg font-bold text-white">Stream Platform Settings</h2>
+            <h2 className="text-lg font-bold text-white">Current Platform Settings</h2>
           </div>
           <button 
             onClick={onClose}

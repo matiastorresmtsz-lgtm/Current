@@ -115,14 +115,14 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
       <div className="flex flex-col md:flex-row md:items-center justify-between bg-[#212121] p-5 rounded-3xl border border-[#2E2E2E] shadow-lg gap-4">
         <div>
           <div className="flex items-center space-x-2 mb-1">
-            <span className="w-5 h-5 text-[#00F0FF]" >✨</span>
+            <span className="w-5 h-5 text-[#17C99E]" >✨</span>
             <h1 className="text-xl font-extrabold text-white">Cryptocurrency Markets</h1>
-            <span className="bg-[#00F0FF]/10 text-[#00F0FF] text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-[#00F0FF]/20">
+            <span className="bg-[#212121] text-white text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-[#2E2E2E]">
               {coins.length > 0 ? `${coins.length}+ Cryptos` : '15,000+ Cryptos'}
             </span>
           </div>
           <p className="text-xs text-gray-400">
-            Real-time live prices, 24h market metrics, and 7-day sparkline performance tracking powered by Stream Market Data. Search any crypto token!
+            Real-time live prices, 24h market metrics, and 7-day sparkline performance tracking powered by Current Market Data. Search any crypto token!
           </p>
         </div>
 
@@ -136,7 +136,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
           </div>
           <div className="h-6 w-px bg-[#2E2E2E]" />
           <div>
-            <div className="text-gray-400 text-[10px] uppercase font-bold">Stream Market Index</div>
+            <div className="text-gray-400 text-[10px] uppercase font-bold">Current Market Index</div>
             <div className="text-[#17C99E] font-bold font-mono">15,000+ Cryptos</div>
           </div>
         </div>
@@ -330,7 +330,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                 <tr>
                   <td colSpan={8} className="py-12 text-center text-gray-400">
                     <div className="flex flex-col items-center justify-center space-y-2">
-                      <span className="w-8 h-8 text-[#00F0FF] animate-spin" >⏳</span>
+                      <span className="w-8 h-8 text-[#17C99E] animate-spin" >⏳</span>
                       <p className="font-semibold text-white text-sm">Searching live market library...</p>
                       <p className="text-xs text-gray-400">Loading live data for &quot;{searchFilter}&quot;</p>
                     </div>

@@ -6,6 +6,7 @@ import { PortfolioAsset, CryptoCoin } from '../types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 type Currency = 'USD' | 'CAD' | 'MXN';
+type GoalType = 'Growth' | 'Income' | 'Retirement' | 'Custom';
 
 const CURRENCY_CONFIG: Record<Currency, { flag: string; symbol: string; label: string; rate: number }> = {
   USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
@@ -34,10 +35,15 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   onOpenCoinModal,
   onOpenShareModal
 }) => {
-  const [accountFilter, setAccountFilter] = useState<'All' | 'Other'>('All');
+  const [accountFilter, setAccountFilter] = useState<'All'>('All');
   const [currency, setCurrency] = useState<Currency>('USD');
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [showGoalPopup, setShowGoalPopup] = useState(false);
   const [sortBy, setSortBy] = useState('Total value');
+  const [goalType, setGoalType] = useState<GoalType>('Growth');
+  const [goalAmount, setGoalAmount] = useState<string>('10000');
+  const [goalDeadline, setGoalDeadline] = useState<string>('2025-12-31');
+  const [customGoalName, setCustomGoalName] = useState<string>('');
 
   // Compute live portfolio metrics matching screenshot
   const totalValue = portfolio.reduce((sum, item) => sum + (item.amount * item.currentPrice), 0);
@@ -56,6 +62,10 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   }, 0);
   const todayReturnPercent = totalValue > 0 ? (todayReturnUsd / totalValue) * 100 : 0;
   const convertedTodayReturn = todayReturnUsd * curr.rate;
+
+  // Goal progress (percentage) based on converted portfolio value vs. target goal amount
+  const goalTarget = parseFloat(goalAmount || '0');
+  const goalProgress = goalTarget > 0 ? Math.min(100, (convertedValue / goalTarget) * 100) : 0;
 
   // Donut chart segments
   const colorsList = ['#10B981', '#8B5CF6', '#3B82F6', '#EC4899', '#F59E0B', '#14B8A6'];
@@ -83,27 +93,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
           >
             <span>All</span>
             {accountFilter === 'All' && (
-              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#00F0FF] rounded-full" />
+              <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#17C99E] rounded-full" />
             )}
-          </button>
-
-          <button
-            onClick={() => setAccountFilter('Other')}
-            className="flex items-center space-x-1 text-gray-400 hover:text-white pb-1"
-          >
-            <span>Other</span>
-            <span className="w-3.5 h-3.5 text-gray-500" >🔒</span>
-          </button>
-        </div>
-
-        {/* Currency & Account Selector */}
-        <div className="flex items-center space-x-3">
-          <button
-            onClick={onOpenShareModal}
-            className="flex items-center space-x-1.5 bg-[#00F0FF] hover:bg-[#00D8E6] text-black font-extrabold text-xs px-3.5 py-1.5 rounded-full transition-all shadow"
-          >
-            <span className="w-3.5 h-3.5" >📤</span>
-            <span>Share Portfolio</span>
           </button>
 
           <div className="relative">
@@ -124,7 +115,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                   >
                     <div className="flex items-center justify-between text-sm text-white">
                       <span>{cfg.flag} {key}</span>
-                      {currency === key && <span className="text-[#00F0FF] font-bold">✓</span>}
+                      {currency === key && <span className="text-[#17C99E] font-bold">✓</span>}
                     </div>
                     <div className="text-[10px] text-gray-400">{cfg.label}</div>
                   </button>
@@ -133,8 +124,121 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             )}
           </div>
 
-          <div className="bg-[#212121] border border-[#2E2E2E] px-3 py-1.5 rounded-full text-xs font-medium text-gray-300">
-            Showing: All Accounts
+          <div className="relative bg-[#212121] border border-[#2E2E2E] px-3 py-1.5 rounded-full text-xs font-medium text-gray-300 flex items-center gap-2">
+            <span>Showing: All Accounts</span>
+            <button
+              onClick={() => setShowGoalPopup((prev) => !prev)}
+              className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-white hover:bg-white/10 transition"
+            >
+              Goal
+            </button>
+            {(goalAmount && parseFloat(goalAmount) > 0) && (
+              <span className="hidden sm:inline rounded-full bg-white/5 px-2 py-1 text-[10px] text-gray-200">
+                {customGoalName ? customGoalName : `${goalType} goal`} · {curr.symbol}{parseFloat(goalAmount).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })} by {goalDeadline}
+              </span>
+            )}
+
+            {/* Inline progress bar next to Goal (visible on sm+) */}
+            {(goalAmount && parseFloat(goalAmount) > 0) && (
+              <div className="hidden sm:flex items-center space-x-2 ml-2">
+                <div className="w-36 h-2 bg-[#2E2E2E] rounded-full overflow-hidden">
+                  <div className="h-full bg-[#17C99E]" style={{ width: `${goalProgress}%` }} />
+                </div>
+                <span className="text-xs text-gray-300">{goalProgress.toFixed(0)}%</span>
+              </div>
+            )}
+
+            {showGoalPopup && (
+              <div className="absolute right-0 top-full mt-3 w-[340px] rounded-3xl border border-[#2E2E2E] bg-[#111827] p-4 shadow-2xl z-30">
+                <div className="flex items-center justify-between mb-4">
+                  <div>
+                    <p className="text-xs uppercase tracking-[0.3em] text-gray-400">Investment goal</p>
+                    <p className="mt-1 text-sm font-bold text-white">Track your target value</p>
+                  </div>
+                  <button
+                    onClick={() => setShowGoalPopup(false)}
+                    className="text-gray-400 hover:text-white"
+                  >
+                    <span className="w-4 h-4">✕</span>
+                  </button>
+                </div>
+
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-2">Goal type</label>
+                    <select
+                      value={goalType}
+                      onChange={(event) => setGoalType(event.target.value as GoalType)}
+                      className="w-full rounded-2xl border border-[#2E2E2E] bg-[#16161D] px-3 py-2 text-sm text-white outline-none"
+                    >
+                      <option value="Growth">Growth</option>
+                      <option value="Income">Income</option>
+                      <option value="Retirement">Retirement</option>
+                      <option value="Custom">Custom</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-2">Target value</label>
+                    <div className="flex items-center gap-2 rounded-2xl border border-[#2E2E2E] bg-[#16161D] px-3 py-2">
+                      <span className="text-sm text-gray-400">{curr.symbol}</span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={goalAmount}
+                        onChange={(event) => setGoalAmount(event.target.value)}
+                        className="w-full bg-transparent text-sm text-white outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-2">Deadline</label>
+                      <input
+                        type="date"
+                        value={goalDeadline}
+                        onChange={(event) => setGoalDeadline(event.target.value)}
+                        className="w-full rounded-2xl border border-[#2E2E2E] bg-[#16161D] px-3 py-2 text-sm text-white outline-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-2">Custom name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Retirement nest egg"
+                        value={customGoalName}
+                        onChange={(event) => setCustomGoalName(event.target.value)}
+                        className="w-full rounded-2xl border border-[#2E2E2E] bg-[#16161D] px-3 py-2 text-sm text-white outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="rounded-3xl border border-[#2E2E2E] bg-[#161616] p-3">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400">Current</p>
+                      <p className="mt-2 text-sm font-bold text-white">{curr.symbol}{convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="rounded-3xl border border-[#2E2E2E] bg-[#161616] p-3">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400">Target</p>
+                      <p className="mt-2 text-sm font-bold text-white">{curr.symbol}{parseFloat(goalAmount || '0').toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                    </div>
+                    <div className="rounded-3xl border border-[#2E2E2E] bg-[#161616] p-3">
+                      <p className="text-[10px] uppercase tracking-[0.3em] text-gray-400">Progress</p>
+                      <p className="mt-2 text-sm font-bold text-white">
+                        {goalAmount && parseFloat(goalAmount) > 0
+                          ? `${Math.min(100, (convertedValue / parseFloat(goalAmount || '0')) * 100).toFixed(0)}%`
+                          : '0%'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-3xl border border-[#2E2E2E] bg-[#161616] p-3 text-xs text-gray-400">
+                    {customGoalName ? `Goal: ${customGoalName}` : `Goal: ${goalType} objective`} · Target by {goalDeadline}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -316,7 +420,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                         <div>
                           <div
                             onClick={() => matchedCoin && onOpenCoinModal(matchedCoin)}
-                            className="font-bold text-white hover:text-[#00F0FF] cursor-pointer transition-colors"
+                            className="font-bold text-white hover:text-[#17C99E] cursor-pointer transition-colors"
                           >
                             {item.symbol}
                           </div>
