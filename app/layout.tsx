@@ -3,6 +3,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AppSettingsProvider } from "./context/AppSettingsContext";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -35,6 +36,7 @@ export default function RootLayout({
           <ThemeProvider>
             <AppSettingsProvider>
               {children}
+              <Analytics />
             </AppSettingsProvider>
           </ThemeProvider>
         </body>
