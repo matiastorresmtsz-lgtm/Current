@@ -1,9 +1,10 @@
 'use client';
 
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 import { PortfolioAsset } from '../../types';
+
+export const dynamic = 'force-dynamic';
 
 const CURRENCY_CONFIG: Record<string, { flag: string; symbol: string; label: string; rate: number }> = {
   USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
@@ -11,10 +12,9 @@ const CURRENCY_CONFIG: Record<string, { flag: string; symbol: string; label: str
   MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
 };
 
-function SharePortfolioContent() {  const searchParams = useSearchParams();
-  const initialCurrency = (searchParams?.get('currency') || 'USD').toUpperCase();
+function SharePortfolioContent() {
   const [portfolio, setPortfolio] = useState<PortfolioAsset[]>([]);
-  const [displayCurrency, setDisplayCurrency] = useState<string>(initialCurrency);
+  const [displayCurrency, setDisplayCurrency] = useState<string>('USD');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,13 +31,10 @@ function SharePortfolioContent() {  const searchParams = useSearchParams();
   };
 
   useEffect(() => {
-    if (!searchParams) {
-      setError('Invalid share link.');
-      setLoading(false);
-      return;
-    }
+    const params = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '');
+    const snapshot = params.get('snapshot');
+    const currency = params.get('currency')?.toUpperCase() || 'USD';
 
-    const snapshot = searchParams.get('snapshot');
     if (!snapshot) {
       setError('No portfolio data found in the share link.');
       setLoading(false);
@@ -52,9 +49,9 @@ function SharePortfolioContent() {  const searchParams = useSearchParams();
     }
 
     setPortfolio(parsed.portfolio);
-    setDisplayCurrency((parsed.currency || initialCurrency).toUpperCase());
+    setDisplayCurrency((parsed.currency || currency).toUpperCase());
     setLoading(false);
-  }, [searchParams, initialCurrency]);
+  }, []);
 
   const curr = CURRENCY_CONFIG[displayCurrency] || CURRENCY_CONFIG.USD;
   const totalValue = useMemo(() => portfolio.reduce((sum, item) => sum + item.amount * item.currentPrice, 0), [portfolio]);
