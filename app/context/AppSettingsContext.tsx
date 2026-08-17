@@ -1,6 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { useUser, useAuth } from '@clerk/nextjs';
+import { getUserSettings, isSupabaseConfigured, upsertUserSettings } from '../lib/supabase';
 
 export type CountryCode = 'US' | 'CA' | 'MX' | 'GB' | 'DE' | 'FR' | 'JP' | 'BR' | 'AU' | 'IN';
 
@@ -37,11 +39,53 @@ function readStoredCountry(): CountryCode {
 }
 
 export const AppSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isSignedIn, user } = useUser();
+  const { getToken } = useAuth();
   const [country, setCountryState] = useState<CountryCode>(readStoredCountry);
 
   useEffect(() => {
     localStorage.setItem('current_user_country', country);
-  }, [country]);
+
+    if (!isSignedIn || !user?.id || !isSupabaseConfigured()) {
+      return;
+    }
+
+    (async () => {
+      try {
+        const token = await getToken();
+        void upsertUserSettings({
+          user_id: user.id,
+          country,
+          updated_at: new Date().toISOString(),
+        }, token ?? undefined);
+      } catch (err) {
+        // ignore token/getToken errors and skip upsert
+      }
+    })();
+  }, [country, isSignedIn, user?.id]);
+
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || !isSupabaseConfigured()) return;
+
+    const loadSettings = async () => {
+      try {
+        const token = await getToken();
+        const remoteSettings = await getUserSettings(user.id, token ?? undefined);
+        if (!remoteSettings?.country) return;
+
+        const validCountry = AVAILABLE_COUNTRIES.some((option) => option.code === remoteSettings.country)
+          ? remoteSettings.country as CountryCode
+          : 'US';
+
+        setCountryState(validCountry);
+        localStorage.setItem('current_user_country', validCountry);
+      } catch (err) {
+        // ignore token/getToken errors and skip loading
+      }
+    };
+
+    void loadSettings();
+  }, [isSignedIn, user?.id]);
 
   const setCountry = (value: CountryCode) => setCountryState(value);
 

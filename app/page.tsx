@@ -4,6 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { NavTab, CryptoCoin, PortfolioAsset } from './types';
 import { fetchTopCryptos } from './services/coingecko';
+import { getUserPortfolio, isSupabaseConfigured, upsertLeaderboardEntry, upsertPortfolioSnapshot } from './lib/supabase';
 import {
   INITIAL_COINS,
   INITIAL_PORTFOLIO,
@@ -47,24 +48,41 @@ function readStoredPortfolio(): PortfolioAsset[] {
 }
 
 export default function Home() {
-  const { isSignedIn } = useUser();
-  const { openSignIn } = useClerk();
+  const { isSignedIn, user } = useUser();
+  const { openSignIn, openSignUp } = useClerk();
+  const protectedTabs = new Set<NavTab>(['portfolio', 'markets', 'insights']);
 
   const [activeTab, setActiveTab] = useState<NavTab>('portfolio');
   const [coins, setCoins] = useState<CryptoCoin[]>(INITIAL_COINS);
   const [portfolio, setPortfolio] = useState<PortfolioAsset[]>(readStoredPortfolio);
 
   // Auth Action Interceptor
+  const promptSignUp = () => {
+    if (openSignUp) {
+      openSignUp();
+      return;
+    }
+    if (openSignIn) {
+      openSignIn();
+      return;
+    }
+    alert('Please sign up to access this feature.');
+  };
+
   const handleRequireAuthAction = (action: () => void) => {
     if (!isSignedIn) {
-      if (openSignIn) {
-        openSignIn();
-      } else {
-        alert('Please sign in to add portfolio assets or access active trading features.');
-      }
+      promptSignUp();
       return;
     }
     action();
+  };
+
+  const handleTabSelect = (tab: NavTab) => {
+    if (!isSignedIn && protectedTabs.has(tab)) {
+      promptSignUp();
+      return;
+    }
+    setActiveTab(tab);
   };
 
   // Modals state
@@ -76,14 +94,48 @@ export default function Home() {
   const [selectedCoinDetail, setSelectedCoinDetail] = useState<CryptoCoin | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
-  // Save portfolio to LocalStorage
-  const updateAndSavePortfolio = (newPortfolio: PortfolioAsset[]) => {
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || !isSupabaseConfigured()) {
+      return;
+    }
+
+    const loadRemotePortfolio = async () => {
+      const remotePortfolio = await getUserPortfolio(user.id);
+      if (remotePortfolio && remotePortfolio.length > 0) {
+        setPortfolio(remotePortfolio);
+        localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(remotePortfolio));
+      }
+    };
+
+    void loadRemotePortfolio();
+  }, [isSignedIn, user?.id]);
+
+  // Save portfolio to LocalStorage and Supabase
+  const updateAndSavePortfolio = async (newPortfolio: PortfolioAsset[]) => {
     setPortfolio(newPortfolio);
     try {
       localStorage.setItem(PORTFOLIO_STORAGE_KEY, JSON.stringify(newPortfolio));
     } catch {
       // quota fallback
     }
+
+    if (!isSignedIn || !user?.id || !isSupabaseConfigured()) {
+      return;
+    }
+
+    const totalValue = newPortfolio.reduce((sum, item) => sum + (item.amount * item.currentPrice), 0);
+    const totalCost = newPortfolio.reduce((sum, item) => sum + (item.amount * item.avgBuyPrice), 0);
+    const pnl = totalValue - totalCost;
+
+    await upsertPortfolioSnapshot({
+      user_id: user.id,
+      holdings: newPortfolio,
+      currency: 'USD',
+      portfolio_value: totalValue,
+      total_cost: totalCost,
+      pnl,
+      is_latest: true,
+    });
   };
 
   const pricedPortfolio = useMemo(() => {
@@ -135,12 +187,12 @@ export default function Home() {
       updated = [...portfolio, newAsset];
     }
 
-    updateAndSavePortfolio(updated);
+    void updateAndSavePortfolio(updated);
   };
 
   const handleRemoveHolding = (coinId: string) => {
     const updated = portfolio.filter(p => p.coinId !== coinId);
-    updateAndSavePortfolio(updated);
+    void updateAndSavePortfolio(updated);
   };
 
   // Metrics for share modal
@@ -148,6 +200,26 @@ export default function Home() {
   const totalCost = pricedPortfolio.reduce((sum, item) => sum + (item.amount * item.avgBuyPrice), 0);
   const totalPnlUsd = totalValue - totalCost;
   const totalPnlPercent = totalCost > 0 ? (totalPnlUsd / totalCost) * 100 : 0;
+
+  useEffect(() => {
+    if (!isSignedIn || !user?.id || !isSupabaseConfigured()) {
+      return;
+    }
+
+    const username = user.fullName || user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Current Trader';
+    const storedCountry = localStorage.getItem('current_user_country') || 'US';
+
+    void upsertLeaderboardEntry({
+      user_id: user.id,
+      username,
+      avatar_url: user.imageUrl || null,
+      country: storedCountry,
+      portfolio_value: totalValue,
+      change_24h: totalPnlPercent,
+      win_rate: totalPnlPercent >= 0 ? 82.5 : 61.2,
+      rank: 1,
+    });
+  }, [isSignedIn, user?.id, user?.fullName, user?.username, user?.imageUrl, totalValue, totalPnlPercent]);
 
   return (
     <div className="min-h-screen bg-[#161616] text-gray-100 flex flex-col font-sans selection:bg-[#17C99E] selection:text-black">
@@ -157,8 +229,8 @@ export default function Home() {
         coins={coins}
         onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
         onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
-        onSelectTab={(tab) => setActiveTab(tab)}
-        onOpenShareModal={() => setIsShareOpen(true)}
+        onSelectTab={handleTabSelect}
+        onOpenShareModal={() => handleRequireAuthAction(() => setIsShareOpen(true))}
         holdingsCount={pricedPortfolio.length}
       />
 
@@ -168,27 +240,27 @@ export default function Home() {
         {/* Left Navigation Sidebar */}
         <Sidebar
           activeTab={activeTab}
-          onSelectTab={(tab) => setActiveTab(tab)}
+          onSelectTab={handleTabSelect}
           onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
           onOpenSettingsModal={() => setIsSettingsOpen(true)}
         />
 
         {/* Center Main View Area */}
         <main className="flex-1 min-w-0 py-3">
-          {activeTab === 'portfolio' && (
+          {activeTab === 'portfolio' && isSignedIn && (
             <PortfolioView
               portfolio={pricedPortfolio}
               coins={coins}
               onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
               onOpenAddCommoditiesModal={() => handleRequireAuthAction(() => setIsAddCommoditiesOpen(true))}
-              onOpenVisibilityModal={() => setIsVisibilityOpen(true)}
+              onOpenVisibilityModal={() => handleRequireAuthAction(() => setIsVisibilityOpen(true))}
               onRemoveHolding={handleRemoveHolding}
               onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
-              onOpenShareModal={() => setIsShareOpen(true)}
+              onOpenShareModal={() => handleRequireAuthAction(() => setIsShareOpen(true))}
             />
           )}
 
-          {activeTab === 'markets' && (
+          {activeTab === 'markets' && isSignedIn && (
             <MarketsView
               coins={coins}
               onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
@@ -209,7 +281,7 @@ export default function Home() {
             />
           )}
 
-          {activeTab === 'insights' && (
+          {activeTab === 'insights' && isSignedIn && (
             <InsightsView
               whales={WHALE_TRANSACTIONS}
               portfolio={pricedPortfolio}
@@ -235,11 +307,11 @@ export default function Home() {
         </main>
 
         {/* Right Sidebar Widgets */}
-        {activeTab !== 'settings' && (
+        {activeTab !== 'settings' && isSignedIn && (
           <RightSidebar
             coins={coins}
             onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
-            onOpenAddCryptoModal={() => setIsAddCryptoOpen(true)}
+            onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
           />
         )}
 
@@ -264,7 +336,7 @@ export default function Home() {
       <CoinDetailModal
         coin={selectedCoinDetail}
         onClose={() => setSelectedCoinDetail(null)}
-        onOpenTradeModalWithTicker={() => setIsAddCryptoOpen(true)}
+        onOpenTradeModalWithTicker={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
       />
 
       <AddCashCommoditiesModal

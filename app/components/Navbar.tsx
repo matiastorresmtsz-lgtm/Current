@@ -100,21 +100,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Logo - Current River Logo */}
-        <div
-          onClick={() => onSelectTab('portfolio')}
-          className="flex items-center space-x-2.5 cursor-pointer group shrink-0"
-        >
-          {/* Current Logo Token */}
-          <div className="w-9 h-9 rounded-2xl bg-[#1A3A5C] border border-[#2E2E2E] p-0.5 shadow-md group-hover:scale-105 transition-transform">
-            <div className="w-full h-full bg-[#161616] rounded-[14px] flex items-center justify-center">
-              <span className="w-5 h-5 text-[#17C99E] animate-pulse" >🌊</span>
-            </div>
-          </div>
-          <div className="flex flex-col">
-            <span className="font-extrabold text-2xl tracking-tight text-white group-hover:text-[#17C99E] transition-colors">
-              current
-            </span>
-          </div>
+        <div onClick={() => onSelectTab('portfolio')} className="cursor-pointer shrink-0">
+          <span className="font-extrabold text-2xl tracking-tight text-[#17C99E] transition-colors">
+            current
+          </span>
         </div>
 
         {/* Search Bar - Center Pill */}

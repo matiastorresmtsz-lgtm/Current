@@ -86,7 +86,10 @@ function SharePortfolioContent() {
           <p className="mt-4 text-gray-300">{error}</p>
         </div>
       </div>
-    );
+    );        
+
+
+    
   }
 
   return (
