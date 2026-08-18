@@ -250,7 +250,7 @@ export default function Home() {
       />
 
       {/* Main Body Content Layout */}
-      <div className="max-w-[1500px] w-full mx-auto px-3 sm:px-6 flex-1 flex gap-6 pt-3 pb-16">
+      <div className="max-w-[1500px] w-full mx-auto px-3 sm:px-6 flex-1 flex gap-6 pt-3 pb-24 lg:pb-16">
 
         {/* Left Navigation Sidebar */}
         <Sidebar
