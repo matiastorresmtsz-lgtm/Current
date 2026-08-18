@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AppSettingsProvider } from "./context/AppSettingsContext";
+import { NotificationProvider } from './context/NotificationContext';
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
@@ -28,8 +29,10 @@ export default function RootLayout({
         <body className="min-h-full flex flex-col bg-[#161616] text-gray-100 font-sans">
           <ThemeProvider>
             <AppSettingsProvider>
-              {children}
-              <Analytics />
+              <NotificationProvider>
+                {children}
+                <Analytics />
+              </NotificationProvider>
             </AppSettingsProvider>
           </ThemeProvider>
         </body>

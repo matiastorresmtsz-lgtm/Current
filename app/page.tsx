@@ -11,6 +11,7 @@ import {
   LEARN_COURSES,
   WHALE_TRANSACTIONS
 } from './data/mockData';
+import { useNotifications } from './context/NotificationContext';
 
 // Component imports
 import { Navbar } from './components/Navbar';
@@ -50,9 +51,10 @@ function readStoredPortfolio(): PortfolioAsset[] {
 export default function Home() {
   const { isSignedIn, user } = useUser();
   const { openSignIn, openSignUp } = useClerk();
+  const { addNotification } = useNotifications();
   const protectedTabs = new Set<NavTab>(['portfolio', 'markets', 'insights']);
 
-  const [activeTab, setActiveTab] = useState<NavTab>('portfolio');
+  const [activeTab, setActiveTab] = useState<NavTab>(() => isSignedIn ? 'portfolio' : 'about');
   const [coins, setCoins] = useState<CryptoCoin[]>(INITIAL_COINS);
   const [portfolio, setPortfolio] = useState<PortfolioAsset[]>(readStoredPortfolio);
 
@@ -188,6 +190,17 @@ export default function Home() {
     }
 
     void updateAndSavePortfolio(updated);
+
+    try {
+      const existing = portfolio.find(p => p.symbol.toUpperCase() === newAsset.symbol.toUpperCase());
+      if (existing) {
+        addNotification({ title: 'Holding updated', message: `Updated ${newAsset.symbol} holding.`, time: '' });
+      } else {
+        addNotification({ title: 'New holding added', message: `Added ${newAsset.symbol} to your portfolio.`, time: '' });
+      }
+    } catch (err) {
+      // ignore notification errors
+    }
   };
 
   const handleRemoveHolding = (coinId: string) => {
@@ -206,12 +219,14 @@ export default function Home() {
       return;
     }
 
-    const username = user.fullName || user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Current Trader';
+    const storedDisplayName = localStorage.getItem('current_user_display_name');
+    const storedUsername = localStorage.getItem('current_user_username');
+    const activeName = storedDisplayName || storedUsername || user.fullName || user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Current Trader';
     const storedCountry = localStorage.getItem('current_user_country') || 'US';
 
     void upsertLeaderboardEntry({
       user_id: user.id,
-      username,
+      username: activeName,
       avatar_url: user.imageUrl || null,
       country: storedCountry,
       portfolio_value: totalValue,

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
+import { useNotifications } from '../context/NotificationContext';
 import { CryptoCoin, NavTab } from '../types';
 import { searchCoinGecko } from '../services/coingecko';
 
@@ -27,7 +28,8 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [searchResults, setSearchResults] = useState<CryptoCoin[]>([]);
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
-  const [unreadNotifications, setUnreadNotifications] = useState(2);
+  const { notifications, markAllRead, removeNotification } = useNotifications();
+  const unreadNotifications = notifications.filter(n => n.unread).length;
   const { isSignedIn, user } = useUser();
 
   // Dynamic search across all 15,000+ cryptos on CoinGecko
@@ -78,20 +80,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const extraRemote = searchResults.filter(r => !existingIds.has(r.id));
   const filteredCoins = [...localFiltered, ...extraRemote].slice(0, 12);
 
-  const notifications = [
-    {
-      id: 'n1',
-      title: 'Bitcoin Market Update 🚀',
-      message: 'BTC holding strong above $67,400 with steady ETF inflows.',
-      time: '5m ago'
-    },
-    {
-      id: 'n2',
-      title: 'Solana Momentum Alert',
-      message: 'SOL 24h volume reached $6.8B (+8.95% daily gain).',
-      time: '1h ago'
-    }
-  ];
+  // notifications come from NotificationContext
 
   const userDisplayName = user ? (user.fullName || user.username || 'Trader') : 'Matias Torres';
 
@@ -176,66 +165,78 @@ export const Navbar: React.FC<NavbarProps> = ({
         {/* Right Toolbar Actions */}
         <div className="flex items-center space-x-3">
 
-          {/* Add Holding Action Button */}
-          <button
-            onClick={onOpenAddCryptoModal}
-            className="flex items-center space-x-1.5 bg-[#212121] hover:bg-[#2A2A2A] text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow"
-          >
-            <span className="w-4 h-4 text-black" >➕</span>
-            <span className="hidden sm:inline">Add Holding</span>
-          </button>
-
-          {/* Share Portfolio Button */}
-          <button
-            onClick={onOpenShareModal}
-            title="Share Portfolio"
-            className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-xl text-xs font-bold transition-colors"
-          >
-            <span className="w-4 h-4" >📤</span>
-            <span className="hidden sm:inline">Share</span>
-          </button>
-
-          {/* Notifications Bell */}
-          <div className="relative">
+          {/* Add Holding Action Button (only for signed in users) */}
+          {isSignedIn && (
             <button
-              onClick={() => {
-                setShowNotifications(!showNotifications);
-                setUnreadNotifications(0);
-              }}
-              title="Notifications"
-              className="w-10 h-10 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-full flex items-center justify-center transition-colors relative"
+              onClick={onOpenAddCryptoModal}
+              className="flex items-center space-x-1.5 bg-[#212121] hover:bg-[#2A2A2A] text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow"
             >
-              <span className="w-5 h-5" >🔔</span>
-              {unreadNotifications > 0 && (
-                <span className="absolute -top-1 -right-1 bg-[#17C99E] text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
-                  {unreadNotifications}
-                </span>
-              )}
+              <span className="w-4 h-4 text-black" >➕</span>
+              <span className="hidden sm:inline">Add Holding</span>
             </button>
+          )}
 
-            {/* Notifications Popover */}
-            {showNotifications && (
-              <div className="absolute right-0 mt-3 w-80 sm:w-96 glass-dropdown rounded-2xl p-4 z-50">
-                <div className="flex items-center justify-between pb-3 border-b border-[#2E2E2E]">
-                  <span className="font-bold text-white text-sm">Notifications</span>
-                  <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-white">
-                    <span className="w-4 h-4" >✕</span>
-                  </button>
-                </div>
-                <div className="divide-y divide-[#2E2E2E] max-h-72 overflow-y-auto">
-                  {notifications.map((n) => (
-                    <div key={n.id} className="py-3 px-1 hover:bg-[#242424] rounded-lg transition-colors">
-                      <div className="flex items-center justify-between text-xs font-semibold text-[#17C99E]">
-                        <span>{n.title}</span>
-                        <span className="text-[10px] text-gray-400">{n.time}</span>
+          {/* Share Portfolio Button (only for signed in users) */}
+          {isSignedIn && (
+            <button
+              onClick={onOpenShareModal}
+              title="Share Portfolio"
+              className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+            >
+              <span className="w-4 h-4" >📤</span>
+              <span className="hidden sm:inline">Share</span>
+            </button>
+          )}
+
+          {/* Notifications Bell (only for signed in users) */}
+          {isSignedIn && (
+            <div className="relative">
+              <button
+                onClick={() => {
+                  setShowNotifications(!showNotifications);
+                  markAllRead();
+                }}
+                title="Notifications"
+                className="w-10 h-10 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-full flex items-center justify-center transition-colors relative"
+              >
+                <span className="w-5 h-5" >🔔</span>
+                {unreadNotifications > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-[#17C99E] text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
+                    {unreadNotifications}
+                  </span>
+                )}
+              </button>
+
+              {/* Notifications Popover */}
+              {showNotifications && (
+                <div className="absolute right-0 mt-3 w-80 sm:w-96 glass-dropdown rounded-2xl p-4 z-50">
+                  <div className="flex items-center justify-between pb-3 border-b border-[#2E2E2E]">
+                    <span className="font-bold text-white text-sm">Notifications</span>
+                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-white">
+                      <span className="w-4 h-4" >✕</span>
+                    </button>
+                  </div>
+                  <div className="divide-y divide-[#2E2E2E] max-h-72 overflow-y-auto">
+                    {notifications.length === 0 && (
+                      <div className="p-4 text-sm text-gray-400">No notifications</div>
+                    )}
+                    {notifications.map((n) => (
+                      <div key={n.id} className="py-3 px-1 hover:bg-[#242424] rounded-lg transition-colors">
+                        <div className="flex items-center justify-between text-xs font-semibold text-[#17C99E]">
+                          <span>{n.title}</span>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-[10px] text-gray-400">{n.time}</span>
+                            <button onClick={() => removeNotification(n.id)} className="text-gray-500 hover:text-white">✕</button>
+                          </div>
+                        </div>
+                        <p className="text-xs text-gray-300 mt-1 leading-relaxed">{n.message}</p>
                       </div>
-                      <p className="text-xs text-gray-300 mt-1 leading-relaxed">{n.message}</p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Clerk Auth Section */}
           {isSignedIn ? (

@@ -530,7 +530,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
 
         {/* ── Consolidated Improvement Plan ── */}
         {factors.some(f => f.tips.length > 0) && (
-          <div className="mt-4 bg-blue border border-white/20 rounded-2xl p-5">
+          <div className="mt-4 bg-[#2A2A2A] border border-[#3E3E3E] rounded-2xl p-5">
             <div className="flex items-center space-x-2 mb-4">
               <span className="w-4 h-4 text-yellow-400" >🚀</span>
               <h4 className="text-sm font-extrabold text-white">Your Full Improvement Plan</h4>

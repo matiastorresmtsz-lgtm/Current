@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { ChevronDown } from 'lucide-react';
 import { PortfolioAsset } from '../../types';
 
@@ -13,12 +14,250 @@ interface SharePortfolioModalProps {
 }
 
 type Currency = 'USD' | 'CAD' | 'MXN';
+type BgPreset = 'cyber-carbon' | 'emerald-bull' | 'midnight-onyx' | 'gold-tier' | 'slate-glass';
 
 const CURRENCY_CONFIG: Record<Currency, { flag: string; symbol: string; label: string; rate: number }> = {
   USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
   CAD: { flag: '🇨🇦', symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
   MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
 };
+
+const BG_PRESETS: Record<BgPreset, { name: string; style: string; badgeColor: string }> = {
+  'cyber-carbon': {
+    name: 'Cyber Carbon',
+    style: 'bg-[#11161B] border-zinc-800 text-white',
+    badgeColor: 'bg-zinc-800 text-zinc-300 border-zinc-700',
+  },
+  'emerald-bull': {
+    name: 'Emerald Bull',
+    style: 'bg-gradient-to-br from-[#062419] via-[#0B1512] to-[#121A17] border-emerald-900/60 text-white',
+    badgeColor: 'bg-emerald-950/80 text-emerald-400 border-emerald-800/50',
+  },
+  'midnight-onyx': {
+    name: 'Midnight Onyx',
+    style: 'bg-black border-zinc-900 text-white',
+    badgeColor: 'bg-zinc-900 text-zinc-400 border-zinc-800',
+  },
+  'gold-tier': {
+    name: 'Gold Tier',
+    style: 'bg-gradient-to-br from-[#241A08] via-[#141009] to-[#0D0B07] border-amber-900/60 text-white',
+    badgeColor: 'bg-amber-950/80 text-amber-400 border-amber-800/50',
+  },
+  'slate-glass': {
+    name: 'Slate Glass',
+    style: 'bg-zinc-900/90 backdrop-blur-2xl border-zinc-700 text-white',
+    badgeColor: 'bg-zinc-800/90 text-zinc-200 border-zinc-600',
+  },
+};
+
+function downloadCardAsPngImage({
+  roiStr,
+  pnlStr,
+  isPositive,
+  portfolioSize,
+  holdingsCount,
+  accountAge,
+  username,
+  topHoldings,
+  customBgUrl,
+  bgPresetStyle,
+  filename = 'Current-Trading-PnL.png'
+}: {
+  roiStr: string;
+  pnlStr: string;
+  isPositive: boolean;
+  portfolioSize: string;
+  holdingsCount: string;
+  accountAge: string;
+  username: string;
+  topHoldings: { symbol: string; alloc: string }[];
+  customBgUrl: string;
+  bgPresetStyle: string;
+  filename?: string;
+}) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 1200;
+  canvas.height = 700;
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return;
+
+  const drawDetails = () => {
+    // Outer Frame Border
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+
+    // Header Logo
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 38px sans-serif';
+    ctx.fillText('CURRENT', 60, 90);
+
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '600 16px monospace';
+    ctx.fillText('CRYPTO TRADING PnL SNAPSHOT', 60, 118);
+
+    // Username Badge (Top Right)
+    const userBadgeText = `@${username.replace(/^@/, '')}`;
+    ctx.font = '800 18px monospace';
+    const textWidth = ctx.measureText(userBadgeText).width;
+    const badgeW = Math.max(180, textWidth + 40);
+
+    ctx.fillStyle = 'rgba(23, 201, 158, 0.15)';
+    ctx.fillRect(1140 - badgeW, 55, badgeW, 45);
+    ctx.strokeStyle = '#17C99E';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(1140 - badgeW, 55, badgeW, 45);
+
+    ctx.fillStyle = '#17C99E';
+    ctx.fillText(userBadgeText, 1140 - badgeW + 20, 84);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.beginPath();
+    ctx.moveTo(60, 145);
+    ctx.lineTo(1140, 145);
+    ctx.stroke();
+
+    // ROI Title
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '800 18px sans-serif';
+    ctx.fillText('TOTAL RETURN (ROI)', 60, 195);
+
+    // ROI Value
+    ctx.fillStyle = isPositive ? '#10B981' : '#EF4444';
+    ctx.font = '900 84px monospace';
+    ctx.fillText(roiStr, 60, 285);
+
+    // Net PnL
+    ctx.font = '800 28px monospace';
+    ctx.fillText(pnlStr, 60, 335);
+
+    // Divider
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.beginPath();
+    ctx.moveTo(60, 370);
+    ctx.lineTo(1140, 370);
+    ctx.stroke();
+
+    // Stats Grid Box
+    // 1. Portfolio Size
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(60, 400, 340, 120);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.strokeRect(60, 400, 340, 120);
+
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '700 16px sans-serif';
+    ctx.fillText('PORTFOLIO SIZE', 85, 435);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 28px monospace';
+    ctx.fillText(portfolioSize, 85, 485);
+
+    // 2. Holdings Count
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(430, 400, 340, 120);
+    ctx.strokeRect(430, 400, 340, 120);
+
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '700 16px sans-serif';
+    ctx.fillText('HOLDINGS COUNT', 455, 435);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.font = '900 28px monospace';
+    ctx.fillText(holdingsCount, 455, 485);
+
+    // 3. Account Age
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+    ctx.fillRect(800, 400, 340, 120);
+    ctx.strokeRect(800, 400, 340, 120);
+
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '700 16px sans-serif';
+    ctx.fillText('ACCOUNT AGE', 825, 435);
+    ctx.fillStyle = '#17C99E';
+    ctx.font = '900 28px monospace';
+    ctx.fillText(accountAge, 825, 485);
+
+    // Top Assets Row
+    ctx.fillStyle = '#9CA3AF';
+    ctx.font = '700 16px sans-serif';
+    ctx.fillText('TOP ASSETS:', 60, 575);
+
+    let chipX = 200;
+    topHoldings.slice(0, 5).forEach((h) => {
+      const text = `${h.symbol} (${h.alloc}%)`;
+      ctx.font = '800 15px monospace';
+      const tw = ctx.measureText(text).width;
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.fillRect(chipX, 550, tw + 24, 36);
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+      ctx.strokeRect(chipX, 550, tw + 24, 36);
+
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillText(text, chipX + 12, 574);
+      chipX += tw + 36;
+    });
+
+    // Footer with Site Domain https://currentsocial.vercel.app/
+    ctx.fillStyle = '#17C99E';
+    ctx.font = '700 16px monospace';
+    ctx.fillText('https://currentsocial.vercel.app/', 60, 645);
+
+    ctx.fillStyle = '#9CA3AF';
+    const dateStr = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    ctx.fillText(dateStr, 980, 645);
+
+    // Trigger image download
+    const link = document.createElement('a');
+    link.download = filename;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  };
+
+  const drawFallbackBg = () => {
+    if (bgPresetStyle === 'emerald-bull') {
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#062419');
+      grad.addColorStop(0.5, '#0B1512');
+      grad.addColorStop(1, '#121A17');
+      ctx.fillStyle = grad;
+    } else if (bgPresetStyle === 'gold-tier') {
+      const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+      grad.addColorStop(0, '#241A08');
+      grad.addColorStop(0.5, '#141009');
+      grad.addColorStop(1, '#0D0B07');
+      ctx.fillStyle = grad;
+    } else if (bgPresetStyle === 'midnight-onyx') {
+      ctx.fillStyle = '#050505';
+    } else {
+      ctx.fillStyle = '#11161B';
+    }
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  };
+
+  if (customBgUrl) {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+      const x = (canvas.width / 2) - (img.width / 2) * scale;
+      const y = (canvas.height / 2) - (img.height / 2) * scale;
+      ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+
+      ctx.fillStyle = 'rgba(11, 14, 17, 0.75)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      drawDetails();
+    };
+    img.onerror = () => {
+      drawFallbackBg();
+      drawDetails();
+    };
+    img.src = customBgUrl;
+  } else {
+    drawFallbackBg();
+    drawDetails();
+  }
+}
 
 export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
   isOpen,
@@ -27,16 +266,24 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
   totalValue,
   totalPnlPercent
 }) => {
+  const { user } = useUser();
   const [copied, setCopied] = useState(false);
   const [currency, setCurrency] = useState<Currency>('USD');
+  const [bgPreset, setBgPreset] = useState<BgPreset>('cyber-carbon');
+  const [customBgImage, setCustomBgImage] = useState<string>('');
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!isOpen) return null;
 
+  const storedDisplayName = typeof window !== 'undefined' ? localStorage.getItem('current_user_display_name') : null;
+  const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('current_user_username') : null;
+  const activeUsername = storedDisplayName || (storedUsername ? `@${storedUsername.replace(/^@/, '')}` : null) || user?.fullName || user?.username || user?.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Trader';
+
   const curr = CURRENCY_CONFIG[currency];
   const convertedValue = totalValue * curr.rate;
+  const totalCost = portfolio.reduce((sum, p) => sum + p.amount * p.avgBuyPrice, 0);
+  const totalPnlUsd = totalValue - totalCost;
 
   const serializeSnapshot = (value: any) => {
     try {
@@ -49,10 +296,16 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
     }
   };
 
-  const snapshot = serializeSnapshot({ currency, portfolio });
+  const snapshot = serializeSnapshot({
+    currency,
+    portfolio,
+    username: activeUsername,
+    bg: bgPreset,
+  });
+
   const shareUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/share/portfolio?snapshot=${encodeURIComponent(snapshot)}`
-    : `https://current.crypto/share/portfolio?snapshot=${encodeURIComponent(snapshot)}`;
+    : `https://currentsocial.vercel.app/share/portfolio?snapshot=${encodeURIComponent(snapshot)}`;
 
   const handleCopy = () => {
     navigator.clipboard.writeText(shareUrl);
@@ -60,151 +313,57 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const handleDownloadPDF = async () => {
-    setIsDownloading(true);
+  const handleCustomImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    const shareTotalValue = portfolio.reduce((sum, item) => sum + item.amount * item.currentPrice * curr.rate, 0);
-    const chartColors = ['#10B981', '#8B5CF6', '#3B82F6', '#EC4899', '#F59E0B', '#14B8A6', '#0EA5E9', '#F472B6'];
-    let angleStart = 0;
-    const chartSegments = portfolio.slice(0, 6).map((item, idx) => {
-      const value = item.amount * item.currentPrice * curr.rate;
-      const percent = shareTotalValue > 0 ? value / shareTotalValue : 0;
-      const angle = percent * Math.PI * 2;
-      const x1 = 150 + 100 * Math.cos(angleStart - Math.PI / 2);
-      const y1 = 150 + 100 * Math.sin(angleStart - Math.PI / 2);
-      angleStart += angle;
-      const x2 = 150 + 100 * Math.cos(angleStart - Math.PI / 2);
-      const y2 = 150 + 100 * Math.sin(angleStart - Math.PI / 2);
-      const largeArc = angle > Math.PI ? 1 : 0;
-      return `
-        <path d="M150 150 L ${x1} ${y1} A 100 100 0 ${largeArc} 1 ${x2} ${y2} Z" fill="${chartColors[idx % chartColors.length]}" />`;
-    }).join('');
-
-    const portfolioRows = portfolio
-      .slice(0, 10)
-      .map(item => {
-        const val = item.amount * item.currentPrice * curr.rate;
-        const pnl = ((item.currentPrice - item.avgBuyPrice) / item.avgBuyPrice * 100);
-        const alloc = shareTotalValue > 0
-          ? ((item.amount * item.currentPrice * curr.rate / shareTotalValue) * 100).toFixed(1)
-          : '0';
-        return `
-          <tr style="border-bottom:1px solid #2E2E2E;">
-            <td style="padding:10px 12px;font-weight:700;color:#fff;">${item.symbol}</td>
-            <td style="padding:10px 12px;color:#9CA3AF;">${item.name}</td>
-            <td style="padding:10px 12px;color:#9CA3AF;">${item.amount.toFixed(4)}</td>
-            <td style="padding:10px 12px;color:#fff;font-weight:700;">${curr.symbol}${val.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
-            <td style="padding:10px 12px;color:${pnl >= 0 ? '#10B981' : '#EF4444'};font-weight:700;">${pnl >= 0 ? '+' : ''}${pnl.toFixed(2)}%</td>
-            <td style="padding:10px 12px;color:#9CA3AF;">${alloc}%</td>
-          </tr>`;
-      }).join('');
-
-    const totalCost = portfolio.reduce((s, i) => s + i.amount * i.avgBuyPrice, 0);
-    const totalPnlUsd = totalValue - totalCost;
-
-    const html = `
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8"/>
-  <title>Current Portfolio Report</title>
-  <style>
-    *{margin:0;padding:0;box-sizing:border-box;}
-    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#111;color:#fff;padding:40px;}
-    .header{display:flex;align-items:center;justify-content:space-between;margin-bottom:32px;}
-    .logo{font-size:24px;font-weight:900;letter-spacing:-0.5px;color:#EF4444;}
-    .badge{background:#EF4444/20;border:1px solid #EF4444/40;border-radius:999px;padding:4px 14px;font-size:11px;font-weight:700;color:#EF4444;letter-spacing:1px;}
-    .metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
-    .metric-card{background:#1A1A1A;border:1px solid #2E2E2E;border-radius:16px;padding:20px;}
-    .metric-label{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
-    .metric-value{font-size:22px;font-weight:900;color:#fff;}
-    .metric-sub{font-size:12px;font-weight:700;margin-top:4px;}
-    .chart-card{background:#1A1A1A;border:1px solid #2E2E2E;border-radius:16px;padding:20px;margin-bottom:32px;text-align:center;}
-    .chart-label{font-size:11px;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
-    .chart-value{font-size:28px;font-weight:900;color:#fff;margin-bottom:14px;}
-    .table-wrap{background:#1A1A1A;border:1px solid #2E2E2E;border-radius:16px;overflow:hidden;}
-    table{width:100%;border-collapse:collapse;}
-    thead tr{background:#212121;}
-    th{padding:12px;font-size:10px;color:#6B7280;text-transform:uppercase;letter-spacing:0.5px;text-align:left;font-weight:700;}
-    .footer{margin-top:24px;font-size:11px;color:#4B5563;text-align:center;}
-  </style>
-</head>
-<body>
-  <div class="header">
-    <span class="logo">Current</span>
-    <div style="text-align:right;">
-      <div class="badge">PORTFOLIO REPORT</div>
-      <div style="font-size:11px;color:#6B7280;margin-top:6px;">${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</div>
-    </div>
-  </div>
-
-  <div class="metrics">
-    <div class="metric-card">
-      <div class="metric-label">Portfolio Value</div>
-      <div class="metric-value">${curr.symbol}${convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-      <div class="metric-sub">in ${currency}</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">All-Time Return</div>
-      <div class="metric-value" style="color:${totalPnlPercent >= 0 ? '#10B981' : '#EF4444'};">${totalPnlPercent >= 0 ? '+' : ''}${totalPnlPercent.toFixed(2)}%</div>
-      <div class="metric-sub" style="color:${totalPnlUsd * curr.rate >= 0 ? '#10B981' : '#EF4444'};">${totalPnlUsd * curr.rate >= 0 ? '+' : ''}${curr.symbol}${Math.abs(totalPnlUsd * curr.rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">Holdings</div>
-      <div class="metric-value">${portfolio.length}</div>
-      <div class="metric-sub">Assets tracked</div>
-    </div>
-  </div>
-
-  <div class="chart-card">
-    <div class="chart-label">Portfolio Distribution</div>
-    <div class="chart-value">Donut Graph</div>
-    <svg width="300" height="300" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="150" cy="150" r="100" fill="#111" />
-      ${chartSegments}
-      <circle cx="150" cy="150" r="60" fill="#111" />
-    </svg>
-  </div>
-
-  <div class="table-wrap">
-    <table>
-      <thead><tr>
-        <th>Symbol</th><th>Name</th><th>Amount</th><th>Value (${currency})</th><th>P&L</th><th>Allocation</th>
-      </tr></thead>
-      <tbody>${portfolioRows}</tbody>
-    </table>
-  </div>
-
-  <div class="footer">Generated by Current Crypto Platform · current.crypto · Values in ${currency} (1 USD = ${curr.rate} ${currency})</div>
-</body>
-</html>`;
-
-    const win = window.open('', '_blank');
-    if (win) {
-      win.document.write(html);
-      win.document.close();
-      setTimeout(() => {
-        win.print();
-        setIsDownloading(false);
-      }, 500);
-    } else {
-      setIsDownloading(false);
-    }
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setCustomBgImage(result);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
+  const topHoldingsFormatted = portfolio.slice(0, 6).map((item) => {
+    const itemVal = item.amount * item.currentPrice * curr.rate;
+    const alloc = convertedValue > 0 ? ((itemVal / convertedValue) * 100).toFixed(1) : '0';
+    return { symbol: item.symbol, alloc };
+  });
+
+  const handleDownloadExactImage = () => {
+    downloadCardAsPngImage({
+      roiStr: `${totalPnlPercent >= 0 ? '+' : ''}${totalPnlPercent.toFixed(2)}%`,
+      pnlStr: `${totalPnlUsd * curr.rate >= 0 ? '+' : '-'}${curr.symbol}${Math.abs(totalPnlUsd * curr.rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ${currency}`,
+      isPositive: totalPnlPercent >= 0,
+      portfolioSize: `${curr.symbol}${convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      holdingsCount: `${portfolio.length} Assets`,
+      accountAge: 'Active Trader',
+      username: activeUsername,
+      topHoldings: topHoldingsFormatted,
+      customBgUrl: customBgImage,
+      bgPresetStyle: bgPreset,
+      filename: `${activeUsername}-Current-PnL.png`
+    });
+  };
+
+  const presetStyle = BG_PRESETS[bgPreset];
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-[#1A1A1A] border border-[#2E2E2E] rounded-3xl w-full max-w-md shadow-2xl overflow-hidden">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in font-sans">
+      <div className="bg-[#1A1A1A] border border-[#2E2E2E] rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
 
         {/* Header */}
         <div className="flex items-center justify-between px-6 pt-6 pb-4 border-b border-[#2E2E2E]">
           <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-[#161616] border border-[#2E2E2E] flex items-center justify-center text-[#9CA3AF]">
-              <span className="w-5 h-5" >📤</span>
+            <div className="w-9 h-9 rounded-xl bg-[#161616] border border-[#2E2E2E] flex items-center justify-center text-white font-black text-sm">
+              C
             </div>
             <div>
-              <h2 className="text-base font-bold text-white">Share Portfolio</h2>
-              <p className="text-xs text-gray-400">Export or share your verified holdings</p>
+              <h2 className="text-base font-bold text-white">Share Trading PnL Card</h2>
+              <p className="text-xs text-gray-400">Generate a custom exchange-style trading card</p>
             </div>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-white p-1.5 rounded-lg hover:bg-[#2A2A2A] transition-colors">
@@ -212,7 +371,51 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
           </button>
         </div>
 
-        <div className="p-6 space-y-5">
+        <div className="p-6 space-y-5 overflow-y-auto flex-1">
+
+          {/* Background Controls */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-xs font-semibold text-gray-400 uppercase">Card Background Theme</label>
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                onChange={handleCustomImageUpload}
+                className="hidden"
+              />
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                className="text-xs font-bold text-[#17C99E] hover:underline flex items-center space-x-1"
+              >
+                <span>🖼️</span>
+                <span>{customBgImage ? 'Change Image' : 'Upload Custom BG'}</span>
+              </button>
+            </div>
+
+            {customBgImage && (
+              <div className="mb-2.5 flex items-center justify-between bg-zinc-800/80 px-3 py-1.5 rounded-xl border border-zinc-700 text-xs">
+                <span className="text-emerald-400 font-bold">Custom Image Active</span>
+                <button onClick={() => setCustomBgImage('')} className="text-rose-400 font-bold hover:underline">Clear</button>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {(Object.keys(BG_PRESETS) as BgPreset[]).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => { setBgPreset(key); setCustomBgImage(''); }}
+                  className={`px-3 py-2 rounded-xl text-xs font-bold transition-all border text-left ${
+                    bgPreset === key && !customBgImage
+                      ? 'bg-[#17C99E] text-black border-[#17C99E]'
+                      : 'bg-[#212121] text-gray-300 border-[#2E2E2E] hover:bg-[#2A2A2A]'
+                  }`}
+                >
+                  {BG_PRESETS[key].name}
+                </button>
+              ))}
+            </div>
+          </div>
 
           {/* Currency Selector */}
           <div>
@@ -220,7 +423,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
             <div className="relative">
               <button
                 onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
-                className="w-full flex items-center justify-between bg-[#212121] border border-[#2E2E2E] hover:border-[#3E3E3E] rounded-xl px-4 py-3 transition-colors"
+                className="w-full flex items-center justify-between bg-[#212121] border border-[#2E2E2E] hover:border-[#3E3E3E] rounded-xl px-4 py-2.5 transition-colors"
               >
                 <div className="flex items-center space-x-2.5">
                   <span className="text-base">{curr.flag}</span>
@@ -256,49 +459,52 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
 
           {/* Shareable Card Preview */}
           <div
-            ref={cardRef}
-            className="bg-[#1A1A1A] border border-[#2E2E2E] rounded-2xl p-5 shadow-xl space-y-4 relative overflow-hidden"
+            style={customBgImage ? { backgroundImage: `url(${customBgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}
+            className={`border rounded-2xl p-6 shadow-xl space-y-4 relative overflow-hidden transition-all ${customBgImage ? 'border-zinc-700' : presetStyle.style}`}
           >
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#161616]/80 rounded-full blur-2xl pointer-events-none" />
+            {customBgImage && <div className="absolute inset-0 bg-black/75 backdrop-blur-[2px] pointer-events-none" />}
 
-            <div className="flex items-center justify-between">
+            <div className="relative z-10 flex items-center justify-between border-b border-white/10 pb-3">
               <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-white text-base tracking-tight">Current</span>
+                <span className="font-black text-white text-base tracking-wider uppercase">CURRENT</span>
               </div>
-              <span className="bg-[#EF4444]/20 text-[#EF4444] text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#EF4444]/30">
-                VERIFIED PORTFOLIO
+              <span className="text-xs font-bold text-[#17C99E] bg-[#17C99E]/10 border border-[#17C99E]/30 px-3 py-1 rounded-full font-mono">
+                @{activeUsername.replace(/^@/, '')}
               </span>
             </div>
 
-            <div className="pt-2 border-t border-[#2E2E2E]">
-              <div className="text-[11px] text-gray-400 font-medium uppercase tracking-wider">
-                Total Portfolio Value · {currency}
+            <div className="relative z-10 pt-1">
+              <div className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">
+                Total Return (ROI)
               </div>
-              <div className="text-2xl font-extrabold text-white tracking-tight mt-0.5">
-                {curr.symbol}{convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              <div className={`text-3xl font-black font-mono tracking-tight ${totalPnlPercent >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                {totalPnlPercent >= 0 ? '+' : ''}{totalPnlPercent.toFixed(2)}%
               </div>
-              <div className={`text-xs font-extrabold mt-1 flex items-center space-x-1 ${totalPnlPercent >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
-                <span className="w-3.5 h-3.5" >📈</span>
-                <span>{totalPnlPercent >= 0 ? '+' : ''}{totalPnlPercent.toFixed(2)}% All-Time Return</span>
+              <div className={`text-xs font-bold font-mono mt-0.5 ${totalPnlUsd * curr.rate >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
+                {totalPnlUsd * curr.rate >= 0 ? '+' : '-'}{curr.symbol}{Math.abs(totalPnlUsd * curr.rate).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} {currency}
               </div>
             </div>
 
-            {/* Allocation Chips */}
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {portfolio.slice(0, 5).map((item) => (
-                <span
-                  key={item.coinId}
-                  className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-[#2A2A2A] text-gray-200 border border-[#383838]"
-                >
-                  {item.symbol}: {totalValue > 0 ? ((item.amount * item.currentPrice / totalValue) * 100).toFixed(1) : 0}%
-                </span>
-              ))}
+            {/* Holdings & Size */}
+            <div className="relative z-10 grid grid-cols-2 gap-2 pt-2 border-t border-white/10 text-xs">
+              <div>
+                <span className="text-[10px] text-gray-400 block font-semibold uppercase">Portfolio Size</span>
+                <span className="font-extrabold font-mono text-white">{curr.symbol}{convertedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-gray-400 block font-semibold uppercase">Holdings</span>
+                <span className="font-extrabold font-mono text-white">{portfolio.length} Assets</span>
+              </div>
+            </div>
+
+            {/* Domain Footer */}
+            <div className="relative z-10 pt-2 text-[11px] font-mono text-[#17C99E]">
+              https://currentsocial.vercel.app/
             </div>
           </div>
 
           {/* Action Buttons Row */}
           <div className="grid grid-cols-2 gap-3">
-            {/* Copy Link */}
             <button
               onClick={handleCopy}
               className={`flex items-center justify-center space-x-2 py-3 rounded-xl font-bold text-xs transition-all border ${
@@ -308,31 +514,28 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
               }`}
             >
               {copied ? <span className="w-4 h-4" >✅</span> : <span className="w-4 h-4" >📋</span>}
-              <span>{copied ? 'Copied!' : 'Copy Link'}</span>
+              <span>{copied ? 'Copied Link!' : 'Copy PnL Link'}</span>
             </button>
 
-            {/* Download PDF */}
+            {/* Download Exact Card Image PNG */}
             <button
-              onClick={handleDownloadPDF}
-              disabled={isDownloading}
-              className="flex items-center justify-center space-x-2 py-3 rounded-xl font-bold text-xs bg-[#212121] hover:bg-[#2A2A2A] text-white transition-all shadow-md shadow-black/20 disabled:opacity-60"
+              onClick={handleDownloadExactImage}
+              className="flex items-center justify-center space-x-2 py-3 rounded-xl font-bold text-xs bg-[#17C99E] hover:bg-[#14B8A6] text-black transition-all shadow-md"
             >
-              <span className={`w-4 h-4 ${isDownloading ? 'animate-bounce' : ''}`} >⬇️</span>
-              <span>{isDownloading ? 'Preparing...' : 'Download PDF'}</span>
+              <span className="w-4 h-4" >📸</span>
+              <span>Download Card Image</span>
             </button>
           </div>
 
           {/* Share Link Input */}
           <div>
-            <label className="block text-xs font-semibold text-gray-400 uppercase mb-2">Shareable Link</label>
-            <div className="flex items-center space-x-2">
-              <input
-                type="text"
-                readOnly
-                value={shareUrl}
-                className="flex-1 bg-[#161616] text-gray-300 text-xs p-3 rounded-xl border border-[#2E2E2E] focus:outline-none font-mono"
-              />
-            </div>
+            <label className="block text-xs font-semibold text-gray-400 uppercase mb-2">Shareable PnL Link</label>
+            <input
+              type="text"
+              readOnly
+              value={shareUrl}
+              className="w-full bg-[#161616] text-gray-300 text-xs p-3 rounded-xl border border-[#2E2E2E] focus:outline-none font-mono truncate"
+            />
           </div>
 
         </div>
@@ -340,3 +543,6 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
     </div>
   );
 };
+
+
+

@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useNotifications } from '../context/NotificationContext';
 import { ChevronDown, Coins } from 'lucide-react';
 import { PortfolioAsset, CryptoCoin } from '../types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
@@ -44,6 +45,8 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   const [goalAmount, setGoalAmount] = useState<string>('10000');
   const [goalDeadline, setGoalDeadline] = useState<string>('2025-12-31');
   const [customGoalName, setCustomGoalName] = useState<string>('');
+  const { addNotification } = useNotifications();
+  const prevProgressRef = useRef<number>(0);
 
   // Compute live portfolio metrics matching screenshot
   const totalValue = portfolio.reduce((sum, item) => sum + (item.amount * item.currentPrice), 0);
@@ -66,6 +69,17 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   // Goal progress (percentage) based on converted portfolio value vs. target goal amount
   const goalTarget = parseFloat(goalAmount || '0');
   const goalProgress = goalTarget > 0 ? Math.min(100, (convertedValue / goalTarget) * 100) : 0;
+
+  // Notify when goal reaches or exceeds 100% (only fire on crossing threshold)
+  useEffect(() => {
+    const prev = prevProgressRef.current ?? 0;
+    if (prev < 100 && goalProgress >= 100) {
+      try {
+        addNotification({ title: 'Goal reached 🎉', message: `You reached your ${customGoalName || goalType} goal!`, time: '' });
+      } catch (e) {}
+    }
+    prevProgressRef.current = goalProgress;
+  }, [goalProgress, addNotification, customGoalName, goalType]);
 
   // Donut chart segments
   const colorsList = ['#10B981', '#8B5CF6', '#3B82F6', '#EC4899', '#F59E0B', '#14B8A6'];
@@ -163,7 +177,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                   </button>
                 </div>
 
-                <div className="space-y-3">
+                  <div className="space-y-3">
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-2">Goal type</label>
                     <select
@@ -235,6 +249,18 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
                   <div className="rounded-3xl border border-[#2E2E2E] bg-[#161616] p-3 text-xs text-gray-400">
                     {customGoalName ? `Goal: ${customGoalName}` : `Goal: ${goalType} objective`} · Target by {goalDeadline}
+                  </div>
+
+                  <div className="flex items-center justify-end mt-2 space-x-2">
+                    <button
+                      onClick={() => {
+                        setShowGoalPopup(false);
+                        try { addNotification({ title: 'Goal set', message: `Saved goal ${customGoalName || goalType} for ${curr.symbol}${parseFloat(goalAmount || '0').toLocaleString()}`, time: '' }); } catch (e) {}
+                      }}
+                      className="px-3 py-2 rounded-xl bg-[#17C99E] text-black font-bold text-sm"
+                    >
+                      Save Goal
+                    </button>
                   </div>
                 </div>
               </div>
@@ -483,3 +509,5 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
     </div>
   );
 };
+
+// watch goal progress and fire notification when reached (no default export)

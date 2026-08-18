@@ -45,7 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'topic-passive-income', name: 'Passive Income', icon: Flame, color: 'text-amber-400', emoji: '🔥' },
     { id: 'topic-beginner', name: 'Beginner Investors', icon: GraduationCap, color: 'text-emerald-400', emoji: '🌱' },
     { id: 'topic-memes', name: 'Memecoins', icon: Coins, color: 'text-pink-400', emoji: '🐕' },
-    { id: 'topic-defi', name: 'DeFi & Infra', icon: Compass, color: 'text-cyan-400', emoji: '⚡' },
+    { id: 'topic-defi', name: 'DeFi & Infra', icon: Compass, color: 'text-zinc-400', emoji: '⚡' },
   ] as const;
 
   return (

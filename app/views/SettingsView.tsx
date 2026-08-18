@@ -17,28 +17,60 @@ export const SettingsView: React.FC = () => {
 
   // Profile Form state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
-  const [fullName, setFullName] = useState(user?.fullName || 'Matias Torres');
-  const [username, setUsername] = useState(user?.username || 'matiastorres');
-  const [email, setEmail] = useState(user?.primaryEmailAddress?.emailAddress || 'matiasttorres@gmail.com');
+  const [displayName, setDisplayName] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('current_user_display_name');
+      if (saved) return saved;
+    }
+    return user?.fullName || user?.firstName || 'Current Trader';
+  });
+  const [username, setUsername] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('current_user_username');
+      if (saved) return saved;
+    }
+    return user?.username || user?.primaryEmailAddress?.emailAddress?.split('@')[0] || 'trader';
+  });
+  const [email] = useState(user?.primaryEmailAddress?.emailAddress || 'trader@current.crypto');
   const [bio, setBio] = useState('Crypto trader & long-term investor building my portfolio on Current.');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('current_user_display_name', displayName);
+      localStorage.setItem('current_user_username', username);
+    }
+
+    // Trigger dispatch event so other components refresh immediately
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('storage'));
+    }
+
+    setSaveSuccess(true);
+    setTimeout(() => setSaveSuccess(false), 3000);
     setIsEditingProfile(false);
   };
 
   return (
     <div className="max-w-[1200px] mx-auto space-y-6">
 
-      {/* Main Settings Grid - Matching Blossom Social Screenshot */}
+      {/* Main Settings Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-        {/* Left / Center Column: Primary Settings Content (8 cols) */}
+        {/* Left Column: Primary Settings Content */}
         <div className="lg:col-span-8 space-y-6">
 
           {/* Account Section Card */}
           <div id="account" className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl space-y-6">
-            <h2 className="text-xl font-extrabold text-white">Account</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="text-xl font-extrabold text-white">Account Profile</h2>
+              {saveSuccess && (
+                <span className="text-xs font-bold text-[#17C99E] bg-[#17C99E]/10 border border-[#17C99E]/30 px-3 py-1 rounded-full animate-fade-in">
+                  ✓ Profile Saved!
+                </span>
+              )}
+            </div>
 
             <div className="divide-y divide-[#2E2E2E]">
 
@@ -48,17 +80,21 @@ export const SettingsView: React.FC = () => {
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
                       <span className="text-base">✍️</span>
-                      <h3 className="text-sm font-bold text-white">Edit Profile</h3>
+                      <h3 className="text-sm font-bold text-white">Display Name & Handle</h3>
                     </div>
                     <p className="text-xs text-gray-400 leading-relaxed">
-                      Edit your profile picture, name, username, bio, external link, and your country / city badge.
+                      Set your public display name and handle shown on PnL share cards and the global leaderboard.
                     </p>
+                    <div className="flex items-center space-x-3 pt-1 text-xs font-mono text-[#17C99E]">
+                      <span>Name: <strong className="text-white">{displayName}</strong></span>
+                      <span>Handle: <strong className="text-white">@{username.replace(/^@/, '')}</strong></span>
+                    </div>
                   </div>
                   <button
                     onClick={() => setIsEditingProfile(!isEditingProfile)}
                     className="bg-[#2A2A2A] hover:bg-[#333333] text-white text-xs font-bold px-4 py-2 rounded-full border border-[#3A3A3A] transition-all shrink-0"
                   >
-                    {isEditingProfile ? 'Close' : 'Edit'}
+                    {isEditingProfile ? 'Close' : 'Edit Profile'}
                   </button>
                 </div>
 
@@ -67,21 +103,25 @@ export const SettingsView: React.FC = () => {
                   <form onSubmit={handleSaveProfile} className="mt-4 p-4 bg-[#161616] rounded-2xl border border-[#2E2E2E] space-y-4 animate-fade-in">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Full Name</label>
+                        <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Display Name</label>
                         <input
                           type="text"
-                          value={fullName}
-                          onChange={(e) => setFullName(e.target.value)}
+                          required
+                          value={displayName}
+                          onChange={(e) => setDisplayName(e.target.value)}
+                          placeholder="e.g. Satoshi Nakamoto"
                           className="w-full bg-[#212121] text-white text-xs p-2.5 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-[#17C99E]"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Username</label>
+                        <label className="block text-[11px] font-bold text-gray-400 uppercase mb-1">Username Handle</label>
                         <input
                           type="text"
+                          required
                           value={username}
                           onChange={(e) => setUsername(e.target.value)}
+                          placeholder="e.g. satoshi"
                           className="w-full bg-[#212121] text-white text-xs p-2.5 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-[#17C99E]"
                         />
                       </div>
@@ -97,12 +137,21 @@ export const SettingsView: React.FC = () => {
                       />
                     </div>
 
-                    <button
-                      type="submit"
-                      className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-4 py-2 rounded-xl transition-all shadow"
-                    >
-                      Save Profile Changes
-                    </button>
+                    <div className="flex items-center justify-end space-x-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditingProfile(false)}
+                        className="px-4 py-2 text-xs font-bold text-gray-400 hover:text-white"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-5 py-2 rounded-xl transition-all shadow"
+                      >
+                        Save Profile Changes
+                      </button>
+                    </div>
                   </form>
                 )}
               </div>

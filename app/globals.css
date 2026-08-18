@@ -5,8 +5,8 @@
   --foreground: #f3f4f6;
   --card-bg: #212121;
   --card-border: #2e2e2e;
-  --primary-blue: #3b82f6;
-  --primary-cyan: #00f0ff;
+  --primary-accent: #ffffff;
+  --muted-accent: #71717a;
   --bullish-green: #10b981;
   --bearish-red: #ef4444;
   --muted: #9ca3af;
@@ -39,7 +39,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #3b82f6;
+  background: #52525b;
 }
 
 /* Glassmorphism & Accents */
@@ -52,16 +52,18 @@ body {
 .glass-dropdown {
   background: rgba(26, 26, 26, 0.95);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
 }
 
-.glow-blue {
-  box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+.glow-blue,
+.glow-monochrome {
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
 }
 
-.glow-cyan {
-  box-shadow: 0 0 20px rgba(0, 240, 255, 0.25);
+.glow-cyan,
+.glow-zinc {
+  box-shadow: 0 0 20px rgba(113, 113, 122, 0.25);
 }
 
 /* ── Light Mode Overrides ────────────────────────────── */

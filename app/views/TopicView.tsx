@@ -42,7 +42,7 @@ const TOPIC_CONFIGS: Record<string, { title: string; subtitle: string; icon: str
     title: 'DeFi & Infrastructure',
     subtitle: 'Decentralized exchanges, cross-chain bridges, layer 2 scaling, real-world asset tokenization.',
     icon: '⚡',
-    bannerGradient: 'from-cyan-900/40 via-[#212121] to-[#161616]',
+    bannerGradient: 'from-zinc-800/40 via-[#212121] to-[#161616]',
     tags: ['DEX Volume', 'TVL Trackers', 'Layer 2s', 'RWA']
   }
 };

@@ -6,13 +6,6 @@ const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 export async function POST(req: Request) {
   const { userId } = await auth();
-  if (!userId) {
-    return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } });
-  }
-
-  if (!SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
-    return new Response(JSON.stringify({ message: 'Server not configured with SUPABASE_SERVICE_ROLE_KEY' }), { status: 500, headers: { 'content-type': 'application/json' } });
-  }
 
   let body: any;
   try {
@@ -24,6 +17,15 @@ export async function POST(req: Request) {
   const { path, payload, query, method = 'POST' } = body;
   if (!path) {
     return new Response(JSON.stringify({ message: 'Missing path' }), { status: 400, headers: { 'content-type': 'application/json' } });
+  }
+
+  const isGet = method.toUpperCase() === 'GET';
+  if (!userId && !isGet) {
+    return new Response(JSON.stringify({ message: 'Unauthorized' }), { status: 401, headers: { 'content-type': 'application/json' } });
+  }
+
+  if (!SUPABASE_URL || (!SUPABASE_SERVICE_ROLE_KEY && !SUPABASE_ANON_KEY)) {
+    return new Response(JSON.stringify({ message: 'Server not configured with Supabase keys' }), { status: 500, headers: { 'content-type': 'application/json' } });
   }
 
   // ensure the user_id is set to the authenticated Clerk user
