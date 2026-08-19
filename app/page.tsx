@@ -25,6 +25,7 @@ import { LeaderboardView } from './views/LeaderboardView';
 import { LearnView } from './views/LearnView';
 import { InsightsView } from './views/InsightsView';
 import { AboutView } from './views/AboutView';
+import { PricingView } from './views/PricingView';
 import { SettingsView } from './views/SettingsView';
 import { TopicView } from './views/TopicView';
 
@@ -374,6 +375,12 @@ export default function Home() {
 
           {activeTab === 'settings' && (
             <SettingsView />
+          )}
+
+          {activeTab === 'pricing' && (
+            <PricingView
+              onSelectTab={handleTabSelect}
+            />
           )}
 
           {activeTab === 'about' && (

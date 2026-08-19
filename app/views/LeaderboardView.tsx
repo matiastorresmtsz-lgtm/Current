@@ -2,16 +2,16 @@
 
 import React, { useMemo, useEffect, useState, useCallback } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
-import { 
-  Trophy, 
-  User, 
-  Search, 
-  RefreshCw, 
-  TrendingUp, 
-  TrendingDown, 
-  Award, 
-  Flame, 
-  ShieldCheck, 
+import {
+  Trophy,
+  User,
+  Search,
+  RefreshCw,
+  TrendingUp,
+  TrendingDown,
+  Award,
+  Flame,
+  ShieldCheck,
   X,
   ExternalLink,
   ChevronRight,
@@ -46,12 +46,12 @@ type SortField = 'value' | 'change24h' | 'winRate';
 export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], coins = [] }) => {
   const { isSignedIn, user } = useUser();
   const { country } = useAppSettings();
-  
+
   const [globalEntries, setGlobalEntries] = useState<LeaderboardEntryPayload[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const [lastSyncTime, setLastSyncTime] = useState<Date>(new Date());
-  
+
   // Filtering & Sorting State
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [selectedRegion, setSelectedRegion] = useState<string>('ALL');
@@ -93,8 +93,8 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
       return currentPrice >= p.avgBuyPrice;
     }).length;
 
-    const winRate = portfolio.length > 0 
-      ? Number(((profitable / portfolio.length) * 100).toFixed(1)) 
+    const winRate = portfolio.length > 0
+      ? Number(((profitable / portfolio.length) * 100).toFixed(1))
       : 75.0;
 
     return {
@@ -219,10 +219,10 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
   // Filtered leaderboard based on search query & region filter
   const filteredLeaderboard = useMemo(() => {
     return fullLeaderboard.filter(entry => {
-      const matchesSearch = searchQuery.trim() === '' || 
+      const matchesSearch = searchQuery.trim() === '' ||
         entry.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
         entry.region.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesRegion = selectedRegion === 'ALL' || entry.countryCode === selectedRegion;
 
       return matchesSearch && matchesRegion;
@@ -241,19 +241,11 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
 
   return (
     <div className="space-y-6 animate-fade-in">
-      
+
       {/* Top Header & Live Sync Status */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2">
-            <span className="text-xs uppercase tracking-widest text-[#17C99E] font-extrabold flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> Live Global Rankings
-            </span>
-            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#17C99E]/10 text-[#17C99E] border border-[#17C99E]/30">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#17C99E] animate-pulse mr-1.5" />
-              Live Sync
-            </span>
-          </div>
+
           <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
             Trader Leaderboard
           </h1>
@@ -277,7 +269,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
 
       {/* Overview Stat Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        
+
         {/* Card 1: Top Ranked Trader */}
         <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-5 shadow-xl relative overflow-hidden flex flex-col justify-between">
           <div className="flex items-center justify-between">
@@ -347,11 +339,10 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
         </div>
 
         {/* Card 3: Current User Status Card */}
-        <div className={`rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all ${
-          isSignedIn 
-            ? 'bg-[#212121] border-2 border-[#17C99E]/50 shadow-[#17C99E]/5' 
-            : 'bg-[#212121] border border-[#2E2E2E]'
-        }`}>
+        <div className={`rounded-3xl p-5 shadow-xl flex flex-col justify-between transition-all ${isSignedIn
+          ? 'bg-[#212121] border-2 border-[#17C99E]/50 shadow-[#17C99E]/5'
+          : 'bg-[#212121] border border-[#2E2E2E]'
+          }`}>
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#17C99E] flex items-center gap-1">
               <Flame className="w-3.5 h-3.5" /> Your Live Standing
@@ -402,7 +393,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
 
       {/* Controls Bar: Search, Region Filter & Sort Tabs */}
       <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-4 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
-        
+
         {/* Search Bar */}
         <div className="relative w-full md:w-80">
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -425,7 +416,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
 
         {/* Region & Sort Controls */}
         <div className="flex flex-wrap items-center justify-between md:justify-end gap-3 w-full md:w-auto">
-          
+
           {/* Region Dropdown */}
           <div className="flex items-center space-x-2">
             <span className="text-[11px] font-bold text-gray-400 hidden sm:inline">Region:</span>
@@ -447,31 +438,28 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
           <div className="bg-[#161616] p-1 rounded-2xl border border-[#2E2E2E] flex items-center space-x-1">
             <button
               onClick={() => setSortField('value')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
-                sortField === 'value'
-                  ? 'bg-[#17C99E] text-black shadow-sm'
-                  : 'text-gray-400 hover:text-white'
-              }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${sortField === 'value'
+                ? 'bg-[#17C99E] text-black shadow-sm'
+                : 'text-gray-400 hover:text-white'
+                }`}
             >
               🏆 Value
             </button>
             <button
               onClick={() => setSortField('change24h')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
-                sortField === 'change24h'
-                  ? 'bg-[#17C99E] text-black shadow-sm'
-                  : 'text-gray-400 hover:text-white'
-              }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${sortField === 'change24h'
+                ? 'bg-[#17C99E] text-black shadow-sm'
+                : 'text-gray-400 hover:text-white'
+                }`}
             >
               📈 24h PnL
             </button>
             <button
               onClick={() => setSortField('winRate')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${
-                sortField === 'winRate'
-                  ? 'bg-[#17C99E] text-black shadow-sm'
-                  : 'text-gray-400 hover:text-white'
-              }`}
+              className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all ${sortField === 'winRate'
+                ? 'bg-[#17C99E] text-black shadow-sm'
+                : 'text-gray-400 hover:text-white'
+                }`}
             >
               🎯 Win Rate
             </button>
@@ -543,11 +531,10 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
                     <tr
                       key={entry.id}
                       onClick={() => setSelectedTrader(entry)}
-                      className={`cursor-pointer transition-colors group ${
-                        entry.isCurrentUser 
-                          ? 'bg-[#17C99E]/10 hover:bg-[#17C99E]/20' 
-                          : 'bg-[#212121] hover:bg-[#2A2A2A]'
-                      }`}
+                      className={`cursor-pointer transition-colors group ${entry.isCurrentUser
+                        ? 'bg-[#17C99E]/10 hover:bg-[#17C99E]/20'
+                        : 'bg-[#212121] hover:bg-[#2A2A2A]'
+                        }`}
                     >
                       {/* Rank Column */}
                       <td className="px-5 py-4">
@@ -615,11 +602,10 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
 
                       {/* 24h PnL */}
                       <td className="px-5 py-4 text-right">
-                        <span className={`inline-flex items-center space-x-0.5 font-extrabold font-mono text-xs px-2.5 py-1 rounded-lg ${
-                          entry.change24h >= 0 
-                            ? 'bg-[#17C99E]/10 text-[#17C99E] border border-[#17C99E]/20' 
-                            : 'bg-[#FF4D4D]/10 text-[#FF4D4D] border border-[#FF4D4D]/20'
-                        }`}>
+                        <span className={`inline-flex items-center space-x-0.5 font-extrabold font-mono text-xs px-2.5 py-1 rounded-lg ${entry.change24h >= 0
+                          ? 'bg-[#17C99E]/10 text-[#17C99E] border border-[#17C99E]/20'
+                          : 'bg-[#FF4D4D]/10 text-[#FF4D4D] border border-[#FF4D4D]/20'
+                          }`}>
                           {entry.change24h >= 0 ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
                           {entry.change24h >= 0 ? '+' : ''}{entry.change24h}%
                         </span>
@@ -629,9 +615,9 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
                       <td className="px-5 py-4 text-right">
                         <div className="inline-flex items-center space-x-2">
                           <div className="w-16 h-1.5 bg-[#161616] rounded-full overflow-hidden border border-[#2E2E2E] hidden sm:block">
-                            <div 
-                              className="h-full bg-[#17C99E] rounded-full" 
-                              style={{ width: `${Math.min(100, Math.max(0, entry.winRate))}%` }} 
+                            <div
+                              className="h-full bg-[#17C99E] rounded-full"
+                              style={{ width: `${Math.min(100, Math.max(0, entry.winRate))}%` }}
                             />
                           </div>
                           <span className="font-extrabold font-mono text-gray-200 text-xs">
@@ -657,7 +643,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
       {selectedTrader && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
           <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 max-w-md w-full shadow-2xl space-y-5 animate-scale-in relative">
-            
+
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <span className="text-xs uppercase font-extrabold tracking-wider text-[#17C99E]">Trader Profile</span>
@@ -743,18 +729,7 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
       )}
 
       {/* Footer Info Banner */}
-      <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="text-[11px] uppercase tracking-wider font-extrabold text-[#17C99E]">Real-Time Sync Engine</div>
-          <div className="text-base font-extrabold text-white">Active Signed-In Traders ({fullLeaderboard.length})</div>
-          <p className="text-xs text-gray-400">
-            Leaderboard entries update automatically from active signed-in Clerk accounts and live portfolio holdings synced with Supabase.
-          </p>
-        </div>
-        <div className="text-xs text-gray-400 font-mono shrink-0">
-          Last synced: {lastSyncTime.toLocaleTimeString()}
-        </div>
-      </div>
+
 
     </div>
   );

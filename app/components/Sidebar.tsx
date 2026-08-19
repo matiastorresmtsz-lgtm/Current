@@ -15,7 +15,8 @@ import {
   Trophy,
   Menu,
   X,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Sparkles
 } from 'lucide-react';
 import { NavTab } from '../types';
 
@@ -39,6 +40,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'insights', label: 'Insights', icon: Zap },
     { id: 'learn', label: 'Learn', icon: BookOpen },
+    { id: 'pricing', label: 'Pricing', icon: Sparkles },
     { id: 'about', label: 'About', icon: BookOpen },
   ] as const;
 
