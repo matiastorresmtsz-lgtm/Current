@@ -6,6 +6,8 @@ import { User, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings, AVAILABLE_COUNTRIES } from '../context/AppSettingsContext';
 
+import { upsertLeaderboardEntry, isSupabaseConfigured } from '../lib/supabase';
+
 export const SettingsView: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'account' | 'display'>('account');
   const { theme, setTheme } = useTheme();
@@ -35,16 +37,33 @@ export const SettingsView: React.FC = () => {
   const [bio, setBio] = useState('Crypto trader & long-term investor building my portfolio on Current.');
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  const handleSaveProfile = (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     if (typeof window !== 'undefined') {
       localStorage.setItem('current_user_display_name', displayName);
       localStorage.setItem('current_user_username', username);
     }
 
+    if (isSignedIn && user?.id && isSupabaseConfigured()) {
+      try {
+        await upsertLeaderboardEntry({
+          user_id: user.id,
+          username: displayName || username,
+          avatar_url: user.imageUrl || null,
+          country,
+          portfolio_value: 0,
+          change_24h: 0,
+          win_rate: 75.0,
+        });
+      } catch (err) {
+        // ignore fallback
+      }
+    }
+
     // Trigger dispatch event so other components refresh immediately
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('storage'));
+      window.dispatchEvent(new CustomEvent('current_leaderboard_updated'));
     }
 
     setSaveSuccess(true);

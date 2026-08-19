@@ -34,13 +34,18 @@ export async function POST(req: Request) {
   const url = new URL(`/rest/v1/${path}`, `${SUPABASE_URL}/`);
   if (query) url.search = query;
 
+  const isUpsert = query && query.includes('on_conflict');
+  const preferHeader = isUpsert
+    ? 'return=representation, resolution=merge-duplicates'
+    : 'return=representation';
+
   const fetchOpts: any = {
     method: method.toUpperCase(),
     headers: {
       apikey: SUPABASE_ANON_KEY,
       Authorization: `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
       'Content-Type': 'application/json',
-      Prefer: 'return=representation',
+      Prefer: preferHeader,
     },
   };
 
