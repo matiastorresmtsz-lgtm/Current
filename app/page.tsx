@@ -16,7 +16,7 @@ import { useNotifications } from './context/NotificationContext';
 // Component imports
 import { Navbar } from './components/Navbar';
 import { Sidebar } from './components/Sidebar';
-import { RightSidebar } from './components/RightSidebar';
+import { RightSidebar, WatchlistItem } from './components/RightSidebar';
 
 // View imports
 import { PortfolioView } from './views/PortfolioView';
@@ -35,8 +35,10 @@ import { HoldingVisibilityModal } from './components/Modals/HoldingVisibilityMod
 import { CoinDetailModal } from './components/Modals/CoinDetailModal';
 import { SettingsModal } from './components/Modals/SettingsModal';
 import { SharePortfolioModal } from './components/Modals/SharePortfolioModal';
+import { AddToWatchlistModal } from './components/Modals/AddToWatchlistModal';
 
 const PORTFOLIO_STORAGE_KEY = 'current_crypto_portfolio_v1';
+const WATCHLIST_STORAGE_KEY = 'current_crypto_watchlist_v1';
 
 function readStoredPortfolio(): PortfolioAsset[] {
   if (typeof window === 'undefined') return INITIAL_PORTFOLIO;
@@ -45,6 +47,16 @@ function readStoredPortfolio(): PortfolioAsset[] {
     return saved ? JSON.parse(saved) : INITIAL_PORTFOLIO;
   } catch {
     return INITIAL_PORTFOLIO;
+  }
+}
+
+function readStoredWatchlist(): WatchlistItem[] {
+  if (typeof window === 'undefined') return [];
+  try {
+    const saved = localStorage.getItem(WATCHLIST_STORAGE_KEY);
+    return saved ? JSON.parse(saved) : [];
+  } catch {
+    return [];
   }
 }
 
@@ -57,6 +69,7 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<NavTab>(() => isSignedIn ? 'portfolio' : 'about');
   const [coins, setCoins] = useState<CryptoCoin[]>(INITIAL_COINS);
   const [portfolio, setPortfolio] = useState<PortfolioAsset[]>(readStoredPortfolio);
+  const [watchlist, setWatchlist] = useState<WatchlistItem[]>(readStoredWatchlist);
 
   // Auth Action Interceptor
   const promptSignUp = () => {
@@ -95,6 +108,7 @@ export default function Home() {
   const [isShareOpen, setIsShareOpen] = useState(false);
   const [selectedCoinDetail, setSelectedCoinDetail] = useState<CryptoCoin | null>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isAddToWatchlistOpen, setIsAddToWatchlistOpen] = useState(false);
 
   useEffect(() => {
     if (!isSignedIn || !user?.id || !isSupabaseConfigured()) {
@@ -206,6 +220,35 @@ export default function Home() {
   const handleRemoveHolding = (coinId: string) => {
     const updated = portfolio.filter(p => p.coinId !== coinId);
     void updateAndSavePortfolio(updated);
+  };
+
+  // Watchlist handlers
+  const handleAddToWatchlist = (coinId: string, coinData: { symbol: string; name: string; icon: string }) => {
+    if (watchlist.some(w => w.coinId === coinId)) return;
+    const newItem: WatchlistItem = {
+      coinId,
+      symbol: coinData.symbol,
+      name: coinData.name,
+      icon: coinData.icon,
+    };
+    const updated = [...watchlist, newItem];
+    setWatchlist(updated);
+    try {
+      localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(updated));
+    } catch { /* quota */ }
+    addNotification({ title: 'Added to watchlist', message: `${coinData.symbol.toUpperCase()} added to your watchlist.`, time: '' });
+  };
+
+  const handleRemoveFromWatchlist = (coinId: string) => {
+    const removed = watchlist.find(w => w.coinId === coinId);
+    const updated = watchlist.filter(w => w.coinId !== coinId);
+    setWatchlist(updated);
+    try {
+      localStorage.setItem(WATCHLIST_STORAGE_KEY, JSON.stringify(updated));
+    } catch { /* quota */ }
+    if (removed) {
+      addNotification({ title: 'Removed from watchlist', message: `${removed.symbol.toUpperCase()} removed from your watchlist.`, time: '' });
+    }
   };
 
   // Metrics for share modal
@@ -325,8 +368,10 @@ export default function Home() {
         {activeTab !== 'settings' && isSignedIn && (
           <RightSidebar
             coins={coins}
+            watchlist={watchlist}
             onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
-            onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
+            onOpenAddToWatchlistModal={() => handleRequireAuthAction(() => setIsAddToWatchlistOpen(true))}
+            onRemoveFromWatchlist={handleRemoveFromWatchlist}
           />
         )}
 
@@ -370,6 +415,14 @@ export default function Home() {
       <SettingsModal
         isOpen={isSettingsOpen}
         onClose={() => setIsSettingsOpen(false)}
+      />
+
+      <AddToWatchlistModal
+        isOpen={isAddToWatchlistOpen}
+        onClose={() => setIsAddToWatchlistOpen(false)}
+        coins={coins}
+        watchlistIds={watchlist.map(w => w.coinId)}
+        onAddToWatchlist={handleAddToWatchlist}
       />
 
     </div>

@@ -436,23 +436,26 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
               </button>
 
               {showCurrencyDropdown && (
-                <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#212121] border border-[#2E2E2E] rounded-xl overflow-hidden z-10 shadow-xl">
-                  {(Object.entries(CURRENCY_CONFIG) as [Currency, typeof CURRENCY_CONFIG[Currency]][]).map(([key, cfg]) => (
-                    <button
-                      key={key}
-                      onClick={() => { setCurrency(key); setShowCurrencyDropdown(false); }}
-                      className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-[#2A2A2A] transition-colors ${currency === key ? 'bg-[#2A2A2A]' : ''}`}
-                    >
-                      <span className="text-lg">{cfg.flag}</span>
-                      <div className="text-left flex-1">
-                        <span className="text-sm font-bold text-white">{key}</span>
-                        <span className="text-xs text-gray-400 ml-2">· {cfg.label}</span>
-                      </div>
-                      <span className="text-xs text-gray-400 font-mono">1 USD = {cfg.rate} {key}</span>
-                      {currency === key && <span className="text-[#17C99E] text-xs font-bold">✓</span>}
-                    </button>
-                  ))}
-                </div>
+                <>
+                  <div className="fixed inset-0 z-20" onClick={() => setShowCurrencyDropdown(false)} />
+                  <div className="absolute left-0 right-0 top-full mt-1.5 bg-[#212121] border border-[#2E2E2E] rounded-xl overflow-hidden z-30 shadow-2xl">
+                    {(Object.entries(CURRENCY_CONFIG) as [Currency, typeof CURRENCY_CONFIG[Currency]][]).map(([key, cfg]) => (
+                      <button
+                        key={key}
+                        onClick={() => { setCurrency(key); setShowCurrencyDropdown(false); }}
+                        className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-[#2A2A2A] transition-colors ${currency === key ? 'bg-[#2A2A2A]' : ''}`}
+                      >
+                        <span className="text-lg">{cfg.flag}</span>
+                        <div className="text-left flex-1">
+                          <span className="text-sm font-bold text-white">{key}</span>
+                          <span className="text-xs text-gray-400 ml-2">· {cfg.label}</span>
+                        </div>
+                        <span className="text-xs text-gray-400 font-mono">1 USD = {cfg.rate} {key}</span>
+                        {currency === key && <span className="text-[#17C99E] text-xs font-bold">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                </>
               )}
             </div>
           </div>

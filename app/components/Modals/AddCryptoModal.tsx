@@ -117,11 +117,11 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center space-x-2.5 mb-4 shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-[#17C99E]/10 border border-[#17C99E]/30 flex items-center justify-center text-[#17C99E]">
-            <span className="w-5 h-5" >➕</span>
+          <div className="w-9 h-9 rounded-xl bg-[#161616] border border-[#2E2E2E] flex items-center justify-center text-[#17C99E]">
+            <span className="font-bold text-base">+</span>
           </div>
           <div>
-            <h2 className="text-lg font-bold text-white">Add Crypto Holding</h2>
+            <h2 className="text-base font-bold text-white">Add Crypto Holding</h2>
             <p className="text-xs text-gray-400">Search all 15,000+ cryptos live</p>
           </div>
         </div>
@@ -162,11 +162,12 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
               {displayOptions.slice(0, 200).map((c) => {
                 const price = 'price' in c ? c.price : undefined;
                 return (
-                <option key={c.id} value={c.id}>
-                  #{c.rank || '?'} {c.name} (${(c.symbol || '').toUpperCase()})
-                  {price ? ` — $${price < 1 ? price.toFixed(6) : price.toLocaleString()}` : ''}
-                </option>
-              );})}
+                  <option key={c.id} value={c.id}>
+                    #{c.rank || '?'} {c.name} (${(c.symbol || '').toUpperCase()})
+                    {price ? ` — $${price < 1 ? price.toFixed(6) : price.toLocaleString()}` : ''}
+                  </option>
+                );
+              })}
             </select>
           </div>
 
@@ -236,7 +237,7 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold rounded-xl transition-all shadow-md shadow-[#17C99E]/20 text-sm mt-2"
+            className="w-full py-3 bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold rounded-xl transition-all text-sm mt-2"
           >
             Save Asset to Portfolio
           </button>

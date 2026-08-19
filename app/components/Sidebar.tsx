@@ -70,11 +70,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 <button
                   key={item.id}
                   onClick={() => onSelectTab(item.id as NavTab)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${
-                    isActive
+                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
                       ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
                       : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center space-x-3">
                     <Icon className={`w-4 h-4 ${isActive ? 'text-[#17C99E]' : 'text-gray-400'}`} />
@@ -105,11 +104,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <div
                       key={t.id}
                       onClick={() => onSelectTab(t.id as NavTab)}
-                      className={`flex items-center space-x-3 px-3.5 py-2 text-xs font-medium rounded-xl cursor-pointer transition-all ${
-                        isActive
+                      className={`flex items-center space-x-3 px-3.5 py-2 text-xs font-medium rounded-xl cursor-pointer transition-all ${isActive
                           ? 'bg-[#17C99E]/20 text-[#17C99E] font-extrabold border border-[#17C99E]/40'
                           : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-                      }`}
+                        }`}
                     >
                       <span className="text-sm">{t.emoji}</span>
                       <span>{t.name}</span>
@@ -126,11 +124,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="pt-4 border-t border-[#2E2E2E]">
           <button
             onClick={() => onSelectTab('settings')}
-            className={`w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs font-semibold rounded-2xl transition-all ${
-              activeTab === 'settings'
+            className={`w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs font-semibold rounded-2xl transition-all ${activeTab === 'settings'
                 ? 'bg-[#17C99E]/20 text-[#17C99E] font-extrabold border border-[#17C99E]/40 shadow'
                 : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-            }`}
+              }`}
           >
             <SettingsIcon className={`w-4 h-4 ${activeTab === 'settings' ? 'text-[#17C99E]' : 'text-gray-400'}`} />
             <span>Settings</span>
@@ -142,9 +139,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1A1A1A]/95 backdrop-blur-lg border-t border-[#2E2E2E] px-2 py-1.5 flex items-center justify-around">
         <button
           onClick={() => handleMobileTabClick('portfolio')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
-            activeTab === 'portfolio' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-          }`}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'portfolio' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
+            }`}
         >
           <RefreshCw className="w-5 h-5 mb-0.5" />
           <span>Portfolio</span>
@@ -152,9 +148,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => handleMobileTabClick('markets')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
-            activeTab === 'markets' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-          }`}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'markets' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
+            }`}
         >
           <BarChart3 className="w-5 h-5 mb-0.5" />
           <span>Markets</span>
@@ -162,9 +157,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => handleMobileTabClick('leaderboard')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
-            activeTab === 'leaderboard' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-          }`}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'leaderboard' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
+            }`}
         >
           <Trophy className="w-5 h-5 mb-0.5" />
           <span>Rankings</span>
@@ -172,9 +166,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => handleMobileTabClick('insights')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
-            activeTab === 'insights' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-          }`}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'insights' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
+            }`}
         >
           <Zap className="w-5 h-5 mb-0.5" />
           <span>Insights</span>
@@ -182,9 +175,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
-            mobileMenuOpen ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-          }`}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${mobileMenuOpen ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
+            }`}
         >
           <Menu className="w-5 h-5 mb-0.5" />
           <span>More</span>
@@ -221,11 +213,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   <button
                     key={item.id}
                     onClick={() => handleMobileTabClick(item.id as NavTab)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
-                      isActive
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${isActive
                         ? 'bg-[#212121] text-[#17C99E] border border-[#17C99E]/40'
                         : 'text-gray-300 hover:bg-[#212121]'
-                    }`}
+                      }`}
                   >
                     <Icon className={`w-5 h-5 ${isActive ? 'text-[#17C99E]' : 'text-gray-400'}`} />
                     <span>{item.label}</span>
@@ -244,11 +235,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     <button
                       key={t.id}
                       onClick={() => handleMobileTabClick(t.id as NavTab)}
-                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${
-                        isActive
+                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${isActive
                           ? 'bg-[#17C99E]/20 text-[#17C99E] border border-[#17C99E]/40'
                           : 'text-gray-300 hover:bg-[#212121]'
-                      }`}
+                        }`}
                     >
                       <span className="text-base">{t.emoji}</span>
                       <span>{t.name}</span>
@@ -262,11 +252,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div className="pt-4 border-t border-[#2E2E2E]">
               <button
                 onClick={() => handleMobileTabClick('settings')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
-                  activeTab === 'settings'
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${activeTab === 'settings'
                     ? 'bg-[#17C99E] text-black'
                     : 'bg-[#212121] text-gray-200 border border-[#2E2E2E]'
-                }`}
+                  }`}
               >
                 <div className="flex items-center space-x-3">
                   <SettingsIcon className="w-5 h-5" />

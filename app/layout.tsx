@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "./context/ThemeContext";
 import { AppSettingsProvider } from "./context/AppSettingsContext";
@@ -26,6 +27,14 @@ export default function RootLayout({
         lang="en"
         className="h-full antialiased"
       >
+        <head>
+          <Script
+            async
+            src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7915731043407251"
+            crossOrigin="anonymous"
+            strategy="afterInteractive"
+          />
+        </head>
         <body className="min-h-full flex flex-col bg-[#161616] text-gray-100 font-sans">
           <ThemeProvider>
             <AppSettingsProvider>

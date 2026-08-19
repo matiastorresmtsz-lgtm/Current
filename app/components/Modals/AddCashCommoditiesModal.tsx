@@ -145,24 +145,23 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
                 <button
                   key={key}
                   onClick={() => { setSelected(key); setAmount(''); setCustomPrice(''); }}
-                  className={`relative flex flex-col items-center justify-center p-4 rounded-2xl border-2 transition-all group ${
+                  className={`relative flex flex-col items-center justify-center p-4 rounded-2xl border transition-all ${
                     selected === key
-                      ? `bg-gradient-to-br ${cfg.gradient} ${cfg.border} shadow-lg scale-[1.03]`
+                      ? 'border-[#17C99E] bg-[#2A2A2A]'
                       : 'border-[#2E2E2E] bg-[#212121] hover:border-[#3E3E3E] hover:bg-[#252525]'
                   }`}
                 >
-                  <span className="text-2xl mb-2">{cfg.emoji}</span>
+                  <div className="mb-2 text-gray-300">
+                    {cfg.icon}
+                  </div>
                   <span className={`text-xs font-bold ${selected === key ? 'text-white' : 'text-gray-300'}`}>
                     {cfg.name}
                   </span>
-                  <span className={`text-[10px] font-mono mt-0.5 ${selected === key ? 'text-gray-300' : 'text-gray-500'}`}>
+                  <span className="text-[10px] font-mono mt-0.5 text-gray-400">
                     {cfg.symbol}
                   </span>
                   {selected === key && (
-                    <span
-                      className="absolute top-2 right-2 w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-extrabold text-black"
-                      style={{ backgroundColor: cfg.color }}
-                    >✓</span>
+                    <span className="absolute top-2 right-2 text-xs text-[#17C99E] font-bold">✓</span>
                   )}
                 </button>
               ))}
@@ -174,16 +173,14 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
             <form onSubmit={handleSubmit} className="space-y-4 animate-fade-in">
 
               {/* Reference Price info row */}
-              <div
-                className={`flex items-center justify-between bg-gradient-to-r ${config.gradient} border ${config.border} rounded-xl px-4 py-3`}
-              >
+              <div className="flex items-center justify-between bg-[#161616] border border-[#2E2E2E] rounded-xl px-4 py-3">
                 <div>
                   <p className="text-[11px] text-gray-400 font-medium">Reference Price</p>
                   <p className="text-sm font-extrabold text-white">
                     ${referencePrice.toLocaleString()} / {config.unit}
                   </p>
                 </div>
-                <span className="text-2xl">{config.emoji}</span>
+                <div className="text-gray-400">{config.icon}</div>
               </div>
 
               {/* Amount */}
@@ -198,7 +195,7 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
                   placeholder={config.placeholder}
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full bg-[#161616] text-white font-bold text-base p-3 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-yellow-500/60 transition-colors"
+                  className="w-full bg-[#161616] text-white font-bold text-base p-3 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-[#17C99E] transition-colors"
                   autoFocus
                   required
                 />
@@ -213,8 +210,7 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
                   <button
                     type="button"
                     onClick={() => setCustomPrice(referencePrice.toString())}
-                    className="text-[10px] font-bold hover:underline"
-                    style={{ color: config.color }}
+                    className="text-[10px] font-bold hover:underline text-[#17C99E]"
                   >
                     Use Reference
                   </button>
@@ -226,14 +222,14 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
                   placeholder={`$${referencePrice.toLocaleString()}`}
                   value={customPrice}
                   onChange={(e) => setCustomPrice(e.target.value)}
-                  className="w-full bg-[#161616] text-white font-bold text-base p-3 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-yellow-500/60 transition-colors"
+                  className="w-full bg-[#161616] text-white font-bold text-base p-3 rounded-xl border border-[#2E2E2E] focus:outline-none focus:border-[#17C99E] transition-colors"
                 />
               </div>
 
               {/* Estimated Value */}
               <div className="bg-[#161616] border border-[#2E2E2E] rounded-xl px-4 py-3 flex items-center justify-between">
                 <span className="text-xs text-gray-400 font-medium">Estimated Value</span>
-                <span className="font-extrabold font-mono text-sm" style={{ color: config.color }}>
+                <span className="font-extrabold font-mono text-sm text-[#17C99E]">
                   ${estimatedValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               </div>
@@ -242,11 +238,9 @@ export const AddCashCommoditiesModal: React.FC<AddCashCommoditiesModalProps> = (
               <button
                 type="submit"
                 disabled={parsedAmount <= 0}
-                className="w-full py-3 text-black font-extrabold rounded-xl transition-all shadow-md text-sm flex items-center justify-center space-x-2 disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ backgroundColor: config.color }}
+                className="w-full py-3 bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold rounded-xl transition-all text-sm disabled:opacity-40 disabled:cursor-not-allowed"
               >
-                <span>Add {config.name} to Portfolio</span>
-                <span className="w-4 h-4" >▶️</span>
+                Add {config.name} to Portfolio
               </button>
             </form>
           )}

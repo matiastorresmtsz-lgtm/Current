@@ -357,10 +357,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                   <span>Extreme Fear</span>
                   <span>Extreme Greed</span>
                 </div>
-                <div className="relative h-2 rounded-full overflow-hidden bg-[#2E2E2E]">
+                <div className="relative h-2.5 rounded-full bg-[#2E2E2E] overflow-hidden">
                   <div
-                    className="absolute top-1/2 -translate-y-1/2 w-3 h-3 rounded-full border-2 border-white shadow-lg"
-                    style={{ left: `${FEAR_GREED}%`, transform: 'translate(-50%, -50%)', backgroundColor: fg.color }}
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{ width: `${FEAR_GREED}%`, backgroundColor: fg.color }}
                   />
                 </div>
               </div>

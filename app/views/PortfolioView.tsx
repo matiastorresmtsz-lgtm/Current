@@ -76,7 +76,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
     if (prev < 100 && goalProgress >= 100) {
       try {
         addNotification({ title: 'Goal reached 🎉', message: `You reached your ${customGoalName || goalType} goal!`, time: '' });
-      } catch (e) {}
+      } catch (e) { }
     }
     prevProgressRef.current = goalProgress;
   }, [goalProgress, addNotification, customGoalName, goalType]);
@@ -177,7 +177,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                   </button>
                 </div>
 
-                  <div className="space-y-3">
+                <div className="space-y-3">
                   <div>
                     <label className="block text-[10px] uppercase tracking-[0.3em] text-gray-400 mb-2">Goal type</label>
                     <select
@@ -255,7 +255,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                     <button
                       onClick={() => {
                         setShowGoalPopup(false);
-                        try { addNotification({ title: 'Goal set', message: `Saved goal ${customGoalName || goalType} for ${curr.symbol}${parseFloat(goalAmount || '0').toLocaleString()}`, time: '' }); } catch (e) {}
+                        try { addNotification({ title: 'Goal set', message: `Saved goal ${customGoalName || goalType} for ${curr.symbol}${parseFloat(goalAmount || '0').toLocaleString()}`, time: '' }); } catch (e) { }
                       }}
                       className="px-3 py-2 rounded-xl bg-[#17C99E] text-black font-bold text-sm"
                     >
@@ -312,10 +312,10 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
         <div className="lg:col-span-6 space-y-4 flex flex-col justify-between">
 
           {/* Top Row: Today's Return & All-Time Return Cards */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2.5">
 
             {/* Today's Return Card */}
-            <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-5 shadow-xl">
+            <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-4.5 sm:p-5 shadow-xl">
               <div className="flex items-center space-x-1 text-xs font-semibold text-gray-400 mb-2 cursor-pointer hover:text-white">
                 <span>Today's Return</span>
                 <ChevronDown className="w-3.5 h-3.5" />
@@ -329,7 +329,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
             </div>
 
             {/* All-Time Return Card */}
-            <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-5 shadow-xl">
+            <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-4.5 sm:p-5 shadow-xl">
               <div className="text-xs font-semibold text-gray-400 mb-2">All-Time Return</div>
               <div className={`text-2xl font-extrabold tracking-tight ${convertedPnlUsd >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
                 {convertedPnlUsd >= 0 ? '+' : ''}{curr.symbol}{convertedPnlUsd.toFixed(2)}
@@ -455,7 +455,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                       </div>
                     </td>
 
-                            {/* % of portfolio */}
+                    {/* % of portfolio */}
                     <td className="py-3.5 px-3 text-center font-mono font-bold text-gray-200">
                       {allocPct}%
                     </td>
@@ -510,4 +510,3 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   );
 };
 
-// watch goal progress and fire notification when reached (no default export)
