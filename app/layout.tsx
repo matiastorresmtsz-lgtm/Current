@@ -11,8 +11,8 @@ export const metadata: Metadata = {
   title: "Current — Smart Crypto Portfolio & Market Intelligence",
   description: "Track your crypto portfolio, market analytics, and interactive learning powered by Current.",
   icons: {
-    icon: '/favicon.svg',
-    shortcut: '/favicon.svg',
+    icon: '/favicon.ico',
+    shortcut: '/favicon.ico',
   },
 };
 
