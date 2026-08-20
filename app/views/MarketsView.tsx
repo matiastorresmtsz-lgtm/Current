@@ -112,35 +112,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
     <div className="space-y-6">
 
       {/* Header Info Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between bg-[#212121] p-5 rounded-3xl border border-[#2E2E2E] shadow-lg gap-4">
-        <div>
-          <div className="flex items-center space-x-2 mb-1">
-            <span className="w-5 h-5 text-[#17C99E]" >✨</span>
-            <h1 className="text-xl font-extrabold text-white">Cryptocurrency Markets</h1>
-            <span className="bg-[#212121] text-white text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-[#2E2E2E]">
-              {coins.length > 0 ? `${coins.length}+ Cryptos` : '15,000+ Cryptos'}
-            </span>
-          </div>
-          <p className="text-xs text-gray-400">
-            Real-time live prices, 24h market metrics, and 7-day sparkline performance tracking powered by Current Market Data. Search any crypto token!
-          </p>
-        </div>
 
-        {/* Quick Market Summary Badge */}
-        <div className="flex items-center space-x-3 text-xs bg-[#161616] p-3 rounded-2xl border border-[#2E2E2E] shrink-0">
-          <div>
-            <div className="text-gray-400 text-[10px] uppercase font-bold">Top Ranked</div>
-            <div className="text-white font-bold font-mono">
-              {coins[0] ? `${coins[0].name} ($${coins[0].price.toLocaleString()})` : 'Bitcoin (BTC)'}
-            </div>
-          </div>
-          <div className="h-6 w-px bg-[#2E2E2E]" />
-          <div>
-            <div className="text-gray-400 text-[10px] uppercase font-bold">Current Market Index</div>
-            <div className="text-[#17C99E] font-bold font-mono">15,000+ Cryptos</div>
-          </div>
-        </div>
-      </div>
 
       {/* Category Pills & Search Header */}
       <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -157,11 +129,10 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
             <button
               key={cat.id}
               onClick={() => { setSelectedCategory(cat.id); setCurrentPage(1); }}
-              className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${
-                selectedCategory === cat.id
-                  ? 'bg-[#17C99E] text-black shadow-md shadow-[#17C99E]/20 font-extrabold'
-                  : 'bg-[#212121] text-gray-400 hover:text-white border border-[#2E2E2E]'
-              }`}
+              className={`px-4 py-2 rounded-2xl text-xs font-bold whitespace-nowrap transition-all ${selectedCategory === cat.id
+                ? 'bg-[#17C99E] text-black shadow-md shadow-[#17C99E]/20 font-extrabold'
+                : 'bg-[#212121] text-gray-400 hover:text-white border border-[#2E2E2E]'
+                }`}
             >
               {cat.label}
             </button>
@@ -253,8 +224,8 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                       <td className="py-3.5 px-4 text-right font-extrabold text-white text-sm font-mono">
                         {coin.price > 0
                           ? `$${coin.price < 0.0001
-                              ? coin.price.toFixed(8)
-                              : coin.price < 1
+                            ? coin.price.toFixed(8)
+                            : coin.price < 1
                               ? coin.price.toFixed(4)
                               : coin.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                           : '—'}
@@ -263,9 +234,8 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                       {/* 24h Change */}
                       <td className="py-3.5 px-4 text-right font-bold">
                         {coin.price > 0 ? (
-                          <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-mono font-bold ${
-                            isPositive ? 'bg-[#17C99E]/10 text-[#17C99E]' : 'bg-[#FF4D4D]/10 text-[#FF4D4D]'
-                          }`}>
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-mono font-bold ${isPositive ? 'bg-[#17C99E]/10 text-[#17C99E]' : 'bg-[#FF4D4D]/10 text-[#FF4D4D]'
+                            }`}>
                             {isPositive ? <span className="w-3 h-3 mr-1" >📈</span> : <span className="w-3 h-3 mr-1" >📉</span>}
                             {isPositive ? '+' : ''}{coin.change24h.toFixed(2)}%
                           </span>
