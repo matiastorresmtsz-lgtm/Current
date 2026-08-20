@@ -67,40 +67,18 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
     <div className="space-y-6">
 
       {/* Header Banner */}
-      <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center space-x-2 text-xs font-bold text-[#17C99E] uppercase tracking-wider mb-2">
-            <span className="w-4 h-4" >📖</span>
-            <span>Current Academy</span>
-          </div>
-          <h2 className="text-2xl font-extrabold text-white">Interactive Mini-Courses</h2>
-          <p className="text-xs text-gray-300 mt-1 max-w-xl">
-            Short, effective lessons on asset allocation, cold storage security, and market cycle analysis. Earn XP badges!
-          </p>
-        </div>
 
-        <div className="bg-[#161616] border border-[#2E2E2E] p-4 rounded-2xl flex items-center space-x-4 shrink-0">
-          <div className="w-12 h-12 rounded-xl bg-[#161616] border border-[#2E2E2E] flex items-center justify-center text-[#17C99E]">
-            <span className="w-7 h-7" >🏅</span>
-          </div>
-          <div>
-            <div className="text-[10px] font-bold text-gray-400 uppercase">ACADEMY SCORE</div>
-            <div className="text-xl font-extrabold text-white">{totalXP} XP Earned</div>
-            <div className="text-[10px] text-[#10B981] font-bold">Level 2 Current Trader</div>
-          </div>
-        </div>
-      </div>
 
       {/* Course Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {courses.map((course) => {
           const isDone = Boolean(completedMap[course.id]);
 
-                return (
-                  <div
-                    key={course.id}
-                    className="bg-[#212121] border border-[#2E2E2E] hover:border-[#17C99E]/40 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all group"
-                  >
+          return (
+            <div
+              key={course.id}
+              className="bg-[#212121] border border-[#2E2E2E] hover:border-[#17C99E]/40 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between transition-all group"
+            >
               <div>
                 <div className="relative h-40 w-full">
                   <img

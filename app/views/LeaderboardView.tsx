@@ -243,29 +243,8 @@ export const LeaderboardView: React.FC<LeaderboardProps> = ({ portfolio = [], co
     <div className="space-y-6 animate-fade-in">
 
       {/* Top Header & Live Sync Status */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div>
 
-          <h1 className="mt-2 text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Trader Leaderboard
-          </h1>
-          <p className="mt-1 text-xs sm:text-sm text-gray-400 max-w-2xl">
-            Live rankings of verified Current traders worldwide sorted by real-time portfolio performance and returns.
-          </p>
-        </div>
 
-        {/* Live Refresh Trigger */}
-        <div className="flex items-center space-x-3 shrink-0">
-          <button
-            onClick={() => void fetchGlobalData(true)}
-            disabled={isRefreshing}
-            className="flex items-center space-x-2 bg-[#212121] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] px-4 py-2.5 rounded-2xl text-xs font-bold transition-all shadow-sm active:scale-95 disabled:opacity-60"
-          >
-            <RefreshCw className={`w-3.5 h-3.5 text-[#17C99E] ${isRefreshing ? 'animate-spin' : ''}`} />
-            <span>{isRefreshing ? 'Syncing...' : 'Sync Live'}</span>
-          </button>
-        </div>
-      </div>
 
       {/* Overview Stat Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
