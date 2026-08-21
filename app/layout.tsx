@@ -8,13 +8,15 @@ import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Current — Smart Crypto Portfolio & Market Intelligence",
-  description: "Track your crypto portfolio, market analytics, and interactive learning powered by Current.",
+  title: "Current — Social investing for crypto",
+  description: "Track your crypto portfolio, AI advisory, and interactive learning.",
   icons: {
     icon: '/favicon.ico',
     shortcut: '/favicon.ico',
   },
 };
+
+//TODO: change metadata for social media
 
 export default function RootLayout({
   children,
