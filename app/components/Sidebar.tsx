@@ -7,6 +7,7 @@ import {
   RefreshCw,
   Zap,
   ChevronDown,
+  ChevronRight,
   Flame,
   GraduationCap,
   PieChart,
@@ -16,7 +17,8 @@ import {
   Menu,
   X,
   Settings as SettingsIcon,
-  Sparkles
+  Sparkles,
+  Info
 } from 'lucide-react';
 import { NavTab } from '../types';
 
@@ -37,11 +39,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const mainNavItems = [
     { id: 'portfolio', label: 'Portfolio', icon: RefreshCw },
     { id: 'markets', label: 'Markets', icon: BarChart3 },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
     { id: 'insights', label: 'Insights', icon: Zap },
-    { id: 'learn', label: 'Learn', icon: BookOpen },
-    { id: 'pricing', label: 'Pricing', icon: Sparkles },
-    { id: 'about', label: 'About', icon: BookOpen },
+    { id: 'advisory', label: 'AI Advisor', icon: Sparkles },
+    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
+    { id: 'about', label: 'About', icon: Info },
   ] as const;
 
   const topics = [
@@ -60,70 +61,99 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar (lg and up) */}
-      <aside className="w-60 shrink-0 hidden lg:flex py-6 px-2 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col justify-between border-r border-[#2E2E2E]">
-        <div className="space-y-6">
-
-          {/* Primary Navigation Tabs */}
-          <div className="space-y-1">
-            {mainNavItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => onSelectTab(item.id as NavTab)}
-                  className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
-                      ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
-                      : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-                    }`}
-                >
-                  <div className="flex items-center space-x-3">
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#17C99E]' : 'text-gray-400'}`} />
-                    <span>{item.label}</span>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Collapsible Topics Section */}
-          <div className="space-y-2 pt-2 border-t border-[#2E2E2E]">
-            <button
-              onClick={() => setTopicsOpen(!topicsOpen)}
-              className="w-full flex items-center justify-between px-3.5 py-1 text-xs font-bold text-gray-400 hover:text-white transition-colors"
-            >
-              <span className="flex items-center space-x-1.5">
-                <span>Topics</span>
-              </span>
-              {topicsOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <span className="w-3.5 h-3.5">▶️</span>}
-            </button>
-
-            {topicsOpen && (
-              <div className="space-y-1">
-                {topics.map((t) => {
-                  const isActive = activeTab === t.id;
-                  return (
-                    <div
-                      key={t.id}
-                      onClick={() => onSelectTab(t.id as NavTab)}
-                      className={`flex items-center space-x-3 px-3.5 py-2 text-xs font-medium rounded-xl cursor-pointer transition-all ${isActive
-                          ? 'bg-[#17C99E]/20 text-[#17C99E] font-extrabold border border-[#17C99E]/40'
-                          : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-                        }`}
-                    >
-                      <span className="text-sm">{t.emoji}</span>
-                      <span>{t.name}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-
+      <aside className="w-60 shrink-0 hidden lg:flex py-6 px-2 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col border-r border-[#2E2E2E] justify-start">
+        {/* Primary Navigation Tabs */}
+        <div className="space-y-1">
+          {mainNavItems.slice(0, 5).map((item) => {
+            const Icon = item.icon;
+            const isActive = activeTab === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => onSelectTab(item.id as NavTab)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
+                    ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
+                    : 'text-gray-300 hover:text-white hover:bg-[#212121]'
+                  }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#17C99E]' : 'text-gray-400'}`} />
+                  <span>{item.label}</span>
+                </div>
+              </button>
+            );
+          })}
         </div>
 
+        {/* Divider */}
+        <div className="mt-4" />
+
+        {/* Collapsible Topics Section */}
+        <div className="space-y-2 pt-4 border-t border-[#2E2E2E]">
+          <button
+            onClick={() => setTopicsOpen(!topicsOpen)}
+            className="w-full flex items-center justify-between px-3.5 py-1 text-xs font-bold text-gray-400 hover:text-white transition-colors"
+          >
+            <span className="flex items-center space-x-1.5">
+              <span>Topics</span>
+            </span>
+            {topicsOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+          </button>
+
+          {topicsOpen && (
+            <div className="space-y-1">
+              {topics.map((t) => {
+                const isActive = activeTab === t.id;
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => onSelectTab(t.id as NavTab)}
+                    className={`flex items-center space-x-3 px-3.5 py-2 text-xs font-medium rounded-xl cursor-pointer transition-all ${isActive
+                        ? 'bg-[#17C99E]/20 text-[#17C99E] font-extrabold border border-[#17C99E]/40'
+                        : 'text-gray-300 hover:text-white hover:bg-[#212121]'
+                      }`}
+                  >
+                    <span className="text-sm">{t.emoji}</span>
+                    <span>{t.name}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
+        {/* Spacer */}
+        <div className="h-4" />
+
+        {/* About Button */}
+        <div className="pt-2 border-t border-[#2E2E2E]">
+          {(() => {
+            const aboutItem = mainNavItems[5]; // About
+            const Icon = aboutItem.icon;
+            const isActive = activeTab === aboutItem.id;
+            return (
+              <button
+                key={aboutItem.id}
+                onClick={() => onSelectTab(aboutItem.id as NavTab)}
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
+                    ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
+                    : 'text-gray-300 hover:text-white hover:bg-[#212121]'
+                  }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#17C99E]' : 'text-gray-400'}`} />
+                  <span>{aboutItem.label}</span>
+                </div>
+              </button>
+            );
+          })()}
+        </div>
+
+        {/* Spacer */}
+        <div className="h-4" />
+
         {/* Settings Button */}
-        <div className="pt-4 border-t border-[#2E2E2E]">
+        <div className="pt-2 border-t border-[#2E2E2E]">
           <button
             onClick={() => onSelectTab('settings')}
             className={`w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs font-semibold rounded-2xl transition-all ${activeTab === 'settings'
@@ -158,21 +188,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
         </button>
 
         <button
-          onClick={() => handleMobileTabClick('leaderboard')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'leaderboard' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-            }`}
-        >
-          <Trophy className="w-5 h-5 mb-0.5" />
-          <span>Rankings</span>
-        </button>
-
-        <button
           onClick={() => handleMobileTabClick('insights')}
           className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'insights' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
             }`}
         >
           <Zap className="w-5 h-5 mb-0.5" />
           <span>Insights</span>
+        </button>
+
+        <button
+          onClick={() => handleMobileTabClick('leaderboard')}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'leaderboard' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
+            }`}
+        >
+          <Trophy className="w-5 h-5 mb-0.5" />
+          <span>Rankings</span>
         </button>
 
         <button

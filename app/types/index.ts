@@ -6,7 +6,7 @@ export type NavTab =
   | 'insights'
   | 'about'
   | 'ai'
-  | 'pricing'
+  | 'advisory'
   | 'settings'
   | 'topic-etfs'
   | 'topic-passive-income'

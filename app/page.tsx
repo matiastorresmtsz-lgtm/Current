@@ -25,7 +25,7 @@ import { LeaderboardView } from './views/LeaderboardView';
 import { LearnView } from './views/LearnView';
 import { InsightsView } from './views/InsightsView';
 import { AboutView } from './views/AboutView';
-import { PricingView } from './views/PricingView';
+import { AdvisoryView } from './views/AdvisoryView';
 import { SettingsView } from './views/SettingsView';
 import { TopicView } from './views/TopicView';
 
@@ -65,9 +65,7 @@ export default function Home() {
   const { isSignedIn, user } = useUser();
   const { openSignIn, openSignUp } = useClerk();
   const { addNotification } = useNotifications();
-  const protectedTabs = new Set<NavTab>(['portfolio', 'markets', 'insights']);
-
-  const [activeTab, setActiveTab] = useState<NavTab>(() => isSignedIn ? 'portfolio' : 'about');
+  const [activeTab, setActiveTab] = useState<NavTab>('portfolio');
   const [coins, setCoins] = useState<CryptoCoin[]>(INITIAL_COINS);
   const [portfolio, setPortfolio] = useState<PortfolioAsset[]>(readStoredPortfolio);
   const [watchlist, setWatchlist] = useState<WatchlistItem[]>(readStoredWatchlist);
@@ -94,7 +92,7 @@ export default function Home() {
   };
 
   const handleTabSelect = (tab: NavTab) => {
-    if (!isSignedIn && protectedTabs.has(tab)) {
+    if (!isSignedIn) {
       promptSignUp();
       return;
     }
@@ -331,7 +329,7 @@ export default function Home() {
 
         {/* Center Main View Area */}
         <main className="flex-1 min-w-0 py-3">
-          {activeTab === 'portfolio' && isSignedIn && (
+          {activeTab === 'portfolio' && (
             <PortfolioView
               portfolio={pricedPortfolio}
               coins={coins}
@@ -344,7 +342,7 @@ export default function Home() {
             />
           )}
 
-          {activeTab === 'markets' && isSignedIn && (
+          {activeTab === 'markets' && (
             <MarketsView
               coins={coins}
               onOpenCoinModal={(coin) => setSelectedCoinDetail(coin)}
@@ -365,7 +363,7 @@ export default function Home() {
             />
           )}
 
-          {activeTab === 'insights' && isSignedIn && (
+          {activeTab === 'insights' && (
             <InsightsView
               whales={WHALE_TRANSACTIONS}
               portfolio={pricedPortfolio}
@@ -377,9 +375,12 @@ export default function Home() {
             <SettingsView />
           )}
 
-          {activeTab === 'pricing' && (
-            <PricingView
+          {activeTab === 'advisory' && (
+            <AdvisoryView
+              portfolio={pricedPortfolio}
+              coins={coins}
               onSelectTab={handleTabSelect}
+              onOpenAddCryptoModal={() => handleRequireAuthAction(() => setIsAddCryptoOpen(true))}
             />
           )}
 
