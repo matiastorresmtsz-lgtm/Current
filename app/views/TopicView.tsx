@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { ExternalLink, Bookmark, Clock, Sparkles, Check, Loader2, RefreshCw } from 'lucide-react';
+import { Bookmark, Clock, Sparkles, Check, Loader2, RefreshCw } from 'lucide-react';
 import { TopicNewsItem, CryptoCoin } from '../types';
 
 interface TopicViewProps {
@@ -192,22 +192,22 @@ export const TopicView: React.FC<TopicViewProps> = ({
         </div>
       </div>
 
-      {/* Topic News Feed Section */}
+      {/* Retrospective Updates Section */}
       <div className="space-y-4">
         <div className="flex items-center justify-between px-1">
           <h2 className="text-lg font-extrabold text-white flex items-center space-x-2">
-            <span>Latest {config.title} News</span>
+            <span>Latest {config.title} Updates</span>
             <span className="bg-[#17C99E]/10 text-[#17C99E] text-xs font-mono font-bold px-2.5 py-0.5 rounded-full border border-[#17C99E]/30">
-              Live Articles
+              Live Updates
             </span>
           </h2>
-          <span className="text-xs text-gray-400 font-medium">{news.length} {news.length === 1 ? 'Article' : 'Articles'}</span>
+          <span className="text-xs text-gray-400 font-medium">{news.length} {news.length === 1 ? 'Update' : 'Updates'}</span>
         </div>
 
         {isLoading ? (
           <div className="py-16 bg-[#212121] border border-[#2E2E2E] rounded-3xl flex flex-col items-center justify-center space-y-3">
             <Loader2 className="w-8 h-8 text-[#17C99E] animate-spin" />
-            <span className="text-xs text-gray-400 font-medium">Fetching real-time news articles...</span>
+            <span className="text-xs text-gray-400 font-medium">Fetching real-time updates...</span>
           </div>
         ) : news.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -216,25 +216,6 @@ export const TopicView: React.FC<TopicViewProps> = ({
                 key={item.id}
                 className="bg-[#212121] border border-[#2E2E2E] hover:border-[#17C99E]/50 rounded-3xl overflow-hidden shadow-xl flex flex-col justify-between group transition-all"
               >
-                {/* News Cover Image */}
-                {item.image && (
-                  <a
-                    href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="h-48 w-full overflow-hidden relative block cursor-pointer"
-                  >
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-3 left-3 bg-[#161616]/90 backdrop-blur-md text-[#17C99E] text-[10px] font-bold px-2.5 py-1 rounded-full border border-[#17C99E]/30 font-mono">
-                      {item.topic}
-                    </div>
-                  </a>
-                )}
-
                 {/* News Body Content */}
                 <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                   <div className="space-y-2">
@@ -246,16 +227,9 @@ export const TopicView: React.FC<TopicViewProps> = ({
                       </div>
                     </div>
 
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block group/title cursor-pointer"
-                    >
-                      <h3 className="text-base font-extrabold text-white group-hover/title:text-[#17C99E] transition-colors leading-snug">
-                        {item.title}
-                      </h3>
-                    </a>
+                    <h3 className="text-base font-extrabold text-white leading-snug">
+                      {item.title}
+                    </h3>
 
                     <p className="text-xs text-gray-400 line-clamp-3 leading-relaxed">
                       {item.description}
@@ -277,16 +251,10 @@ export const TopicView: React.FC<TopicViewProps> = ({
 
                   {/* Footer Meta & Actions */}
                   <div className="pt-3 border-t border-[#2E2E2E] flex items-center justify-between">
-                    {item.readTime && (
-                      <span className="text-[11px] font-mono text-gray-500 font-semibold">
-                        {item.readTime}
-                      </span>
-                    )}
-
                     <div className="flex items-center space-x-2 ml-auto">
                       <button
                         onClick={(e) => toggleBookmark(item.id, e)}
-                        title={bookmarkedIds.has(item.id) ? 'Bookmarked' : 'Bookmark article'}
+                        title={bookmarkedIds.has(item.id) ? 'Bookmarked' : 'Bookmark update'}
                         className={`p-2 rounded-xl border border-[#2E2E2E] transition-colors ${
                           bookmarkedIds.has(item.id)
                             ? 'bg-[#17C99E]/20 text-[#17C99E] border-[#17C99E]/40'
@@ -296,15 +264,6 @@ export const TopicView: React.FC<TopicViewProps> = ({
                         <Bookmark className="w-4 h-4" />
                       </button>
 
-                      <a
-                        href={item.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center space-x-1.5 bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow-sm"
-                      >
-                        <span>Read Story</span>
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
                     </div>
                   </div>
 
@@ -314,7 +273,7 @@ export const TopicView: React.FC<TopicViewProps> = ({
           </div>
         ) : (
           <div className="py-12 bg-[#212121] border border-[#2E2E2E] rounded-3xl text-center text-gray-400 space-y-3">
-            <p className="text-sm">No news articles found for this topic right now.</p>
+            <p className="text-sm">No updates found for this topic right now.</p>
             <button
               onClick={() => loadTopicNews()}
               className="px-4 py-2 bg-[#17C99E] text-black font-bold text-xs rounded-xl hover:bg-[#14B8A6] transition-colors"

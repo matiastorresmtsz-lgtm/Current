@@ -39,11 +39,11 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
   });
 
   return (
-    <aside className="w-72 shrink-0 hidden xl:block py-6 px-2 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto space-y-6">
+    <aside className="w-64 shrink-0 hidden xl:block py-5 pl-1 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto space-y-5">
 
       {/* Watchlist Widget */}
-      <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-5 shadow-xl">
-        <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#2E2E2E]">
+      <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-4 shadow-xl">
+        <div className="flex items-center justify-between mb-3 pb-3 border-b border-[#2E2E2E]">
           <div className="flex items-center space-x-1.5 font-bold text-white text-sm">
             <Eye className="w-3.5 h-3.5 text-[#17C99E]" />
             <span>Watchlist</span>

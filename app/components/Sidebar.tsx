@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import {
   BarChart3,
-  BookOpen,
   RefreshCw,
   Zap,
   ChevronDown,
@@ -61,9 +60,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar (lg and up) */}
-      <aside className="w-60 shrink-0 hidden lg:flex py-6 px-2 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col border-r border-[#2E2E2E] justify-start">
+      <aside className="w-56 shrink-0 hidden lg:flex py-5 pr-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col border-r border-[#2E2E2E] justify-start">
         {/* Primary Navigation Tabs */}
-        <div className="space-y-1">
+        <div className="space-y-0.5">
           {mainNavItems.slice(0, 5).map((item) => {
             const Icon = item.icon;
             const isActive = activeTab === item.id;
@@ -73,7 +72,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => onSelectTab(item.id as NavTab)}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
                     ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
-                    : 'text-gray-300 hover:text-white hover:bg-[#212121]'
+                    : 'text-gray-400 hover:text-white hover:bg-[#212121]'
                   }`}
               >
                 <div className="flex items-center space-x-3">
@@ -89,7 +88,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
         <div className="mt-4" />
 
         {/* Collapsible Topics Section */}
-        <div className="space-y-2 pt-4 border-t border-[#2E2E2E]">
+        <div className="space-y-2 pt-5 border-t border-[#2E2E2E]">
           <button
             onClick={() => setTopicsOpen(!topicsOpen)}
             className="w-full flex items-center justify-between px-3.5 py-1 text-xs font-bold text-gray-400 hover:text-white transition-colors"
@@ -168,7 +167,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       </aside>
 
       {/* Mobile Persistent Bottom Navigation Bar (< lg) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1A1A1A]/95 backdrop-blur-lg border-t border-[#2E2E2E] px-2 py-1.5 flex items-center justify-around">
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#1A1A1A] border-t border-[#2E2E2E] px-2 py-1.5 flex items-center justify-around">
         <button
           onClick={() => handleMobileTabClick('portfolio')}
           className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'portfolio' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
@@ -217,8 +216,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Mobile Navigation Slide-Over Drawer Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm animate-fade-in flex flex-col justify-end">
-          <div className="bg-[#1A1A1A] border-t border-[#2E2E2E] rounded-t-3xl p-6 max-h-[85vh] overflow-y-auto space-y-6">
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/80 animate-fade-in flex flex-col justify-end">
+          <div className="bg-[#1A1A1A] border-t border-[#2E2E2E] rounded-t-xl p-5 max-h-[85vh] overflow-y-auto space-y-5">
 
             <div className="flex items-center justify-between border-b border-[#2E2E2E] pb-4">
               <div className="flex items-center space-x-2">

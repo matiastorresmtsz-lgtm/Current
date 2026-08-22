@@ -5,6 +5,12 @@
   --foreground: #f3f4f6;
   --card-bg: #212121;
   --card-border: #2e2e2e;
+  --surface-raised: #242424;
+  --surface-subtle: #1d1d1d;
+  --surface-hover: #2a2a2a;
+  --focus-ring: rgba(23, 201, 158, 0.55);
+  --shadow-panel: 0 8px 24px rgba(0, 0, 0, 0.18);
+  --shadow-popover: 0 16px 32px rgba(0, 0, 0, 0.3);
   --primary-accent: #ffffff;
   --muted-accent: #71717a;
   --bullish-green: #10b981;
@@ -44,16 +50,15 @@ body {
 
 /* Glassmorphism & Accents */
 .glass-panel {
-  background: rgba(33, 33, 33, 0.9);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(46, 46, 46, 0.8);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-panel);
 }
 
 .glass-dropdown {
-  background: rgba(26, 26, 26, 0.95);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  background: var(--surface-raised);
+  border: 1px solid var(--card-border);
+  box-shadow: var(--shadow-popover);
 }
 
 .glow-blue,
@@ -64,6 +69,25 @@ body {
 .glow-cyan,
 .glow-zinc {
   box-shadow: 0 0 20px rgba(113, 113, 122, 0.25);
+}
+
+/* Shared visual system: keep surfaces compact and let hierarchy come from spacing. */
+@layer utilities {
+  .rounded-3xl { border-radius: 0.875rem; }
+  .rounded-2xl { border-radius: 0.75rem; }
+  .rounded-xl { border-radius: 0.625rem; }
+  .shadow-xl { box-shadow: var(--shadow-panel); }
+  .shadow-lg { box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16); }
+  .shadow-2xl { box-shadow: var(--shadow-popover); }
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
 }
 
 /* ── Light Mode Overrides ────────────────────────────── */
@@ -139,13 +163,12 @@ html.light .bg-gradient-to-br { --tw-gradient-from: #f3f4f6; }
 
 /* Glass panels */
 html.light .glass-panel {
-  background: rgba(255,255,255,0.9);
-  border-color: rgba(229,231,235,0.8);
+  background: var(--card-bg);
+  border-color: var(--card-border);
 }
 
-/* Transition on theme switch */
+/* Keep theme changes responsive without animating the entire document tree. */
 body,
-nav, header, aside, main,
-div, section, article, button, input, textarea, select {
-  transition: background-color 0.25s ease, border-color 0.2s ease, color 0.2s ease;
+nav, header, aside, main {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }

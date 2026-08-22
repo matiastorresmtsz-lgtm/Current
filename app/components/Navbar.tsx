@@ -85,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const userDisplayName = user ? (user.fullName || user.username || 'Trader') : 'Matias Torres';
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#161616]/95 backdrop-blur-md border-b border-[#2E2E2E]">
+    <header className="sticky top-0 z-40 w-full bg-[#161616] border-b border-[#2E2E2E]">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Logo - Current River Logo */}
@@ -96,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Search Bar - Center Pill */}
-        <div className="relative flex-1 max-w-xl hidden md:block">
+        <div className="relative flex-1 max-w-lg hidden md:block">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
             <input
@@ -106,7 +106,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-              className="w-full bg-[#242424] text-gray-100 placeholder-gray-400 pl-11 pr-9 py-2.5 rounded-full border border-transparent focus:border-[#17C99E]/50 focus:outline-none text-sm transition-all"
+              className="w-full bg-[#242424] text-gray-100 placeholder-gray-400 pl-11 pr-9 py-2.5 rounded-lg border border-[#2E2E2E] focus:border-[#17C99E]/60 focus:outline-none text-sm transition-colors"
             />
             {searchQuery && (
               <button
@@ -169,7 +169,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           {isSignedIn && (
             <button
               onClick={onOpenAddCryptoModal}
-              className="flex items-center space-x-1.5 bg-[#212121] hover:bg-[#2A2A2A] text-white font-extrabold px-3.5 py-2 rounded-xl text-xs transition-all shadow"
+              className="flex items-center space-x-1.5 bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold px-3.5 py-2 rounded-lg text-xs transition-colors"
             >
               <span className="w-4 h-4 text-black" >➕</span>
               <span className="hidden sm:inline">Add Holding</span>
@@ -181,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({
             <button
               onClick={onOpenShareModal}
               title="Share Portfolio"
-              className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-xl text-xs font-bold transition-colors"
+              className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-lg text-xs font-bold transition-colors"
             >
               <span className="w-4 h-4" >📤</span>
               <span className="hidden sm:inline">Share</span>
@@ -197,7 +197,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   markAllRead();
                 }}
                 title="Notifications"
-                className="w-10 h-10 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-full flex items-center justify-center transition-colors relative"
+                className="w-9 h-9 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-lg flex items-center justify-center transition-colors relative"
               >
                 <span className="w-5 h-5" >🔔</span>
                 {unreadNotifications > 0 && (
@@ -240,7 +240,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Clerk Auth Section */}
           {isSignedIn ? (
-            <div className="flex items-center space-x-2.5 bg-[#242424] px-2.5 py-1.5 rounded-full border border-[#2E2E2E]">
+            <div className="flex items-center space-x-2.5 bg-[#242424] px-2.5 py-1.5 rounded-lg border border-[#2E2E2E]">
               <UserButton />
               <div className="text-left hidden lg:block pr-1">
                 <div className="text-xs font-bold text-white leading-tight">{userDisplayName}</div>
@@ -250,12 +250,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           ) : (
             <div className="flex items-center space-x-2">
               <SignInButton mode="modal">
-                <button className="text-xs font-bold text-gray-300 hover:text-white px-3 py-2 rounded-xl transition-colors">
+                <button className="text-xs font-bold text-gray-300 hover:text-white px-3 py-2 rounded-lg transition-colors">
                   Sign In
                 </button>
               </SignInButton>
               <SignUpButton mode="modal">
-                <button className="bg-[#212121] hover:bg-[#2A2A2A] text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all shadow">
+                <button className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-3.5 py-2 rounded-lg transition-colors">
                   Sign Up
                 </button>
               </SignUpButton>
