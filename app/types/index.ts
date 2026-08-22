@@ -1,7 +1,6 @@
 export type NavTab =
   | 'portfolio'
   | 'markets'
-  | 'leaderboard'
   | 'learn'
   | 'insights'
   | 'about'

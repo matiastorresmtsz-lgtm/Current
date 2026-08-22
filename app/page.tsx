@@ -4,7 +4,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { NavTab, CryptoCoin, PortfolioAsset } from './types';
 import { fetchTopCryptos } from './services/coingecko';
-import { getUserPortfolio, isSupabaseConfigured, upsertLeaderboardEntry, upsertPortfolioSnapshot } from './lib/supabase';
+import { getUserPortfolio, isSupabaseConfigured, upsertPortfolioSnapshot } from './lib/supabase';
 import {
   INITIAL_COINS,
   INITIAL_PORTFOLIO,
@@ -21,7 +21,6 @@ import { RightSidebar, WatchlistItem } from './components/RightSidebar';
 // View imports
 import { PortfolioView } from './views/PortfolioView';
 import { MarketsView } from './views/MarketsView';
-import { LeaderboardView } from './views/LeaderboardView';
 import { LearnView } from './views/LearnView';
 import { InsightsView } from './views/InsightsView';
 import { AboutView } from './views/AboutView';
@@ -250,58 +249,11 @@ export default function Home() {
     }
   };
 
-  // Metrics for share modal and leaderboard sync
+  // Metrics for portfolio and share modal
   const totalValue = pricedPortfolio.reduce((sum, item) => sum + (item.amount * item.currentPrice), 0);
   const totalCost = pricedPortfolio.reduce((sum, item) => sum + (item.amount * item.avgBuyPrice), 0);
   const totalPnlUsd = totalValue - totalCost;
   const totalPnlPercent = totalCost > 0 ? (totalPnlUsd / totalCost) * 100 : 0;
-
-  // Real weighted 24h PnL change
-  const weighted24hChange = useMemo(() => {
-    if (totalValue <= 0 || pricedPortfolio.length === 0) return 0;
-    const weightedSum = pricedPortfolio.reduce((sum, item) => {
-      const itemVal = item.amount * item.currentPrice;
-      return sum + (itemVal * (item.change24h || 0));
-    }, 0);
-    return Number((weightedSum / totalValue).toFixed(2));
-  }, [pricedPortfolio, totalValue]);
-
-  // Dynamic Win Rate % based on profitable holdings
-  const calculatedWinRate = useMemo(() => {
-    if (pricedPortfolio.length === 0) return 75.0;
-    const profitable = pricedPortfolio.filter(item => item.currentPrice >= item.avgBuyPrice).length;
-    return Number(((profitable / pricedPortfolio.length) * 100).toFixed(1));
-  }, [pricedPortfolio]);
-
-  useEffect(() => {
-    if (!isSignedIn || !user?.id || !isSupabaseConfigured()) {
-      return;
-    }
-
-    const syncLeaderboard = async () => {
-      const storedDisplayName = typeof window !== 'undefined' ? localStorage.getItem('current_user_display_name') : null;
-      const storedUsername = typeof window !== 'undefined' ? localStorage.getItem('current_user_username') : null;
-      const activeName = storedDisplayName || storedUsername || user.fullName || user.username || user.primaryEmailAddress?.emailAddress?.split('@')[0] || 'Current Trader';
-      const storedCountry = (typeof window !== 'undefined' ? localStorage.getItem('current_user_country') : null) || 'US';
-
-      await upsertLeaderboardEntry({
-        user_id: user.id,
-        username: activeName,
-        avatar_url: user.imageUrl || null,
-        country: storedCountry,
-        portfolio_value: totalValue,
-        change_24h: weighted24hChange,
-        win_rate: calculatedWinRate,
-        rank: 1,
-      });
-
-      if (typeof window !== 'undefined') {
-        window.dispatchEvent(new CustomEvent('current_leaderboard_updated'));
-      }
-    };
-
-    void syncLeaderboard();
-  }, [isSignedIn, user?.id, user?.fullName, user?.username, user?.imageUrl, totalValue, weighted24hChange, calculatedWinRate]);
 
   return (
     <div className="min-h-screen bg-[#161616] text-gray-100 flex flex-col font-sans selection:bg-[#17C99E] selection:text-black">
@@ -353,13 +305,6 @@ export default function Home() {
           {activeTab === 'learn' && (
             <LearnView
               courses={LEARN_COURSES}
-            />
-          )}
-
-          {activeTab === 'leaderboard' && (
-            <LeaderboardView
-              portfolio={pricedPortfolio}
-              coins={coins}
             />
           )}
 

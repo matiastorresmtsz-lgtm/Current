@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useUser, useClerk } from '@clerk/nextjs';
+import { useUser } from '@clerk/nextjs';
 import { User, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings, AVAILABLE_COUNTRIES } from '../context/AppSettingsContext';
-
-import { upsertLeaderboardEntry, isSupabaseConfigured } from '../lib/supabase';
 
 export const SettingsView: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'account' | 'display'>('account');
@@ -14,8 +12,7 @@ export const SettingsView: React.FC = () => {
   const { country, setCountry } = useAppSettings();
 
   // Clerk Auth integration
-  const { isSignedIn, user } = useUser();
-  const { signOut } = useClerk();
+  const { user } = useUser();
 
   // Profile Form state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -44,26 +41,8 @@ export const SettingsView: React.FC = () => {
       localStorage.setItem('current_user_username', username);
     }
 
-    if (isSignedIn && user?.id && isSupabaseConfigured()) {
-      try {
-        await upsertLeaderboardEntry({
-          user_id: user.id,
-          username: displayName || username,
-          avatar_url: user.imageUrl || null,
-          country,
-          portfolio_value: 0,
-          change_24h: 0,
-          win_rate: 75.0,
-        });
-      } catch (err) {
-        // ignore fallback
-      }
-    }
-
-    // Trigger dispatch event so other components refresh immediately
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new Event('storage'));
-      window.dispatchEvent(new CustomEvent('current_leaderboard_updated'));
     }
 
     setSaveSuccess(true);
@@ -102,7 +81,7 @@ export const SettingsView: React.FC = () => {
                       <h3 className="text-sm font-bold text-white">Display Name & Handle</h3>
                     </div>
                     <p className="text-xs text-gray-400 leading-relaxed">
-                      Set your public display name and handle shown on PnL share cards and the global leaderboard.
+                      Set your public display name and handle shown on PnL share cards.
                     </p>
                     <div className="flex items-center space-x-3 pt-1 text-xs font-mono text-[#17C99E]">
                       <span>Name: <strong className="text-white">{displayName}</strong></span>
@@ -226,7 +205,7 @@ export const SettingsView: React.FC = () => {
                       <h3 className="text-sm font-bold text-white">Profile Flag / Region</h3>
                     </div>
                     <p className="text-xs text-gray-400">
-                      Select your flag icon displayed on the 1 Global International Leaderboard.
+                      Select your profile region.
                     </p>
                   </div>
                   <div className="w-full max-w-[220px]">

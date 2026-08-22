@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
   BarChart3,
   RefreshCw,
@@ -12,7 +13,6 @@ import {
   PieChart,
   Compass,
   Coins,
-  Trophy,
   Menu,
   X,
   Settings as SettingsIcon,
@@ -32,6 +32,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   activeTab,
   onSelectTab
 }) => {
+  const router = useRouter();
   const [topicsOpen, setTopicsOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -40,9 +41,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'markets', label: 'Markets', icon: BarChart3 },
     { id: 'insights', label: 'Insights', icon: Zap },
     { id: 'advisory', label: 'AI Advisor', icon: Sparkles },
-    { id: 'leaderboard', label: 'Leaderboard', icon: Trophy },
-    { id: 'about', label: 'About', icon: Info },
   ] as const;
+
+  const aboutItem = { id: 'about', label: 'About', icon: Info } as const;
 
   const topics = [
     { id: 'topic-etfs', name: 'ETFs & Inflows', icon: PieChart, emoji: '🔮' },
@@ -54,6 +55,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   const handleMobileTabClick = (tab: NavTab) => {
     onSelectTab(tab);
+    setMobileMenuOpen(false);
+  };
+
+  const handleAboutClick = () => {
+    router.push('/about');
     setMobileMenuOpen(false);
   };
 
@@ -127,13 +133,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* About Button */}
         <div className="pt-2 border-t border-[#2E2E2E]">
           {(() => {
-            const aboutItem = mainNavItems[5]; // About
             const Icon = aboutItem.icon;
             const isActive = activeTab === aboutItem.id;
             return (
               <button
                 key={aboutItem.id}
-                onClick={() => onSelectTab(aboutItem.id as NavTab)}
+                onClick={handleAboutClick}
                 className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
                     ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
                     : 'text-gray-300 hover:text-white hover:bg-[#212121]'
@@ -193,15 +198,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
         >
           <Zap className="w-5 h-5 mb-0.5" />
           <span>Insights</span>
-        </button>
-
-        <button
-          onClick={() => handleMobileTabClick('leaderboard')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'leaderboard' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-            }`}
-        >
-          <Trophy className="w-5 h-5 mb-0.5" />
-          <span>Rankings</span>
         </button>
 
         <button
