@@ -2,12 +2,12 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
+import Image from 'next/image';
 import {
   Sparkles,
   Send,
   AlertTriangle,
-  RefreshCw,
-  Bot
+  RefreshCw
 } from 'lucide-react';
 import { NavTab, PortfolioAsset, CryptoCoin, AIMessage } from '../types';
 
@@ -294,7 +294,7 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                     ? 'bg-[#17C99E]/10 border-[#17C99E]/20 text-[#17C99E]'
                     : 'bg-white/10 border-white/10 text-white'
                     }`}>
-                    {isAi ? <Bot className="w-4 h-4" /> : <span className="text-[11px] font-black uppercase">{user?.firstName?.[0] || 'U'}</span>}
+                    {isAi ? <Image src="/favicon.ico" alt="Current AI" width={32} height={32} className="w-full h-full rounded-xl object-cover" /> : <span className="text-[11px] font-black uppercase">{user?.firstName?.[0] || 'U'}</span>}
                   </div>
 
                   {/* Message Bubble */}
@@ -317,7 +317,7 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
             {isLoading && (
               <div className="flex items-start gap-3.5 max-w-[80%] mr-auto text-left">
                 <div className="w-8 h-8 rounded-xl bg-[#17C99E]/10 border border-[#17C99E]/20 text-[#17C99E] flex items-center justify-center shrink-0 shadow-sm animate-pulse">
-                  <Bot className="w-4 h-4 animate-bounce" />
+                  <Image src="/favicon.ico" alt="Current AI" width={32} height={32} className="w-full h-full rounded-xl object-cover animate-bounce" />
                 </div>
                 <div className="space-y-1">
                   <div className="px-5 py-3.5 bg-[#2E2E2E] text-gray-400 border border-white/5 rounded-2xl rounded-tl-sm text-xs flex items-center space-x-2">

@@ -16,6 +16,20 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Profiles Leaderboard
+
+Run the SQL in `supabase/schema.sql` in the Supabase SQL editor. The server-side leaderboard reads from `profiles` and is available at `/leaderboard`.
+
+Configure these server environment variables:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=...
+SUPABASE_SERVICE_ROLE_KEY=...
+CLERK_WEBHOOK_SIGNING_SECRET=...
+```
+
+In the Clerk Dashboard, add a webhook pointing to `/api/webhooks/clerk` and subscribe to `user.created`, `user.updated`, and `user.deleted`. The webhook verifies Clerk's signature and upserts or removes the matching profile by `clerk_user_id`.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

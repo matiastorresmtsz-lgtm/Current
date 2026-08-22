@@ -1,6 +1,18 @@
 -- Enable UUID extension
 create extension if not exists "uuid-ossp";
 
+create table if not exists public.profiles (
+  id uuid primary key default uuid_generate_v4(),
+  clerk_user_id text not null unique,
+  username text not null,
+  first_name text,
+  last_name text,
+  image_url text,
+  score integer not null default 0 check (score >= 0),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
 create table if not exists public.user_settings (
   id uuid primary key default uuid_generate_v4(),
   user_id text not null unique,
@@ -45,6 +57,8 @@ create table if not exists public.leaderboard_entries (
 );
 
 create index if not exists idx_user_settings_user_id on public.user_settings(user_id);
+create index if not exists idx_profiles_clerk_user_id on public.profiles(clerk_user_id);
+create index if not exists idx_profiles_score on public.profiles(score desc, created_at asc);
 create index if not exists idx_portfolio_snapshots_user_id on public.portfolio_snapshots(user_id);
 create index if not exists idx_portfolio_snapshots_latest on public.portfolio_snapshots(user_id, is_latest, updated_at desc);
 create index if not exists idx_leaderboard_entries_value on public.leaderboard_entries(portfolio_value desc, updated_at desc);
@@ -61,6 +75,10 @@ create trigger trg_user_settings_updated_at
 before update on public.user_settings
 for each row execute function public.set_updated_at();
 
+create trigger trg_profiles_updated_at
+before update on public.profiles
+for each row execute function public.set_updated_at();
+
 create trigger trg_portfolio_snapshots_updated_at
 before update on public.portfolio_snapshots
 for each row execute function public.set_updated_at();
@@ -70,12 +88,18 @@ before update on public.leaderboard_entries
 for each row execute function public.set_updated_at();
 
 alter table public.user_settings enable row level security;
+alter table public.profiles enable row level security;
 alter table public.portfolio_snapshots enable row level security;
 alter table public.leaderboard_entries enable row level security;
 
 create policy "Users can view own settings"
 on public.user_settings for select
 using (auth.uid()::text = user_id);
+
+drop policy if exists "Anyone can view profiles" on public.profiles;
+create policy "Anyone can view profiles"
+on public.profiles for select
+using (true);
 
 create policy "Users can upsert own settings"
 on public.user_settings for insert
