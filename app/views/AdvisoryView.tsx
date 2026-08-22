@@ -5,17 +5,9 @@ import { useUser } from '@clerk/nextjs';
 import {
   Sparkles,
   Send,
-  Brain,
-  TrendingUp,
   AlertTriangle,
-  ArrowRight,
-  Plus,
   RefreshCw,
-  Info,
-  ShieldCheck,
-  Bot,
-  Layers,
-  MessageSquare
+  Bot
 } from 'lucide-react';
 import { NavTab, PortfolioAsset, CryptoCoin, AIMessage } from '../types';
 
@@ -259,133 +251,16 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
 
       {/* Page Header */}
 
-      {/* Main Grid: Sidebar stats & Chat area */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
-
-        {/* Left Column: Automated Portfolio Stats */}
-        <div className="lg:col-span-1 space-y-6 flex flex-col">
-
-          {/* Card 1: Diversification & Risk */}
-          <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl space-y-5">
-            <h3 className="text-xs font-black text-white uppercase tracking-wider border-b border-[#2E2E2E] pb-3 flex items-center space-x-2">
-              <Layers className="w-4 h-4 text-[#17C99E]" />
-              <span>Advisory Metrics</span>
-            </h3>
-
-            {portfolio.length === 0 ? (
-              <div className="text-center py-6 space-y-2">
-                <Info className="w-8 h-8 text-gray-500 mx-auto" />
-                <p className="text-xs text-gray-400">No assets loaded. Setup your holdings to calculate metrics.</p>
-              </div>
-            ) : (
-              <div className="space-y-6">
-
-                {/* Health Score */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-semibold text-gray-400">Diversification Rating</span>
-                    <span className={`font-black px-2 py-0.5 rounded-md ${divInfo.bg} ${divInfo.color}`}>
-                      {divInfo.label}
-                    </span>
-                  </div>
-                  <div className="w-full bg-black/50 rounded-full h-3 overflow-hidden border border-white/5 p-0.5">
-                    <div
-                      className="bg-gradient-to-r from-teal-500 to-[#17C99E] h-full rounded-full transition-all duration-1000 shadow-[0_0_8px_#17C99E]"
-                      style={{ width: `${divInfo.score}%` }}
-                    />
-                  </div>
-                  <div className="flex justify-between text-[9px] text-gray-500 font-mono">
-                    <span>Low</span>
-                    <span>Moderate</span>
-                    <span>Excellent</span>
-                  </div>
-                </div>
-
-                {/* Risk profile */}
-                <div className="flex items-center justify-between border-t border-[#2E2E2E] pt-4">
-                  <span className="text-xs font-semibold text-gray-400">Portfolio Risk Profile</span>
-                  <span className={`text-xs font-extrabold ${riskInfo.color}`}>
-                    {riskInfo.label}
-                  </span>
-                </div>
-
-                {/* Allocation breakdown list */}
-                <div className="border-t border-[#2E2E2E] pt-4 space-y-3">
-                  <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Top Allocations</span>
-                  {topAllocations.map(alloc => (
-                    <div key={alloc.symbol} className="space-y-1.5">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center space-x-2">
-                          <div className="w-2 h-2 rounded-full" style={{ backgroundColor: alloc.color }} />
-                          <span className="font-bold text-white uppercase">{alloc.symbol}</span>
-                          <span className="text-[10px] text-gray-400 font-medium">({alloc.name})</span>
-                        </div>
-                        <span className="font-black text-gray-300">{alloc.pct.toFixed(1)}%</span>
-                      </div>
-                      <div className="w-full bg-black/40 h-1.5 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-1000"
-                          style={{
-                            backgroundColor: alloc.color,
-                            width: `${alloc.pct}%`
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-              </div>
-            )}
-          </div>
-
-          {/* Card 2: Interactive Tips & Info */}
-          <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl space-y-4 flex-1 flex flex-col justify-between">
-            <div className="space-y-3">
-              <h3 className="text-xs font-black text-white uppercase tracking-wider flex items-center space-x-2">
-                <Info className="w-4 h-4 text-[#17C99E]" />
-                <span>How it works</span>
-              </h3>
-              <p className="text-[11px] text-gray-400 leading-relaxed">
-                When you submit a question, we package your current holdings (prices, buys, allocations) and securely transmit them to Groq's high-speed completion engine.
-              </p>
-              <p className="text-[11px] text-gray-400 leading-relaxed">
-                The advisor doesn't have access to your private credentials, wallets, or credit card keys. All insights are educational and based on the mathematical properties of your asset allocation.
-              </p>
-            </div>
-
-            {portfolio.length === 0 ? (
-              <button
-                onClick={onOpenAddCryptoModal}
-                className="w-full flex items-center justify-center space-x-2 bg-[#17C99E] hover:bg-[#13A682] text-black font-extrabold py-3 px-4 rounded-2xl text-xs transition-all shadow-lg hover:shadow-[#17C99E]/20 mt-4 cursor-pointer"
-              >
-                <Plus className="w-4 h-4 shrink-0" />
-                <span>Add Crypto Asset</span>
-              </button>
-            ) : (
-              <div className="bg-[#17C99E]/10 border border-[#17C99E]/20 rounded-2xl p-4 flex items-start space-x-3 mt-4">
-                <ShieldCheck className="w-5 h-5 text-[#17C99E] shrink-0 mt-0.5" />
-                <div className="space-y-1">
-                  <span className="text-xs font-bold text-white block">Custody Safeguard</span>
-                  <span className="text-[10px] text-gray-400 leading-relaxed block">
-                    No real-money trading is supported directly in the Advisory tab. Your funds are 100% safe.
-                  </span>
-                </div>
-              </div>
-            )}
-          </div>
-
-        </div>
-
-        {/* Right Column: Chat Hub */}
-        <div className="lg:col-span-2 bg-[#212121] border border-[#2E2E2E] rounded-3xl flex flex-col h-[650px] shadow-xl overflow-hidden">
+      {/* Chat Hub */}
+      <div className="max-w-[900px] mx-auto w-full">
+        <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl flex flex-col h-[700px] shadow-xl overflow-hidden">
 
           {/* Chat Header */}
           <div className="bg-black/25 px-6 py-4 border-b border-[#2E2E2E] flex items-center justify-between">
             <div className="flex items-center space-x-3">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#17C99E] animate-pulse" />
+              <div className="" />
               <div>
-                <h3 className="text-xs font-black text-white uppercase tracking-wider">Advisor Chat Room</h3>
+                <h3 className="text-xs font-black text-white uppercase tracking-wider">Current AI Advisor</h3>
                 <p className="text-[10px] text-gray-400 mt-0.5">Direct line to GPT OSS 20B</p>
               </div>
             </div>
