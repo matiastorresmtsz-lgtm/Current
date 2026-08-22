@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { ArrowRight, Menu } from 'lucide-react';
+import { AboutReveal } from './AboutReveal';
 
 const previewMetrics = [
   { label: 'Today\'s return', value: '-$1,852.24', change: '-0.60%' },
@@ -25,16 +26,16 @@ export default function AboutPage() {
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-56 bg-gradient-to-b from-transparent via-[#f5f0ee]/55 to-[#f5f0ee]" />
 
         <header className="relative z-10">
-          <div className="mx-auto flex h-20 max-w-[1240px] items-center justify-between px-5 sm:px-8">
+          <div className="mx-auto grid h-20 max-w-[1240px] grid-cols-[1fr_auto_1fr] items-center px-5 sm:px-8">
             <Link href="/" className="font-extrabold text-2xl tracking-tight text-[#17C99E]" aria-label="Go to Current dashboard">
               current
             </Link>
-            <nav className="hidden items-center gap-8 text-xs font-semibold text-[#303735] md:flex" aria-label="About navigation">
+            <nav className="hidden items-center justify-self-center gap-8 text-xs font-semibold text-[#303735] md:flex" aria-label="About navigation">
               <a href="#platform" className="transition-colors hover:text-[#087d62]">Platform</a>
               <a href="#principles" className="transition-colors hover:text-[#087d62]">Why Current</a>
               <a href="#faq" className="transition-colors hover:text-[#087d62]">FAQ</a>
             </nav>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center justify-self-end gap-2">
               <Link href="/" className="hidden rounded-lg px-3 py-2 text-xs font-bold text-[#303735] transition-colors hover:text-[#087d62] sm:inline-flex">
                 Sign in
               </Link>
@@ -52,7 +53,6 @@ export default function AboutPage() {
         <div className="relative z-10 mx-auto max-w-[1240px] px-5 pb-16 pt-20 sm:px-8 sm:pb-24 sm:pt-28">
           <div className="max-w-[660px]">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#17C99E]/35 bg-white/45 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#087d62] backdrop-blur-sm">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#17C99E]" />
               Social investing, made clearer
             </div>
             <h1 className="max-w-[620px] text-5xl font-extrabold leading-[0.98] tracking-tight text-[#101513] sm:text-7xl">
@@ -150,7 +150,7 @@ export default function AboutPage() {
           </div>
 
           <div className="mt-14 space-y-6 sm:mt-20">
-            <article className="about-card grid overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_rgba(45,37,37,0.08)] md:grid-cols-2">
+            <AboutReveal className="grid overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_rgba(45,37,37,0.08)] md:grid-cols-2">
               <div className="p-7 sm:p-12">
                 <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#087d62]">Portfolio clarity</p>
                 <h3 className="mt-5 max-w-md text-2xl font-extrabold leading-tight text-[#161616] sm:text-3xl">Know where you stand, at a glance.</h3>
@@ -169,9 +169,9 @@ export default function AboutPage() {
                   <div className="mt-4 flex justify-between text-[9px] font-semibold text-[#8a878c]"><span>Jan</span><span>Jun</span><span>Dec</span></div>
                 </div>
               </div>
-            </article>
+            </AboutReveal>
 
-            <article className="about-card grid overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_rgba(45,37,37,0.08)] md:grid-cols-2" style={{ animationDelay: '120ms' }}>
+            <AboutReveal delay={0.12} className="grid overflow-hidden rounded-2xl bg-white shadow-[0_18px_45px_rgba(45,37,37,0.08)] md:grid-cols-2">
               <div className="order-2 flex min-h-[300px] items-center justify-center bg-[#dceee8] p-7 sm:p-10 md:order-1">
                 <div className="w-full max-w-[390px] rounded-xl bg-[#18231f] p-5 shadow-[0_16px_30px_rgba(23,54,43,0.18)]">
                   <div className="flex items-center justify-between border-b border-white/10 pb-4"><span className="text-[9px] font-bold uppercase tracking-wider text-white/50">Market context</span><span className="rounded-full bg-[#17C99E]/15 px-2 py-1 text-[9px] font-bold text-[#17C99E]">Live</span></div>
@@ -184,7 +184,7 @@ export default function AboutPage() {
                 <h3 className="mt-5 max-w-md text-2xl font-extrabold leading-tight text-[#161616] sm:text-3xl">Make decisions with the bigger picture.</h3>
                 <p className="mt-5 max-w-md text-sm leading-6 text-[#707a75]">Markets move quickly. Current keeps prices, insights, learning, and your own thesis close together so every update has somewhere to land.</p>
               </div>
-            </article>
+            </AboutReveal>
           </div>
         </div>
       </section>
@@ -228,13 +228,15 @@ export default function AboutPage() {
                 ['Is Current free to use?', 'Yes. The core product is free to use and supported by non-intrusive advertising rather than a subscription.'],
                 ['Is Current open source?', 'Yes. Current is built in the open so the community can inspect the project and help improve it over time.'],
               ].map(([question, answer], index) => (
-                <details key={question} className="about-card group rounded-xl border border-[#dce5e0] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(45,65,55,0.05)]" style={{ animationDelay: `${360 + index * 100}ms` }}>
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-extrabold text-[#161616] marker:hidden">
-                    {question}
-                    <span className="text-xl font-normal leading-none text-[#087d62] transition-transform group-open:rotate-45">+</span>
-                  </summary>
-                  <p className="max-w-2xl pt-3 text-sm leading-6 text-[#68736e]">{answer}</p>
-                </details>
+                <AboutReveal key={question} delay={0.36 + index * 0.1}>
+                  <details className="group rounded-xl border border-[#dce5e0] bg-white px-5 py-4 shadow-[0_10px_24px_rgba(45,65,55,0.05)]">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-extrabold text-[#161616] marker:hidden">
+                      {question}
+                      <span className="text-xl font-normal leading-none text-[#087d62] transition-transform group-open:rotate-45">+</span>
+                    </summary>
+                    <p className="max-w-2xl pt-3 text-sm leading-6 text-[#68736e]">{answer}</p>
+                  </details>
+                </AboutReveal>
               ))}
             </div>
           </div>

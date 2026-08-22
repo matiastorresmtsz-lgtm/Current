@@ -90,23 +90,6 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-@keyframes about-card-in {
-  from { opacity: 0; transform: translateY(18px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.about-card {
-  opacity: 0;
-  animation: about-card-in 0.55s ease-out forwards;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .about-card {
-    opacity: 1;
-    animation: none;
-  }
-}
-
 /* ── Light Mode Overrides ────────────────────────────── */
 html.light {
   --background: #f4f5f7;
