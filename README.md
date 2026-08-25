@@ -1,3 +1,15 @@
+
+## Robinhood import
+
+The Add Investments modal can import read-only Robinhood positions through OAuth. Register a Robinhood application and configure:
+
+```env
+ROBINHOOD_CLIENT_ID=your_client_id
+ROBINHOOD_CLIENT_SECRET=your_client_secret
+ROBINHOOD_REDIRECT_URI=https://your-domain.com/api/robinhood/callback
+```
+
+The redirect URI must exactly match the one registered with Robinhood. Credentials stay server-side; the browser only receives the imported positions.
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started

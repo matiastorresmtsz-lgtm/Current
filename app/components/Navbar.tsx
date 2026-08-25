@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Search } from 'lucide-react';
+import { Bell, Search, Share2 } from 'lucide-react';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { useNotifications } from '../context/NotificationContext';
 import { CryptoCoin, NavTab } from '../types';
@@ -85,7 +85,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const userDisplayName = user ? (user.fullName || user.username || 'Trader') : 'Matias Torres';
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#161616] border-b border-[#2E2E2E]">
+    <header className="sticky top-0 z-40 w-full bg-[#1D1D1D] border-b border-[#2E2E2E]">
       <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Logo - Current River Logo */}
@@ -183,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               title="Share Portfolio"
               className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-lg text-xs font-bold transition-colors"
             >
-              <span className="w-4 h-4" >📤</span>
+              <Share2 className="w-4 h-4" />
               <span className="hidden sm:inline">Share</span>
             </button>
           )}
@@ -199,7 +199,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 title="Notifications"
                 className="w-9 h-9 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-lg flex items-center justify-center transition-colors relative"
               >
-                <span className="w-5 h-5" >🔔</span>
+                <Bell className="w-5 h-5" />
                 {unreadNotifications > 0 && (
                   <span className="absolute -top-1 -right-1 bg-[#17C99E] text-black text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
                     {unreadNotifications}

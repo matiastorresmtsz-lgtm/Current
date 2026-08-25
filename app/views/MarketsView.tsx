@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, Loader2 } from 'lucide-react';
+import { Search, Loader2, TrendingDown, TrendingUp } from 'lucide-react';
 import { CryptoCoin } from '../types';
 import { searchCoinGecko } from '../services/coingecko';
 
@@ -236,7 +236,7 @@ export const MarketsView: React.FC<MarketsViewProps> = ({
                         {coin.price > 0 ? (
                           <span className={`inline-flex items-center px-2.5 py-1 rounded-xl text-xs font-mono font-bold ${isPositive ? 'bg-[#17C99E]/10 text-[#17C99E]' : 'bg-[#FF4D4D]/10 text-[#FF4D4D]'
                             }`}>
-                            {isPositive ? <span className="w-3 h-3 mr-1" >📈</span> : <span className="w-3 h-3 mr-1" >📉</span>}
+                            {isPositive ? <TrendingUp className="w-3 h-3 mr-1" /> : <TrendingDown className="w-3 h-3 mr-1" />}
                             {isPositive ? '+' : ''}{coin.change24h.toFixed(2)}%
                           </span>
                         ) : (

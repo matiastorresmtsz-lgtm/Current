@@ -1,61 +1,49 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bookmark, Clock, Sparkles, Check, Loader2, RefreshCw } from 'lucide-react';
-import { TopicNewsItem, CryptoCoin } from '../types';
+import { TopicNewsItem } from '../types';
 
 interface TopicViewProps {
   topicId: string;
-  coins: CryptoCoin[];
-  onOpenCoinModal: (coin: CryptoCoin) => void;
+  isFollowing: boolean;
+  onToggleFollow: (topic: { id: string; name: string }) => void;
 }
 
-const TOPIC_CONFIGS: Record<string, { title: string; subtitle: string; icon: string; bannerGradient: string; tags: string[] }> = {
+const TOPIC_CONFIGS: Record<string, { title: string; subtitle: string; bannerGradient: string }> = {
   'topic-beginner': {
     title: 'Beginner Investors',
     subtitle: 'Educational guides, risk management strategies, and starter market insights.',
-    icon: '🌱',
     bannerGradient: 'from-emerald-900/40 via-[#212121] to-[#161616]',
-    tags: ['Beginner Guides', 'Risk Management', 'Wallets', 'Tokenomics', 'Market Basics']
   },
   'topic-etfs': {
     title: 'ETFs & Institutional Flow',
     subtitle: 'Spot Bitcoin, Ethereum & Solana ETF inflows, asset management data, SEC regulatory developments.',
-    icon: '🔮',
     bannerGradient: 'from-purple-900/40 via-[#212121] to-[#161616]',
-    tags: ['Spot Bitcoin ETF', 'Ether ETF', 'Institutional Inflows', 'SEC News']
   },
   'topic-passive-income': {
     title: 'Passive Income & Yield',
     subtitle: 'Native staking yields, liquid staking (LSTs), lending protocols, automated liquidity pool APRs.',
-    icon: '🔥',
     bannerGradient: 'from-amber-900/40 via-[#212121] to-[#161616]',
-    tags: ['Staking Yields', 'LSTs', 'DeFi Vaults', 'APRs']
   },
   'topic-memes': {
     title: 'Memecoins & Culture',
     subtitle: 'High velocity community tokens, viral momentum, volume surges across Solana, Base & Ethereum.',
-    icon: '🐕',
     bannerGradient: 'from-pink-900/40 via-[#212121] to-[#161616]',
-    tags: ['Dogecoin', 'Shiba', 'Pepe', 'Solana Memes']
   },
   'topic-defi': {
     title: 'DeFi & Infrastructure',
     subtitle: 'Decentralized exchanges, cross-chain bridges, layer 2 scaling, real-world asset tokenization.',
-    icon: '⚡',
     bannerGradient: 'from-zinc-800/40 via-[#212121] to-[#161616]',
-    tags: ['DEX Volume', 'TVL Trackers', 'Layer 2s', 'RWA']
   }
 };
 
 export const TopicView: React.FC<TopicViewProps> = ({
   topicId,
-  coins,
-  onOpenCoinModal
+  isFollowing,
+  onToggleFollow
 }) => {
   const [news, setNews] = useState<TopicNewsItem[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [isFollowing, setIsFollowing] = useState<boolean>(false);
   const [bookmarkedIds, setBookmarkedIds] = useState<Set<string>>(new Set());
 
   const config = TOPIC_CONFIGS[topicId] || TOPIC_CONFIGS['topic-beginner'];
@@ -100,7 +88,6 @@ export const TopicView: React.FC<TopicViewProps> = ({
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center space-x-3">
-              <span className="text-3xl sm:text-4xl">{config.icon}</span>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
                 {config.title}
               </h1>
@@ -109,17 +96,6 @@ export const TopicView: React.FC<TopicViewProps> = ({
               {config.subtitle}
             </p>
 
-            {/* Tags Bar */}
-            <div className="flex flex-wrap gap-2 pt-2">
-              {config.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="bg-[#161616]/80 text-[#17C99E] font-mono text-[10px] font-extrabold px-3 py-1 rounded-full border border-[#17C99E]/30"
-                >
-                  #{tag}
-                </span>
-              ))}
-            </div>
           </div>
 
           <div className="flex items-center space-x-3 shrink-0">
@@ -128,67 +104,20 @@ export const TopicView: React.FC<TopicViewProps> = ({
               title="Refresh News Feed"
               className="p-2.5 rounded-2xl bg-[#161616] border border-[#2E2E2E] text-gray-400 hover:text-white hover:bg-[#2A2A2A] transition-colors"
             >
-              <RefreshCw className={`w-4 h-4 ${isLoading ? 'animate-spin text-[#17C99E]' : ''}`} />
+              Refresh
             </button>
 
             <button
-              onClick={() => setIsFollowing(!isFollowing)}
+              onClick={() => onToggleFollow({ id: topicId, name: config.title })}
               className={`px-5 py-2.5 rounded-2xl text-xs font-extrabold transition-all flex items-center space-x-1.5 shrink-0 ${
                 isFollowing
                   ? 'bg-[#17C99E]/20 text-[#17C99E] border border-[#17C99E]/40'
                   : 'bg-[#17C99E] hover:bg-[#14B8A6] text-black shadow-lg shadow-[#17C99E]/20'
               }`}
             >
-              {isFollowing ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>Following Topic</span>
-                </>
-              ) : (
-                <>
-                  <Sparkles className="w-4 h-4" />
-                  <span>Follow Topic</span>
-                </>
-              )}
+              {isFollowing ? 'Following Topic' : 'Follow Topic'}
             </button>
           </div>
-        </div>
-      </div>
-
-      {/* Relevant Coin Tickers Carousel Bar */}
-      <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-4 shadow-lg">
-        <div className="text-[11px] font-extrabold text-gray-400 uppercase tracking-wider mb-3 px-1 flex items-center justify-between">
-          <span>Trending Market Movers</span>
-          <span className="text-[#17C99E] font-mono">Live Crypto Prices</span>
-        </div>
-
-        <div className="flex items-center space-x-3 overflow-x-auto pb-1 scrollbar-none">
-          {coins.slice(0, 8).map((coin) => (
-            <div
-              key={coin.id}
-              onClick={() => onOpenCoinModal(coin)}
-              className="flex items-center space-x-3 bg-[#161616] hover:bg-[#2A2A2A] border border-[#2E2E2E] px-3.5 py-2 rounded-2xl cursor-pointer transition-all shrink-0"
-            >
-              {coin.icon ? (
-                <img src={coin.icon} alt={coin.name} className="w-6 h-6 rounded-full" />
-              ) : (
-                <div className="w-6 h-6 rounded-full bg-[#2A2A2A] flex items-center justify-center font-bold text-[#17C99E] text-[10px]">
-                  {coin.symbol.slice(0, 2)}
-                </div>
-              )}
-              <div>
-                <div className="text-xs font-bold text-white flex items-center space-x-1">
-                  <span>{coin.symbol}</span>
-                  <span className={`text-[10px] font-mono ${coin.change24h >= 0 ? 'text-[#17C99E]' : 'text-[#FF4D4D]'}`}>
-                    {coin.change24h >= 0 ? '+' : ''}{coin.change24h}%
-                  </span>
-                </div>
-                <div className="text-[10px] font-mono text-gray-400">
-                  ${coin.price < 1 ? coin.price.toFixed(4) : coin.price.toLocaleString()}
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
       </div>
 
@@ -206,7 +135,6 @@ export const TopicView: React.FC<TopicViewProps> = ({
 
         {isLoading ? (
           <div className="py-16 bg-[#212121] border border-[#2E2E2E] rounded-3xl flex flex-col items-center justify-center space-y-3">
-            <Loader2 className="w-8 h-8 text-[#17C99E] animate-spin" />
             <span className="text-xs text-gray-400 font-medium">Fetching real-time updates...</span>
           </div>
         ) : news.length > 0 ? (
@@ -222,7 +150,6 @@ export const TopicView: React.FC<TopicViewProps> = ({
                     <div className="flex items-center justify-between text-[11px] text-gray-400 font-medium">
                       <span className="text-[#17C99E] font-bold uppercase tracking-wider">{item.source}</span>
                       <div className="flex items-center space-x-1">
-                        <Clock className="w-3 h-3 text-gray-500" />
                         <span>{item.publishedAt}</span>
                       </div>
                     </div>
@@ -255,13 +182,13 @@ export const TopicView: React.FC<TopicViewProps> = ({
                       <button
                         onClick={(e) => toggleBookmark(item.id, e)}
                         title={bookmarkedIds.has(item.id) ? 'Bookmarked' : 'Bookmark update'}
-                        className={`p-2 rounded-xl border border-[#2E2E2E] transition-colors ${
+                        className={`rounded-xl border border-[#2E2E2E] px-3 py-2 text-[10px] font-bold transition-colors ${
                           bookmarkedIds.has(item.id)
                             ? 'bg-[#17C99E]/20 text-[#17C99E] border-[#17C99E]/40'
                             : 'bg-[#161616] text-gray-400 hover:text-white'
                         }`}
                       >
-                        <Bookmark className="w-4 h-4" />
+                        {bookmarkedIds.has(item.id) ? 'Bookmarked' : 'Bookmark'}
                       </button>
 
                     </div>

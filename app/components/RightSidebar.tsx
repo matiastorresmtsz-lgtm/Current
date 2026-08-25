@@ -9,6 +9,7 @@ export interface WatchlistItem {
   symbol: string;
   name: string;
   icon: string;
+  type?: 'coin' | 'topic';
 }
 
 interface RightSidebarProps {
@@ -74,7 +75,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
                 key={item.coinId}
                 className="flex items-center justify-between p-2 rounded-2xl hover:bg-[#2A2A2A] cursor-pointer transition-colors group relative"
                 onClick={() => {
-                  if (item.liveCoin) onOpenCoinModal(item.liveCoin);
+                  if (item.type !== 'topic' && item.liveCoin) onOpenCoinModal(item.liveCoin);
                 }}
               >
                 <div className="flex items-center space-x-3">
@@ -98,7 +99,9 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({
                 <div className="flex items-center space-x-1.5">
                   {/* Price / Change */}
                   <div className="text-right">
-                    {item.price !== undefined ? (
+                    {item.type === 'topic' ? (
+                      <span className="text-[10px] text-[#17C99E] font-bold">Topic</span>
+                    ) : item.price !== undefined ? (
                       <>
                         <div className="text-[10px] font-bold text-white font-mono">
                           ${item.price < 1 ? item.price.toFixed(4) : item.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}

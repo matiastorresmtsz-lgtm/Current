@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
 import { LearnCourse, LearnLesson } from '../types';
+import { Check, Clock3, GraduationCap, Lightbulb } from 'lucide-react';
 
 interface LearnViewProps {
   courses: LearnCourse[];
@@ -32,7 +33,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
         <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center sm:text-left">
             <div className="inline-flex items-center space-x-2 bg-[#161616] text-[#17C99E] text-xs font-extrabold px-3 py-1 rounded-full border border-[#2E2E2E]">
-              <span>🎓</span>
+              <GraduationCap className="h-4 w-4" />
               <span>Sign In Required for Courses</span>
             </div>
             <h3 className="text-xl font-extrabold text-white">Unlock Current Academy & Earn XP</h3>
@@ -102,7 +103,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                     <span className="text-[#17C99E] font-bold">{course.category}</span>
                     <span>•</span>
                     <span className="flex items-center space-x-1">
-                      <span className="w-3 h-3" >🕒</span>
+                      <Clock3 className="w-3 h-3" />
                       <span>{course.duration}</span>
                     </span>
                   </div>
@@ -123,7 +124,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                     onClick={() => toggleCourseComplete(course.id)}
                     className="flex items-center space-x-2 text-xs font-bold text-[#10B981]"
                   >
-                    <span className="w-4 h-4" >✅</span>
+                    <Check className="w-4 h-4" />
                     <span>Completed</span>
                   </button>
                 ) : (
@@ -178,7 +179,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                 </div>
 
                 <div className="p-4 bg-[#161616] border border-[#2E2E2E] rounded-2xl space-y-1">
-                  <div className="text-xs font-bold text-[#17C99E] uppercase tracking-wide">💡 Key Takeaway</div>
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-[#17C99E] uppercase tracking-wide"><Lightbulb className="h-4 w-4" />Key Takeaway</div>
                   <div className="text-xs text-gray-200 font-medium leading-relaxed">
                     {activeCourse.lessons[activeLessonIndex].keyTakeaway}
                   </div>
@@ -210,7 +211,7 @@ export const LearnView: React.FC<LearnViewProps> = ({ courses }) => {
                       }}
                       className="bg-[#10B981] hover:bg-[#059669] text-black font-extrabold text-xs px-5 py-2.5 rounded-xl transition-all flex items-center space-x-1.5 shadow"
                     >
-                      <span className="w-4 h-4" >✅</span>
+                      <Check className="w-4 h-4" />
                       <span>Complete Mini-Course (+{activeCourse.xpReward} XP)</span>
                     </button>
                   )}

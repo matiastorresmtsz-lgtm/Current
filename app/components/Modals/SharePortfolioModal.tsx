@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { ChevronDown } from 'lucide-react';
+import { Camera, Check, ChevronDown, Clipboard, DollarSign, Image as ImageIcon, CheckCircle } from 'lucide-react';
 import { PortfolioAsset } from '../../types';
 
 interface SharePortfolioModalProps {
@@ -16,10 +16,10 @@ interface SharePortfolioModalProps {
 type Currency = 'USD' | 'CAD' | 'MXN';
 type BgPreset = 'cyber-carbon' | 'emerald-bull' | 'midnight-onyx' | 'gold-tier' | 'slate-glass';
 
-const CURRENCY_CONFIG: Record<Currency, { flag: string; symbol: string; label: string; rate: number }> = {
-  USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
-  CAD: { flag: '🇨🇦', symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
-  MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
+const CURRENCY_CONFIG: Record<Currency, { symbol: string; label: string; rate: number }> = {
+  USD: { symbol: '$', label: 'US Dollar', rate: 1 },
+  CAD: { symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
+  MXN: { symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
 };
 
 const BG_PRESETS: Record<BgPreset, { name: string; style: string; badgeColor: string }> = {
@@ -388,7 +388,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
                 onClick={() => fileInputRef.current?.click()}
                 className="text-xs font-bold text-[#17C99E] hover:underline flex items-center space-x-1"
               >
-                <span>🖼️</span>
+                <ImageIcon className="h-4 w-4" />
                 <span>{customBgImage ? 'Change Image' : 'Upload Custom BG'}</span>
               </button>
             </div>
@@ -426,7 +426,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
                 className="w-full flex items-center justify-between bg-[#212121] border border-[#2E2E2E] hover:border-[#3E3E3E] rounded-xl px-4 py-2.5 transition-colors"
               >
                 <div className="flex items-center space-x-2.5">
-                  <span className="text-base">{curr.flag}</span>
+                  <DollarSign className="h-4 w-4 text-gray-400" />
                   <div className="text-left">
                     <span className="text-sm font-bold text-white">{currency}</span>
                     <span className="text-xs text-gray-400 ml-2">· {curr.label}</span>
@@ -445,13 +445,13 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
                         onClick={() => { setCurrency(key); setShowCurrencyDropdown(false); }}
                         className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-[#2A2A2A] transition-colors ${currency === key ? 'bg-[#2A2A2A]' : ''}`}
                       >
-                        <span className="text-lg">{cfg.flag}</span>
+                        <DollarSign className="h-5 w-5 text-gray-400" />
                         <div className="text-left flex-1">
                           <span className="text-sm font-bold text-white">{key}</span>
                           <span className="text-xs text-gray-400 ml-2">· {cfg.label}</span>
                         </div>
                         <span className="text-xs text-gray-400 font-mono">1 USD = {cfg.rate} {key}</span>
-                        {currency === key && <span className="text-[#17C99E] text-xs font-bold">✓</span>}
+                        {currency === key && <Check className="h-4 w-4 text-[#17C99E]" />}
                       </button>
                     ))}
                   </div>
@@ -516,7 +516,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
                   : 'bg-[#212121] border-[#2E2E2E] text-gray-200 hover:border-[#3E3E3E] hover:text-white'
               }`}
             >
-              {copied ? <span className="w-4 h-4" >✅</span> : <span className="w-4 h-4" >📋</span>}
+              {copied ? <CheckCircle className="w-4 h-4" /> : <Clipboard className="w-4 h-4" />}
               <span>{copied ? 'Copied Link!' : 'Copy PnL Link'}</span>
             </button>
 
@@ -525,7 +525,7 @@ export const SharePortfolioModal: React.FC<SharePortfolioModalProps> = ({
               onClick={handleDownloadExactImage}
               className="flex items-center justify-center space-x-2 py-3 rounded-xl font-bold text-xs bg-[#17C99E] hover:bg-[#14B8A6] text-black transition-all shadow-md"
             >
-              <span className="w-4 h-4" >📸</span>
+              <Camera className="w-4 h-4" />
               <span>Download Card Image</span>
             </button>
           </div>

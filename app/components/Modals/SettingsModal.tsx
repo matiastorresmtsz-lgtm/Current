@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { CheckCircle, Settings, ShieldCheck, Wallet, X } from 'lucide-react';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -30,14 +31,14 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         {/* Header */}
         <div className="flex items-center justify-between pb-4 border-b border-[#242B35]">
           <div className="flex items-center space-x-2">
-            <span className="w-5 h-5 text-[#FF2E55]" >⚙️</span>
+            <Settings className="w-5 h-5 text-[#FF2E55]" />
             <h2 className="text-lg font-bold text-white">Current Platform Settings</h2>
           </div>
           <button 
             onClick={onClose}
             className="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-[#1B2028]"
           >
-            <span className="w-5 h-5" >✕</span>
+            <X className="w-5 h-5" />
           </button>
         </div>
 
@@ -138,7 +139,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <div className="p-3 bg-[#0B0E11] rounded-xl border border-[#242B35] flex items-center justify-between">
                 <div>
                   <div className="font-bold text-white flex items-center space-x-1.5">
-                    <span className="w-4 h-4 text-[#00D293]" >🛡️</span>
+                    <ShieldCheck className="w-4 h-4 text-[#00D293]" />
                     <span>Two-Factor Authentication (2FA)</span>
                   </div>
                   <div className="text-gray-400 text-[11px]">Enabled via Authenticator App</div>
@@ -149,7 +150,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               <div className="p-3 bg-[#0B0E11] rounded-xl border border-[#242B35] flex items-center justify-between">
                 <div>
                   <div className="font-bold text-white flex items-center space-x-1.5">
-                    <span className="w-4 h-4 text-[#FF2E55]" >👛</span>
+                    <Wallet className="w-4 h-4 text-[#FF2E55]" />
                     <span>Simulated Paper Account</span>
                   </div>
                   <div className="text-gray-400 text-[11px]">Balance: $50,000.00 USD</div>
@@ -166,7 +167,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         <div className="pt-3 border-t border-[#242B35] flex items-center justify-between">
           {savedSuccess ? (
             <span className="text-xs font-bold text-[#00D293] flex items-center space-x-1">
-              <span className="w-4 h-4" >✅</span>
+                <CheckCircle className="w-4 h-4" />
               <span>Settings Saved!</span>
             </span>
           ) : <span />}

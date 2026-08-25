@@ -22,7 +22,6 @@ const ASSET_CONFIG: Record<AssetType, {
   gradient: string;
   border: string;
   icon: React.ReactNode;
-  emoji: string;
   priceFetcher: () => number;
 }> = {
   gold: {
@@ -35,7 +34,6 @@ const ASSET_CONFIG: Record<AssetType, {
     gradient: 'from-yellow-500/20 to-amber-600/10',
     border: 'border-yellow-500/40',
     icon: <Gem className="w-6 h-6" />,
-    emoji: '🥇',
     priceFetcher: () => 2380.00, // Gold ~price per oz
   },
   silver: {
@@ -48,7 +46,6 @@ const ASSET_CONFIG: Record<AssetType, {
     gradient: 'from-slate-400/20 to-slate-600/10',
     border: 'border-slate-400/40',
     icon: <Coins className="w-6 h-6" />,
-    emoji: '🥈',
     priceFetcher: () => 30.50, // Silver ~price per oz
   },
   cash: {
@@ -61,7 +58,6 @@ const ASSET_CONFIG: Record<AssetType, {
     gradient: 'from-green-500/20 to-emerald-600/10',
     border: 'border-green-500/40',
     icon: <DollarSign className="w-6 h-6" />,
-    emoji: '💵',
     priceFetcher: () => 1.00,
   },
 };

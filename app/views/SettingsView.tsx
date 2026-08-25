@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { User, Moon } from 'lucide-react';
+import { Check, Globe2, LockKeyhole, Mail, Moon, Palette, PenLine, Sun, Trash2, User } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { useAppSettings, AVAILABLE_COUNTRIES } from '../context/AppSettingsContext';
 
@@ -65,7 +65,7 @@ export const SettingsView: React.FC = () => {
               <h2 className="text-xl font-extrabold text-white">Account Profile</h2>
               {saveSuccess && (
                 <span className="text-xs font-bold text-[#17C99E] bg-[#17C99E]/10 border border-[#17C99E]/30 px-3 py-1 rounded-full animate-fade-in">
-                  ✓ Profile Saved!
+                  <Check className="mr-1 inline h-3.5 w-3.5" /> Profile Saved!
                 </span>
               )}
             </div>
@@ -77,7 +77,7 @@ export const SettingsView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">✍️</span>
+                      <PenLine className="h-4 w-4 text-gray-400" />
                       <h3 className="text-sm font-bold text-white">Display Name & Handle</h3>
                     </div>
                     <p className="text-xs text-gray-400 leading-relaxed">
@@ -159,7 +159,7 @@ export const SettingsView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">🔒</span>
+                      <LockKeyhole className="h-4 w-4 text-gray-400" />
                       <h3 className="text-sm font-bold text-white">Change Password</h3>
                     </div>
                     <div className="text-xs text-gray-400 font-mono tracking-widest pt-0.5">
@@ -180,7 +180,7 @@ export const SettingsView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">✉️</span>
+                      <Mail className="h-4 w-4 text-gray-400" />
                       <h3 className="text-sm font-bold text-white">Change Email</h3>
                     </div>
                     <div className="text-xs text-gray-300 font-mono">
@@ -201,7 +201,7 @@ export const SettingsView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">🌐</span>
+                      <Globe2 className="h-4 w-4 text-gray-400" />
                       <h3 className="text-sm font-bold text-white">Profile Flag / Region</h3>
                     </div>
                     <p className="text-xs text-gray-400">
@@ -220,7 +220,7 @@ export const SettingsView: React.FC = () => {
                           value={option.code}
                           className="bg-[#0B0E11] text-white"
                         >
-                          {option.emoji} {option.label}
+                          {option.code} - {option.label}
                         </option>
                       ))}
                     </select>
@@ -233,7 +233,7 @@ export const SettingsView: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 pr-4">
                     <div className="flex items-center space-x-2">
-                      <span className="text-base">🗑️</span>
+                      <Trash2 className="h-4 w-4 text-gray-400" />
                       <h3 className="text-sm font-bold text-white">Delete Account</h3>
                     </div>
                     <p className="text-xs text-gray-400">
@@ -262,7 +262,7 @@ export const SettingsView: React.FC = () => {
 
             <div>
               <div className="flex items-center space-x-2 mb-3">
-                <span className="text-base">🎨</span>
+                <Palette className="h-4 w-4 text-gray-400" />
                 <h3 className="text-sm font-bold text-white">Appearance</h3>
               </div>
 
@@ -276,7 +276,7 @@ export const SettingsView: React.FC = () => {
                   }`}
                 >
                   <div className="w-12 h-12 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-500">
-                    <span className="w-6 h-6" >☀️</span>
+                    <Sun className="h-6 w-6" />
                   </div>
                   <span className="text-xs font-extrabold">Light Mode</span>
                 </div>
@@ -290,7 +290,7 @@ export const SettingsView: React.FC = () => {
                   }`}
                 >
                   <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400">
-                    <span className="w-6 h-6" >🌙</span>
+                    <Moon className="h-6 w-6" />
                   </div>
                   <span className="text-xs font-extrabold">Dark Mode</span>
                 </div>

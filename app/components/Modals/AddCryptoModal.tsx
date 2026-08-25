@@ -29,7 +29,7 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
   isOpen,
   onClose,
   coins,
-  onAddHolding
+  onAddHolding,
 }) => {
   const [selectedCoinId, setSelectedCoinId] = useState(coins[0]?.id || 'bitcoin');
   const [searchFilter, setSearchFilter] = useState('');
@@ -117,9 +117,7 @@ export const AddCryptoModal: React.FC<AddCryptoModalProps> = ({
 
         {/* Header */}
         <div className="flex items-center space-x-2.5 mb-4 shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-[#161616] border border-[#2E2E2E] flex items-center justify-center text-[#17C99E]">
-            <span className="font-bold text-base">+</span>
-          </div>
+          
           <div>
             <h2 className="text-base font-bold text-white">Add Crypto Holding</h2>
             <p className="text-xs text-gray-400">Search all 15,000+ cryptos live</p>

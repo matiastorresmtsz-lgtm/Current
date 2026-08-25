@@ -2,7 +2,6 @@
 
 import React, { useMemo, useState } from 'react';
 import { useUser, SignInButton } from '@clerk/nextjs';
-import { PieChart } from 'lucide-react';
 import { WhaleTransaction, PortfolioAsset, CryptoCoin } from '../types';
 
 interface InsightsViewProps {
@@ -27,7 +26,6 @@ interface RatingFactor {
   label: string;
   score: number;   // 0–100
   weight: number;  // weight in overall
-  icon: React.ReactNode;
   status: 'good' | 'warn' | 'bad';
   description: string;
   tips: string[];  // actionable improvement steps
@@ -122,7 +120,6 @@ function computePortfolioRating(
       label: 'Diversification',
       score: diversScore,
       weight: 0.30,
-      icon: <PieChart className="w-4 h-4" />,
       status: diversScore >= 70 ? 'good' : diversScore >= 40 ? 'warn' : 'bad',
       description:
         n === 0
@@ -145,7 +142,6 @@ function computePortfolioRating(
       label: 'Profitability',
       score: profitScore,
       weight: 0.25,
-      icon: <span className="w-4 h-4" >📈</span>,
       status: profitScore >= 60 ? 'good' : profitScore >= 40 ? 'warn' : 'bad',
       description:
         totalCost === 0
@@ -168,7 +164,6 @@ function computePortfolioRating(
       label: 'Volatility Control',
       score: riskScore,
       weight: 0.20,
-      icon: <span className="w-4 h-4" >⚠️</span>,
       status: riskScore >= 70 ? 'good' : riskScore >= 45 ? 'warn' : 'bad',
       description:
         n === 0
@@ -191,7 +186,6 @@ function computePortfolioRating(
       label: 'Asset Mix',
       score: categoryScore,
       weight: 0.15,
-      icon: <span className="w-4 h-4" >🛡️</span>,
       status: categoryScore >= 70 ? 'good' : categoryScore >= 45 ? 'warn' : 'bad',
       description:
         n === 0
@@ -214,7 +208,6 @@ function computePortfolioRating(
       label: 'Position Sizing',
       score: sizingScore,
       weight: 0.10,
-      icon: <span className="w-4 h-4" >⭐</span>,
       status: sizingScore >= 70 ? 'good' : sizingScore >= 45 ? 'warn' : 'bad',
       description:
         n === 0
@@ -250,20 +243,12 @@ const getRatingMeta = (score: number) => {
   return { label: 'Poor', color: '#EF4444', bg: 'from-red-500/20 to-red-500/5', ring: 'border-red-500/40' };
 };
 
-const statusIcon = (s: 'good' | 'warn' | 'bad') => {
-  if (s === 'good') return <span className="w-4 h-4 text-[#10B981] shrink-0" >✅</span>;
-  if (s === 'warn') return <span className="w-4 h-4 text-[#EAB308] shrink-0" >ℹ️</span>;
-  return <span className="w-4 h-4 text-[#EF4444] shrink-0">✕</span>;
-};
-
 const statusBar = (score: number) => {
-  const c =
-    score >= 70 ? '#10B981' : score >= 45 ? '#EAB308' : '#EF4444';
   return (
     <div className="flex-1 h-1.5 rounded-full bg-[#242B35] overflow-hidden">
       <div
         className="h-full rounded-full transition-all duration-700"
-        style={{ width: `${score}%`, backgroundColor: c }}
+        style={{ width: `${score}%`, backgroundColor: '#17C99E' }}
       />
     </div>
   );
@@ -294,7 +279,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
         <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl p-6 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-6">
           <div className="space-y-2 text-center sm:text-left">
             <div className="inline-flex items-center space-x-2 bg-[#17C99E]/10 text-[#17C99E] text-xs font-extrabold px-3 py-1 rounded-full border border-[#17C99E]/20">
-              <span>📊</span>
               <span>Sign In Required for Market Insights</span>
             </div>
             <h2 className="text-xl font-extrabold text-white">Unlock Live Portfolio Ratings & Analytics</h2>
@@ -323,7 +307,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
         <div className="bg-[#242424] border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center space-x-2">
-              <span className="w-5 h-5 text-[#FF2E55]" >📊</span>
               <h3 className="font-extrabold text-white text-base">Crypto Fear &amp; Greed</h3>
             </div>
             <span className="text-xs text-gray-400 font-mono">Updated 10m ago</span>
@@ -360,7 +343,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                 <div className="relative h-2.5 rounded-full bg-[#2E2E2E] overflow-hidden">
                   <div
                     className="h-full rounded-full transition-all duration-700"
-                    style={{ width: `${FEAR_GREED}%`, backgroundColor: fg.color }}
+                    style={{ width: `${FEAR_GREED}%`, backgroundColor: '#17C99E' }}
                   />
                 </div>
               </div>
@@ -381,7 +364,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
         <div className="bg-[#242424] border border-white/10 rounded-3xl p-6 shadow-xl relative overflow-hidden">
           <div className="flex items-center justify-between mb-5">
             <div className="flex items-center space-x-2">
-              <span className="w-5 h-5" style={{ color: meta.color }} >⭐</span>
               <h3 className="font-extrabold text-white text-base">Portfolio Rating</h3>
             </div>
             <span
@@ -439,7 +421,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
       <div className="bg-[#242424] border border-white/10 rounded-3xl p-6 shadow-xl">
         <div className="flex items-center justify-between mb-5 pb-3 border-b border-white/10">
           <div className="flex items-center space-x-2">
-            <span className="w-5 h-5 text-[#17C99E]" >🛡️</span>
             <h3 className="font-extrabold text-white text-base">Portfolio Health Breakdown</h3>
           </div>
           <div className="flex items-center space-x-1.5">
@@ -464,16 +445,12 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                 <div className="p-4">
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-2xl flex items-center justify-center" style={{ backgroundColor: factorColor + '18', color: factorColor }}>
-                        {f.icon}
-                      </div>
                       <div>
                         <div className="text-sm font-extrabold text-white">{f.label}</div>
                         <div className="text-[11px] text-gray-400">Weight: {Math.round(f.weight * 100)}%</div>
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      {statusIcon(f.status)}
                       <div className="text-sm font-black" style={{ color: factorColor }}>{f.score}</div>
                       <div className="text-xs text-gray-400">/100</div>
                     </div>
@@ -481,7 +458,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
 
                   <div className="mt-4">
                     <div className="h-2 rounded-full bg-[#1A1F26] overflow-hidden">
-                      <div className="h-full rounded-full" style={{ width: `${f.score}%`, backgroundColor: factorColor }} />
+                      <div className="h-full rounded-full" style={{ width: `${f.score}%`, backgroundColor: '#17C99E' }} />
                     </div>
                   </div>
 
@@ -492,14 +469,12 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                       onClick={() => setExpandedFactor(isExpanded ? null : f.key)}
                       className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold text-gray-200"
                     >
-                      <span className="w-4 h-4 text-[#EAB308]" >💡</span>
                       <span>{isExpanded ? 'Hide tips' : 'How to improve'}</span>
                     </button>
                   )}
 
                   {f.status === 'good' && (
                     <div className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold text-[#10B981]">
-                      <span className="w-4 h-4" >✅</span>
                       <span>Looking great — no action needed right now.</span>
                     </div>
                   )}
@@ -508,7 +483,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                 {isExpanded && hasTips && (
                   <div className="border-t border-white/10 bg-[#242424] px-4 py-4">
                     <div className="flex items-center gap-2 mb-3 text-[11px] uppercase tracking-[0.2em] text-[#EAB308] font-bold">
-                      <span className="w-4 h-4" >🚀</span>
                       <span>Improvement Steps</span>
                     </div>
                     <ul className="space-y-2">
@@ -532,7 +506,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
         {factors.some(f => f.tips.length > 0) && (
           <div className="mt-4 bg-[#2A2A2A] border border-[#3E3E3E] rounded-2xl p-5">
             <div className="flex items-center space-x-2 mb-4">
-              <span className="w-4 h-4 text-yellow-400" >🚀</span>
               <h4 className="text-sm font-extrabold text-white">Your Full Improvement Plan</h4>
               <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-500/30 ml-auto">
                 {factors.filter(f => f.tips.length > 0).length} areas to work on
@@ -556,7 +529,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                         <span className="text-xs font-bold text-white">{f.label}</span>
                         <span className="text-[10px] text-gray-500 ml-auto">Score: {f.score}/100</span>
                       </div>
-                      <p className="text-[11px] text-gray-400 pl-1">→ {f.tips[0]}</p>
+                      <p className="text-[11px] text-gray-400 pl-1">Tip: {f.tips[0]}</p>
                     </div>
                   );
                 })}
@@ -566,7 +539,6 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
 
         {portfolio.length === 0 && (
           <div className="mt-4 text-center py-6 text-gray-500 text-sm">
-            <span className="w-8 h-8 mx-auto mb-2 opacity-30" >⭐</span>
             Add holdings to your portfolio to get a personalized rating.
           </div>
         )}

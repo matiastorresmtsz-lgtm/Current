@@ -2,17 +2,17 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useNotifications } from '../context/NotificationContext';
-import { ChevronDown, Coins } from 'lucide-react';
+import { Building2, ChevronDown, Coins, DollarSign, Eye, Trash2 } from 'lucide-react';
 import { PortfolioAsset, CryptoCoin } from '../types';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
 
 type Currency = 'USD' | 'CAD' | 'MXN';
 type GoalType = 'Growth' | 'Income' | 'Retirement' | 'Custom';
 
-const CURRENCY_CONFIG: Record<Currency, { flag: string; symbol: string; label: string; rate: number }> = {
-  USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
-  CAD: { flag: '🇨🇦', symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
-  MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
+const CURRENCY_CONFIG: Record<Currency, { symbol: string; label: string; rate: number }> = {
+  USD: { symbol: '$', label: 'US Dollar', rate: 1 },
+  CAD: { symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
+  MXN: { symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
 };
 
 interface PortfolioViewProps {
@@ -75,7 +75,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
     const prev = prevProgressRef.current ?? 0;
     if (prev < 100 && goalProgress >= 100) {
       try {
-        addNotification({ title: 'Goal reached 🎉', message: `You reached your ${customGoalName || goalType} goal!`, time: '' });
+        addNotification({ title: 'Goal reached', message: `You reached your ${customGoalName || goalType} goal!`, time: '' });
       } catch (e) { }
     }
     prevProgressRef.current = goalProgress;
@@ -116,7 +116,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
               onClick={() => setShowCurrencyDropdown((prev) => !prev)}
               className="bg-[#212121] border border-[#2E2E2E] px-3 py-1.5 rounded-full text-xs font-bold text-gray-200 flex items-center space-x-1.5"
             >
-              <span>{curr.flag} {currency}</span>
+              <span className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5" />{currency}</span>
               <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
             </button>
             {showCurrencyDropdown && (
@@ -128,7 +128,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                     className={`w-full text-left px-4 py-3 transition-colors ${currency === key ? 'bg-[#2A2A2A]' : 'hover:bg-[#2E2E2E]'}`}
                   >
                     <div className="flex items-center justify-between text-sm text-white">
-                      <span>{cfg.flag} {key}</span>
+                      <span className="flex items-center gap-1"><DollarSign className="h-3.5 w-3.5" />{key}</span>
                       {currency === key && <span className="text-[#17C99E] font-bold">✓</span>}
                     </div>
                     <div className="text-[10px] text-gray-400">{cfg.label}</div>
@@ -351,7 +351,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                 className="flex flex-col items-center group cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-[#14B8A6]/20 group-hover:bg-[#14B8A6]/30 flex items-center justify-center text-[#14B8A6] mb-2 transition-colors">
-                  <span className="w-5 h-5" >🏢</span>
+                  <Building2 className="w-5 h-5" />
                 </div>
                 <span className="text-[11px] font-medium text-gray-300 leading-tight">Add Investments</span>
               </button>
@@ -373,7 +373,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                 className="flex flex-col items-center group cursor-pointer"
               >
                 <div className="w-12 h-12 rounded-full bg-[#8B5CF6]/20 group-hover:bg-[#8B5CF6]/30 flex items-center justify-center text-[#8B5CF6] mb-2 transition-colors">
-                  <span className="w-5 h-5" >👁️</span>
+                  <Eye className="w-5 h-5" />
                 </div>
                 <span className="text-[11px] font-medium text-gray-300 leading-tight">Holding visibility</span>
               </button>
@@ -493,7 +493,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
                         title="Delete asset"
                         className="text-gray-500 hover:text-[#EF4444] p-1.5 rounded-lg hover:bg-[#161616] transition-colors"
                       >
-                        <span className="w-4 h-4" >🗑️</span>
+                        <Trash2 className="w-4 h-4" />
                       </button>
                     </td>
 

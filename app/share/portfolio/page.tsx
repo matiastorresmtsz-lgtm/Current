@@ -2,13 +2,14 @@
 
 import React, { Suspense, useEffect, useMemo, useState } from 'react';
 import { PortfolioAsset } from '../../types';
+import { Camera } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
-const CURRENCY_CONFIG: Record<string, { flag: string; symbol: string; label: string; rate: number }> = {
-  USD: { flag: '🇺🇸', symbol: '$', label: 'US Dollar', rate: 1 },
-  CAD: { flag: '🇨🇦', symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
-  MXN: { flag: '🇲🇽', symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
+const CURRENCY_CONFIG: Record<string, { symbol: string; label: string; rate: number }> = {
+  USD: { symbol: '$', label: 'US Dollar', rate: 1 },
+  CAD: { symbol: 'CA$', label: 'Canadian Dollar', rate: 1.36 },
+  MXN: { symbol: 'MX$', label: 'Mexican Peso', rate: 17.15 },
 };
 
 type BgPreset = 'cyber-carbon' | 'emerald-bull' | 'midnight-onyx' | 'gold-tier' | 'slate-glass';
@@ -388,7 +389,7 @@ function SharePortfolioContent() {
             onClick={handleExportExactImage}
             className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-5 py-2.5 rounded-2xl transition-all shadow-md flex items-center space-x-1.5 shrink-0"
           >
-            <span>📸</span>
+            <Camera className="h-4 w-4" />
             <span>Download Card Image</span>
           </button>
         </div>
@@ -495,7 +496,7 @@ function SharePortfolioContent() {
               onClick={handleExportExactImage}
               className="bg-[#17C99E] hover:bg-[#14B8A6] text-black font-extrabold text-xs px-3.5 py-1.5 rounded-xl transition-all shadow-sm flex items-center space-x-1"
             >
-              <span>📸 Download Image</span>
+              <span className="flex items-center gap-1.5"><Camera className="h-4 w-4" />Download Image</span>
             </button>
           </div>
           <div className="overflow-x-auto">

@@ -7,7 +7,10 @@ import {
   Sparkles,
   Send,
   AlertTriangle,
-  RefreshCw
+  RefreshCw,
+  Rocket,
+  Search,
+  TrendingUp
 } from 'lucide-react';
 import { NavTab, PortfolioAsset, CryptoCoin, AIMessage } from '../types';
 
@@ -353,7 +356,7 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                 onClick={() => handleSuggestionClick('Analyze my portfolio risk & diversification.')}
                 className="px-3 py-1.5 bg-[#2E2E2E] hover:bg-[#3E3E3E] text-gray-300 hover:text-white rounded-xl text-[10px] font-bold border border-white/5 flex items-center space-x-1 transition-all shrink-0 cursor-pointer"
               >
-                <span>🔍 Risk Audit</span>
+                <span className="flex items-center gap-1.5"><Search className="h-3.5 w-3.5" />Risk Audit</span>
               </button>
               <button
                 onClick={() => handleSuggestionClick('Suggest rebalancing strategies for my portfolio.')}
@@ -365,13 +368,13 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                 onClick={() => handleSuggestionClick('What are the key market narratives driving my assets?')}
                 className="px-3 py-1.5 bg-[#2E2E2E] hover:bg-[#3E3E3E] text-gray-300 hover:text-white rounded-xl text-[10px] font-bold border border-white/5 flex items-center space-x-1 transition-all shrink-0 cursor-pointer"
               >
-                <span>🚀 Asset Narratives</span>
+                <span className="flex items-center gap-1.5"><Rocket className="h-3.5 w-3.5" />Asset Narratives</span>
               </button>
               <button
                 onClick={() => handleSuggestionClick('Give me a 24h performance summary of my holdings.')}
                 className="px-3 py-1.5 bg-[#2E2E2E] hover:bg-[#3E3E3E] text-gray-300 hover:text-white rounded-xl text-[10px] font-bold border border-white/5 flex items-center space-x-1 transition-all shrink-0 cursor-pointer"
               >
-                <span>📈 24h Summary</span>
+                <span className="flex items-center gap-1.5"><TrendingUp className="h-3.5 w-3.5" />24h Summary</span>
               </button>
             </div>
           )}

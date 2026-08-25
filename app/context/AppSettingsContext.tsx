@@ -6,17 +6,17 @@ import { getUserSettings, isSupabaseConfigured, upsertUserSettings } from '../li
 
 export type CountryCode = 'US' | 'CA' | 'MX' | 'GB' | 'DE' | 'FR' | 'JP' | 'BR' | 'AU' | 'IN';
 
-export const AVAILABLE_COUNTRIES: { code: CountryCode; label: string; emoji: string }[] = [
-  { code: 'US', label: 'United States', emoji: '🇺🇸' },
-  { code: 'CA', label: 'Canada', emoji: '🇨🇦' },
-  { code: 'MX', label: 'Mexico', emoji: '🇲🇽' },
-  { code: 'GB', label: 'United Kingdom', emoji: '🇬🇧' },
-  { code: 'DE', label: 'Germany', emoji: '🇩🇪' },
-  { code: 'FR', label: 'France', emoji: '🇫🇷' },
-  { code: 'JP', label: 'Japan', emoji: '🇯🇵' },
-  { code: 'BR', label: 'Brazil', emoji: '🇧🇷' },
-  { code: 'AU', label: 'Australia', emoji: '🇦🇺' },
-  { code: 'IN', label: 'India', emoji: '🇮🇳' },
+export const AVAILABLE_COUNTRIES: { code: CountryCode; label: string }[] = [
+  { code: 'US', label: 'United States' },
+  { code: 'CA', label: 'Canada' },
+  { code: 'MX', label: 'Mexico' },
+  { code: 'GB', label: 'United Kingdom' },
+  { code: 'DE', label: 'Germany' },
+  { code: 'FR', label: 'France' },
+  { code: 'JP', label: 'Japan' },
+  { code: 'BR', label: 'Brazil' },
+  { code: 'AU', label: 'Australia' },
+  { code: 'IN', label: 'India' },
 ];
 
 interface AppSettingsContextValue {
