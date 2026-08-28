@@ -3,7 +3,7 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { UserButton, useClerk, useUser } from '@clerk/nextjs';
-import { ArrowRight, BarChart3, Building2, Coins, Eye, Globe2, Menu, Pencil, PieChart, RefreshCw, Sparkles, Zap } from 'lucide-react';
+import { ArrowRight, BarChart3, Building2, Coins, Eye, Globe2, Menu, MessageCircle, Pencil, PieChart, RefreshCw, ScanSearch, Sparkles, Upload, X, Zap } from 'lucide-react';
 import { animate, motion } from 'motion/react';
 
 const previewMetrics = [
@@ -21,6 +21,7 @@ const previewWatchlist = [
 export default function AboutPage() {
   const [isHeaderFloating, setIsHeaderFloating] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isAnnouncementVisible, setIsAnnouncementVisible] = useState(true);
   const { openSignIn, openSignUp } = useClerk();
   const { isLoaded, isSignedIn } = useUser();
   const isAuthenticated = isLoaded && isSignedIn;
@@ -50,7 +51,7 @@ export default function AboutPage() {
   };
 
   return (
-    <main className="min-h-screen overflow-hidden bg-[#f5f0ee] text-[#161616]">
+    <main className="landing-page min-h-screen overflow-hidden bg-[#f5f0ee] text-[#161616]">
       <section
         className="relative min-h-[760px] bg-cover bg-center sm:min-h-screen"
         style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1534088568595-a066f410bcda?auto=format&fit=crop&w=2400&q=85)' }}
@@ -59,7 +60,16 @@ export default function AboutPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-white/35 via-transparent to-[#eef4f0]/90" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 z-20 h-56 bg-gradient-to-b from-transparent via-[#f5f0ee]/55 to-[#f5f0ee]" />
 
-        <header className={`fixed inset-x-0 top-0 z-50 transition-[padding] duration-300 ${isHeaderFloating ? 'px-3 pt-3 sm:px-6 sm:pt-5' : ''}`}>
+        {isAnnouncementVisible && (
+          <div className="fixed inset-x-0 top-0 z-50 flex h-10 items-center justify-center bg-[#17C99E] px-12 text-center text-[11px] font-bold uppercase tracking-[0.14em] text-white sm:h-11 sm:text-xs">
+            Current Pro <span className="mx-2 text-white/50">|</span> Coming soon
+            <button type="button" onClick={() => setIsAnnouncementVisible(false)} className="announcement-dismiss !absolute right-4 top-1/2 -translate-y-1/2 !m-0 !border-0 !bg-transparent !p-1 !text-white/80 !shadow-none !transition-colors hover:!bg-transparent hover:!text-white" aria-label="Dismiss announcement">
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
+
+        <header className={`fixed inset-x-0 z-50 transition-[padding,top] duration-300 ${isAnnouncementVisible ? 'top-10 sm:top-11' : 'top-0'} ${isHeaderFloating ? 'px-3 pt-3 sm:px-6 sm:pt-5' : ''}`}>
           <div className={`mx-auto flex h-20 max-w-[1240px] items-center justify-between border border-transparent px-5 transition-[background-color,border-color,border-radius,box-shadow] duration-300 sm:px-8 ${isHeaderFloating ? 'rounded-2xl border-white/70 bg-white/65 shadow-[0_14px_36px_rgba(45,37,37,0.16)] backdrop-blur-xl' : ''}`}>
             <Link href="/dashboard" className="font-extrabold text-2xl tracking-tight text-[#17C99E]" aria-label="Go to Current dashboard">
               current
@@ -72,7 +82,7 @@ export default function AboutPage() {
             <div className="flex items-center gap-2">
               {isAuthenticated ? (
                 <>
-                  <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-lg bg-[#161616] px-3.5 py-2.5 text-xs font-bold text-white transition-colors hover:bg-[#087d62]">
+                  <Link href="/dashboard" className="landing-primary-button inline-flex items-center gap-2 rounded-lg px-3.5 py-2.5 text-xs font-bold">
                     Open dashboard
                     <ArrowRight className="h-3.5 w-3.5" />
                   </Link>
@@ -100,7 +110,7 @@ export default function AboutPage() {
               <a href="#plans" onClick={(event) => { handleNavClick(event); setIsMenuOpen(false); }} className="rounded-lg px-3 py-2 hover:bg-black/[0.06]">Pricing</a>
               <a href="#faq" onClick={(event) => { handleNavClick(event); setIsMenuOpen(false); }} className="rounded-lg px-3 py-2 hover:bg-black/[0.06]">FAQ</a>
               {isAuthenticated ? (
-                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className="rounded-lg px-3 py-2 hover:bg-black/[0.06]">Open dashboard</Link>
+                <Link href="/dashboard" onClick={() => setIsMenuOpen(false)} className="landing-primary-button rounded-lg px-3 py-2">Open dashboard</Link>
               ) : (
                 <>
                   <button type="button" onClick={() => { openSignIn?.(); setIsMenuOpen(false); }} className="rounded-lg px-3 py-2 text-left hover:bg-black/[0.06]">Sign in</button>
@@ -111,15 +121,20 @@ export default function AboutPage() {
           )}
         </header>
 
-        <div className="relative z-10 mx-auto max-w-[1240px] px-5 pb-16 pt-20 sm:px-8 sm:pb-24 sm:pt-28">
+        <div className="relative z-10 mx-auto max-w-[1240px] px-5 pb-16 pt-40 sm:px-8 sm:pb-24 sm:pt-28">
           <div className="max-w-[660px]">
             <motion.div
               initial={{ opacity: 0, y: 24 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0, ease: [0.22, 1, 0.36, 1] }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#17C99E]/35 bg-white/45 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-[#087d62] backdrop-blur-sm"
+              className="mt-10 mb-6 inline-flex max-w-full items-center gap-3 rounded-full px-3 py-2 text-sm text-black  sm:mt-14 sm:gap-4 sm:px-4"
             >
-              Social investing, made clearer
+              <span className="flex shrink-0 items-center pl-1" aria-hidden="true">
+                <span className="h-8 w-8 rounded-full border-2 border-[#1743a3] bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1502602898657-3e91760cbb34?auto=format&fit=crop&w=160&q=85)' }} />
+                <span className="-ml-2 h-8 w-8 rounded-full border-2 border-[#1743a3] bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=160&q=85)' }} />
+                <span className="-ml-2 h-8 w-8 rounded-full border-2 border-[#1743a3] bg-cover bg-center" style={{ backgroundImage: 'url(https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=160&q=85)' }} />
+              </span>
+              <span className="min-w-0 leading-5"><strong className="font-extrabold">3,434 people</strong> analyzing their portfolios with Current</span>
             </motion.div>
             <motion.h1
               initial={{ opacity: 0, y: 24 }}
@@ -127,7 +142,7 @@ export default function AboutPage() {
               transition={{ duration: 0.55, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="max-w-[620px] text-5xl font-extrabold leading-[0.98] tracking-tight text-[#101513] sm:text-7xl"
             >
-              See your crypto portfolio in a clearer light.
+              The 1# AI Analizer For Crypto Portfolios.
             </motion.h1>
             <motion.p
               initial={{ opacity: 0, y: 24 }}
@@ -144,7 +159,7 @@ export default function AboutPage() {
               className="mt-8 flex flex-wrap items-center gap-3"
             >
               {isAuthenticated ? (
-                <Link href="/dashboard" className="inline-flex items-center gap-2 rounded-lg bg-[#17C99E] px-4 py-3 text-sm font-extrabold text-[#07130f] transition-colors hover:bg-[#0eaf88]">
+                <Link href="/dashboard" className="landing-primary-button inline-flex items-center gap-2 rounded-lg px-4 py-3 text-sm font-extrabold">
                   Open dashboard
                   <ArrowRight className="h-4 w-4" />
                 </Link>
@@ -235,6 +250,45 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section id="process" className="bg-white px-5 py-20 text-[#161616] sm:px-8 sm:py-28">
+        <div className="mx-auto max-w-[1100px]">
+          <div className="mx-auto max-w-2xl text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#087d62]">A clearer way to decide</p>
+            <h2 className="mt-4 text-4xl font-extrabold leading-tight tracking-tight text-[#101513] sm:text-6xl">Upload. Analyze. Ask.</h2>
+            <p className="mx-auto mt-4 max-w-xl text-sm leading-6 text-[#68736e] sm:text-base">In three simple steps, turn your portfolio into a conversation you can act on.</p>
+          </div>
+
+          <div className="mx-auto mt-12 max-w-[780px] space-y-4 sm:mt-16 sm:space-y-5">
+            <article className="relative overflow-hidden rounded-2xl border border-[#dfe8f5] bg-[#fbfdff] shadow-[0_14px_34px_rgba(54,87,127,0.1)]">
+              <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#dff7ef] to-transparent" />
+              <div className="relative flex min-h-[190px] flex-col items-center justify-center px-6 py-10 text-center sm:min-h-[205px]">
+                <span className="landing-primary-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-extrabold"><Upload className="h-4 w-4" /> Step 1</span>
+                <h3 className="mt-5 text-xl font-extrabold sm:text-2xl">Upload your portfolio holdings</h3>
+                <p className="mt-2 text-sm text-[#68736e]">Upload your holdings and Current does the organizing.</p>
+              </div>
+            </article>
+
+            <article className="relative overflow-hidden rounded-2xl border border-[#dfe8f5] bg-[#fbfdff] shadow-[0_14px_34px_rgba(54,87,127,0.1)]">
+              <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#d8f3e9] to-transparent" />
+              <div className="relative flex min-h-[190px] flex-col items-center justify-center px-6 py-10 text-center sm:min-h-[205px]">
+                <span className="landing-primary-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-extrabold"><ScanSearch className="h-4 w-4" /> Step 2</span>
+                <h3 className="mt-5 text-xl font-extrabold sm:text-2xl">AI analyzes your portfolio</h3>
+                <p className="mt-2 text-sm text-[#68736e]">Current reads your allocation, risk, and market context for useful signals.</p>
+              </div>
+            </article>
+
+            <article className="relative overflow-hidden rounded-2xl border border-[#dfe8f5] bg-[#fbfdff] shadow-[0_14px_34px_rgba(54,87,127,0.1)]">
+              <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-[#e1f5ee] to-transparent" />
+              <div className="relative flex min-h-[190px] flex-col items-center justify-center px-6 py-10 text-center sm:min-h-[205px]">
+                <span className="landing-primary-button inline-flex items-center gap-2 rounded-lg px-4 py-2 text-xs font-extrabold"><MessageCircle className="h-4 w-4" /> Step 3</span>
+                <h3 className="mt-5 text-xl font-extrabold sm:text-2xl">Ask questions and get your next move</h3>
+                <p className="mt-2 text-sm text-[#68736e]">Ask anything about your portfolio and get clear, personalized direction.</p>
+              </div>
+            </article>
+          </div>
+        </div>
+      </section>
+
       <section id="principles" className="bg-[#f5f0ee] px-5 py-20 text-[#161616] sm:px-8 sm:py-28">
         <div className="mx-auto max-w-[1100px]">
           <div className="mx-auto max-w-2xl text-center">
@@ -318,7 +372,7 @@ export default function AboutPage() {
                 <li className="flex gap-3"><span aria-hidden="true">✓</span>Insights, topics, and learning</li>
               </ul>
               {isAuthenticated ? (
-                <Link href="/dashboard" style={{ marginTop: '40px' }} className="inline-flex w-full items-center justify-center rounded-full border border-[#161616]/65 px-4 py-3 text-sm font-extrabold text-[#161616] transition-colors hover:bg-[#161616] hover:text-white">Open dashboard</Link>
+                <Link href="/dashboard" style={{ marginTop: '40px' }} className="landing-primary-button inline-flex w-full items-center justify-center rounded-full px-4 py-3 text-sm font-extrabold">Open dashboard</Link>
               ) : (
                 <button type="button" onClick={() => openSignUp?.()} style={{ marginTop: '40px' }} className="inline-flex w-full items-center justify-center rounded-full border border-[#161616]/65 px-4 py-3 text-sm font-extrabold text-[#161616] transition-colors hover:bg-[#161616] hover:text-white">Start free</button>
               )}
