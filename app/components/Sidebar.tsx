@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ChevronDown,
   ChevronRight,
   Menu,
   X,
@@ -22,7 +21,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onSelectTab
 }) => {
   const router = useRouter();
-  const [topicsOpen, setTopicsOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mainNavItems = [
@@ -33,14 +31,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
   ] as const;
 
   const aboutItem = { id: 'about', label: 'About' } as const;
-
-  const topics = [
-    { id: 'topic-etfs', name: 'ETFs & Inflows' },
-    { id: 'topic-passive-income', name: 'Passive Income' },
-    { id: 'topic-beginner', name: 'Beginner Investors' },
-    { id: 'topic-memes', name: 'Memecoins' },
-    { id: 'topic-defi', name: 'DeFi & Infra' },
-  ] as const;
 
   const handleMobileTabClick = (tab: NavTab) => {
     onSelectTab(tab);
@@ -55,16 +45,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
   return (
     <>
       {/* Desktop Sidebar (lg and up) */}
-      <aside className="relative w-56 shrink-0 hidden lg:flex py-5 pr-4 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col border-r border-[#2E2E2E] justify-start bg-[#161616] before:absolute before:inset-y-0 before:right-full before:w-8 before:bg-[#161616]">
+      <aside className="w-52 shrink-0 hidden lg:flex pt-2 pb-6 pr-3 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col border-r border-[#2E2E2E] justify-start bg-[#161616]">
         {/* Primary Navigation Tabs */}
-        <div className="space-y-0.5">
-          {mainNavItems.slice(0, 5).map((item) => {
+        <div className="space-y-1">
+          {mainNavItems.map((item) => {
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id as NavTab)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
                     ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
                     : 'text-gray-400 hover:text-white hover:bg-[#212121]'
                   }`}
@@ -75,54 +65,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
           })}
         </div>
 
-        {/* Divider */}
-        <div className="mt-4" />
-
-        {/* Collapsible Topics Section */}
-        <div className="space-y-2 pt-5 border-t border-[#2E2E2E]">
-          <button
-            onClick={() => setTopicsOpen(!topicsOpen)}
-            className="w-full flex items-center justify-between px-3.5 py-1 text-xs font-bold text-gray-400 hover:text-white transition-colors"
-          >
-            <span className="flex items-center space-x-1.5">
-              <span>Topics</span>
-            </span>
-            {topicsOpen ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-          </button>
-
-          {topicsOpen && (
-            <div className="space-y-1">
-              {topics.map((t) => {
-                const isActive = activeTab === t.id;
-                return (
-                  <div
-                    key={t.id}
-                    onClick={() => onSelectTab(t.id as NavTab)}
-                    className={`flex items-center space-x-3 px-3.5 py-2 text-xs font-medium rounded-xl cursor-pointer transition-all ${isActive
-                        ? 'bg-[#17C99E]/20 text-[#17C99E] font-extrabold border border-[#17C99E]/40'
-                        : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-                      }`}
-                  >
-                    <span>{t.name}</span>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-
-        {/* Spacer */}
-        <div className="h-4" />
-
-        {/* About Button */}
-        <div className="pt-2 border-t border-[#2E2E2E]">
+        {/* Secondary Navigation (About & Settings) */}
+        <div className="space-y-1 pt-2.5 mt-2.5 border-t border-[#2E2E2E]">
           {(() => {
             const isActive = activeTab === aboutItem.id;
             return (
               <button
                 key={aboutItem.id}
                 onClick={handleAboutClick}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-2xl text-sm font-medium transition-all ${isActive
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
                     ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
                     : 'text-gray-300 hover:text-white hover:bg-[#212121]'
                   }`}
@@ -131,17 +82,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
               </button>
             );
           })()}
-        </div>
 
-        {/* Spacer */}
-        <div className="h-4" />
-
-        {/* Settings Button */}
-        <div className="pt-2 border-t border-[#2E2E2E]">
           <button
             onClick={() => onSelectTab('settings')}
-            className={`w-full flex items-center space-x-3 px-3.5 py-2.5 text-xs font-semibold rounded-2xl transition-all ${activeTab === 'settings'
-                ? 'bg-[#17C99E]/20 text-[#17C99E] font-extrabold border border-[#17C99E]/40 shadow'
+            className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${activeTab === 'settings'
+                ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
                 : 'text-gray-300 hover:text-white hover:bg-[#212121]'
               }`}
           >
@@ -216,36 +161,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     key={item.id}
                     onClick={() => handleMobileTabClick(item.id as NavTab)}
                     className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${isActive
-                        ? 'bg-[#212121] text-[#17C99E] border border-[#17C99E]/40'
-                        : 'text-gray-300 hover:bg-[#212121]'
+                      ? 'bg-[#212121] text-[#17C99E] border border-[#17C99E]/40'
+                      : 'text-gray-300 hover:bg-[#212121]'
                       }`}
                   >
                     <span>{item.label}</span>
                   </button>
                 );
               })}
-            </div>
 
-            {/* Topics Items in Drawer */}
-            <div className="space-y-1 pt-4 border-t border-[#2E2E2E]">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Explore Topics</div>
-              <div className="grid grid-cols-1 gap-1.5">
-                {topics.map((t) => {
-                  const isActive = activeTab === t.id;
-                  return (
-                    <button
-                      key={t.id}
-                      onClick={() => handleMobileTabClick(t.id as NavTab)}
-                      className={`w-full flex items-center space-x-3 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-left ${isActive
-                          ? 'bg-[#17C99E]/20 text-[#17C99E] border border-[#17C99E]/40'
-                          : 'text-gray-300 hover:bg-[#212121]'
-                        }`}
-                    >
-                      <span>{t.name}</span>
-                    </button>
-                  );
-                })}
-              </div>
+              <button
+                onClick={handleAboutClick}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'about'
+                  ? 'bg-[#212121] text-[#17C99E] border border-[#17C99E]/40'
+                  : 'text-gray-300 hover:bg-[#212121]'
+                  }`}
+              >
+                <span>About</span>
+              </button>
             </div>
 
             {/* Settings & Profile Button in Drawer */}
@@ -253,8 +186,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
               <button
                 onClick={() => handleMobileTabClick('settings')}
                 className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${activeTab === 'settings'
-                    ? 'bg-[#17C99E] text-black'
-                    : 'bg-[#212121] text-gray-200 border border-[#2E2E2E]'
+                  ? 'bg-[#17C99E] text-black'
+                  : 'bg-[#212121] text-gray-200 border border-[#2E2E2E]'
                   }`}
               >
                 <div className="flex items-center space-x-3">
@@ -270,4 +203,5 @@ export const Sidebar: React.FC<SidebarProps> = ({
     </>
   );
 };
+
 

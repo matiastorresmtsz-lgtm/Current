@@ -86,7 +86,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#1D1D1D] border-b border-[#2E2E2E]">
-      <div className="max-w-[1500px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Logo - Current River Logo */}
         <div onClick={() => onSelectTab('portfolio')} className="cursor-pointer shrink-0">

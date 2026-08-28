@@ -10,7 +10,9 @@ import {
   RefreshCw,
   Rocket,
   Search,
-  TrendingUp
+  TrendingUp,
+  Maximize2,
+  Minimize2
 } from 'lucide-react';
 import { NavTab, PortfolioAsset, CryptoCoin, AIMessage } from '../types';
 
@@ -32,6 +34,7 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
 
@@ -39,6 +42,27 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  // Handle ESC key for fullscreen & lock body scroll
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape' && isFullscreen) {
+        setIsFullscreen(false);
+      }
+    };
+
+    if (isFullscreen) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isFullscreen]);
 
   // Load welcome message on load
   useEffect(() => {
@@ -250,36 +274,62 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
   const topAllocations = getTopAllocations();
 
   return (
-    <div className="max-w-[1200px] mx-auto py-2 px-4 space-y-6 animate-fade-in">
-
-      {/* Page Header */}
-
+    <div
+      className={
+        isFullscreen
+          ? "fixed inset-0 z-50 bg-[#161616]/95 backdrop-blur-md p-3 sm:p-6 flex flex-col items-center justify-center animate-fade-in"
+          : "max-w-[1200px] mx-auto py-2 px-4 space-y-6 animate-fade-in"
+      }
+    >
       {/* Chat Hub */}
-      <div className="max-w-[900px] mx-auto w-full">
-        <div className="bg-[#212121] border border-[#2E2E2E] rounded-3xl flex flex-col h-[700px] shadow-xl overflow-hidden">
-
+      <div className={isFullscreen ? "w-full max-w-6xl h-full flex flex-col" : "max-w-[900px] mx-auto w-full"}>
+        <div
+          className={`bg-[#212121] border border-[#2E2E2E] flex flex-col shadow-2xl overflow-hidden ${
+            isFullscreen ? "h-full rounded-2xl md:rounded-3xl" : "h-[700px] rounded-3xl shadow-xl"
+          }`}
+        >
           {/* Chat Header */}
-          <div className="bg-black/25 px-6 py-4 border-b border-[#2E2E2E] flex items-center justify-between">
+          <div className="bg-black/25 px-6 py-4 border-b border-[#2E2E2E] flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
-              <div className="" />
+              <div className="w-2 h-2 rounded-full bg-[#17C99E] animate-pulse" />
               <div>
                 <h3 className="text-xs font-black text-white uppercase tracking-wider">Current AI Advisor</h3>
                 <p className="text-[10px] text-gray-400 mt-0.5">Direct line to GPT OSS 20B</p>
               </div>
             </div>
 
-            {messages.length > 1 && (
+            <div className="flex items-center space-x-2">
+              {messages.length > 1 && (
+                <button
+                  onClick={() => {
+                    setMessages(prev => [prev[0]]);
+                    setServerError(null);
+                  }}
+                  className="text-[10px] font-bold text-gray-400 hover:text-white flex items-center space-x-1 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/5"
+                >
+                  <RefreshCw className="w-3 h-3" />
+                  <span className="hidden sm:inline">Clear Thread</span>
+                </button>
+              )}
+
               <button
-                onClick={() => {
-                  setMessages(prev => [prev[0]]);
-                  setServerError(null);
-                }}
-                className="text-[10px] font-bold text-gray-400 hover:text-white flex items-center space-x-1 transition-colors"
+                onClick={() => setIsFullscreen(!isFullscreen)}
+                title={isFullscreen ? "Exit Fullscreen (Esc)" : "Expand to Fullscreen"}
+                className="text-[10px] font-bold text-gray-300 hover:text-white flex items-center space-x-1.5 transition-colors px-2.5 py-1.5 rounded-lg bg-black/30 hover:bg-white/10 border border-[#2E2E2E] cursor-pointer"
               >
-                <RefreshCw className="w-3 h-3" />
-                <span>Clear Thread</span>
+                {isFullscreen ? (
+                  <>
+                    <Minimize2 className="w-3.5 h-3.5 text-[#17C99E]" />
+                    <span className="hidden sm:inline">Exit Fullscreen</span>
+                  </>
+                ) : (
+                  <>
+                    <Maximize2 className="w-3.5 h-3.5 text-[#17C99E]" />
+                    <span className="hidden sm:inline">Fullscreen</span>
+                  </>
+                )}
               </button>
-            )}
+            </div>
           </div>
 
           {/* Messages Body */}

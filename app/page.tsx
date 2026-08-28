@@ -343,7 +343,7 @@ export default function Home() {
       />
 
       {/* Main Body Content Layout */}
-      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-8 flex-1 flex gap-5 pt-5 pb-24 lg:pb-16">
+      <div className="max-w-[1440px] w-full mx-auto px-4 sm:px-6 flex-1 flex gap-5 pt-2 pb-24 lg:pb-16">
 
         {/* Left Navigation Sidebar */}
         <Sidebar
