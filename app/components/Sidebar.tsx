@@ -3,9 +3,15 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  ChevronRight,
+  Home,
+  Wand2,
+  FileText,
+  BarChart3,
+  Info,
+  Settings,
   Menu,
   X,
+  ChevronRight,
 } from 'lucide-react';
 import { NavTab } from '../types';
 
@@ -24,13 +30,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const mainNavItems = [
-    { id: 'portfolio', label: 'Portfolio' },
-    { id: 'markets', label: 'Markets' },
-    { id: 'insights', label: 'Insights' },
-    { id: 'advisory', label: 'AI Advisor' },
+    { id: 'portfolio', label: 'Portfolio', icon: Home },
+    { id: 'advisory', label: 'AI Advisor', icon: Wand2 },
+    { id: 'insights', label: 'Insights', icon: FileText },
+    { id: 'markets', label: 'Markets', icon: BarChart3 },
   ] as const;
-
-  const aboutItem = { id: 'about', label: 'About' } as const;
 
   const handleMobileTabClick = (tab: NavTab) => {
     onSelectTab(tab);
@@ -44,87 +48,87 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Sidebar (lg and up) */}
-      <aside className="w-52 shrink-0 hidden lg:flex pt-2 pb-6 pr-3 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col border-r border-[#2E2E2E] justify-start bg-[#161616]">
-        {/* Primary Navigation Tabs */}
-        <div className="space-y-1">
+      {/* Desktop Icon-Only Sidebar (lg and up) */}
+      <aside className="w-16 shrink-0 hidden lg:flex py-5 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto flex-col items-center justify-between border-r border-gray-200 bg-white z-30">
+        {/* Primary Navigation Icons */}
+        <div className="flex flex-col items-center space-y-4 w-full px-2">
           {mainNavItems.map((item) => {
+            const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => onSelectTab(item.id as NavTab)}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
-                    ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
-                    : 'text-gray-400 hover:text-white hover:bg-[#212121]'
-                  }`}
+                title={item.label}
+                aria-label={item.label}
+                className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+                  isActive
+                    ? 'bg-[#17C99E]/15 text-[#17C99E] border border-[#17C99E]/30 font-extrabold shadow-sm'
+                    : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+                }`}
               >
-                <span>{item.label}</span>
+                <Icon className="w-6 h-6 stroke-[2]" />
               </button>
             );
           })}
         </div>
 
         {/* Secondary Navigation (About & Settings) */}
-        <div className="space-y-1 pt-2.5 mt-2.5 border-t border-[#2E2E2E]">
-          {(() => {
-            const isActive = activeTab === aboutItem.id;
-            return (
-              <button
-                key={aboutItem.id}
-                onClick={handleAboutClick}
-                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-sm font-medium transition-all ${isActive
-                    ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
-                    : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-                  }`}
-              >
-                <span>{aboutItem.label}</span>
-              </button>
-            );
-          })()}
+        <div className="flex flex-col items-center space-y-4 w-full px-2 pt-4 border-t border-gray-200">
+          <button
+            key="about"
+            onClick={handleAboutClick}
+            title="About"
+            aria-label="About"
+            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+              activeTab === 'about'
+                ? 'bg-[#17C99E]/15 text-[#17C99E] border border-[#17C99E]/30 font-extrabold shadow-sm'
+                : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+            }`}
+          >
+            <Info className="w-6 h-6 stroke-[2]" />
+          </button>
 
           <button
+            key="settings"
             onClick={() => onSelectTab('settings')}
-            className={`w-full flex items-center justify-between px-3 py-2 text-sm font-medium rounded-xl transition-all ${activeTab === 'settings'
-                ? 'bg-[#212121] text-[#17C99E] font-extrabold shadow-sm border border-[#17C99E]/30'
-                : 'text-gray-300 hover:text-white hover:bg-[#212121]'
-              }`}
+            title="Settings"
+            aria-label="Settings"
+            className={`w-11 h-11 rounded-2xl flex items-center justify-center transition-all ${
+              activeTab === 'settings'
+                ? 'bg-[#17C99E]/15 text-[#17C99E] border border-[#17C99E]/30 font-extrabold shadow-sm'
+                : 'text-gray-400 hover:text-gray-700 hover:bg-gray-100'
+            }`}
           >
-            <span>Settings</span>
+            <Settings className="w-6 h-6 stroke-[2]" />
           </button>
         </div>
       </aside>
 
       {/* Mobile Persistent Bottom Navigation Bar (< lg) */}
-      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#161616] border-t border-[#2E2E2E] px-2 py-1.5 flex items-center justify-around">
-        <button
-          onClick={() => handleMobileTabClick('portfolio')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'portfolio' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-            }`}
-        >
-          <span>Portfolio</span>
-        </button>
-
-        <button
-          onClick={() => handleMobileTabClick('markets')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'markets' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-            }`}
-        >
-          <span>Markets</span>
-        </button>
-
-        <button
-          onClick={() => handleMobileTabClick('insights')}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${activeTab === 'insights' ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-            }`}
-        >
-          <span>Insights</span>
-        </button>
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-200 px-2 py-1.5 flex items-center justify-around shadow-md">
+        {mainNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.id;
+          return (
+            <button
+              key={item.id}
+              onClick={() => handleMobileTabClick(item.id as NavTab)}
+              className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
+                isActive ? 'text-[#17C99E]' : 'text-gray-400 hover:text-gray-700'
+              }`}
+            >
+              <Icon className="w-5 h-5 mb-0.5" />
+              <span>{item.label}</span>
+            </button>
+          );
+        })}
 
         <button
           onClick={() => setMobileMenuOpen(true)}
-          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${mobileMenuOpen ? 'text-[#17C99E]' : 'text-gray-400 hover:text-white'
-            }`}
+          className={`flex flex-col items-center justify-center px-3 py-1 rounded-xl text-[10px] font-bold transition-all ${
+            mobileMenuOpen ? 'text-[#17C99E]' : 'text-gray-400 hover:text-gray-700'
+          }`}
         >
           <Menu className="w-5 h-5 mb-0.5" />
           <span>More</span>
@@ -133,19 +137,19 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Mobile Navigation Slide-Over Drawer Overlay */}
       {mobileMenuOpen && (
-        <div className="lg:hidden fixed inset-0 z-50 bg-black/80 animate-fade-in flex flex-col justify-end">
-          <div className="bg-[#161616] border-t border-[#2E2E2E] rounded-t-xl p-5 max-h-[85vh] overflow-y-auto space-y-5">
+        <div className="lg:hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm animate-fade-in flex flex-col justify-end">
+          <div className="bg-white border-t border-gray-200 rounded-t-2xl p-5 max-h-[85vh] overflow-y-auto space-y-5 shadow-2xl">
 
-            <div className="flex items-center justify-between border-b border-[#2E2E2E] pb-4">
+            <div className="flex items-center justify-between border-b border-gray-200 pb-4">
               <div className="flex items-center space-x-2">
-                <div className="w-7 h-7 rounded-xl bg-white/10 border border-white/20 flex items-center justify-center text-white font-extrabold text-xs">
+                <div className="w-7 h-7 rounded-xl bg-[#17C99E] flex items-center justify-center text-white font-extrabold text-xs">
                   C
                 </div>
-                <span className="font-black text-white text-base tracking-wider uppercase">CURRENT MENU</span>
+                <span className="font-black text-gray-900 text-base tracking-wider uppercase">CURRENT MENU</span>
               </div>
               <button
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-1.5 rounded-full bg-[#212121] text-gray-400 hover:text-white border border-[#2E2E2E]"
+                className="p-1.5 rounded-full bg-gray-100 text-gray-500 hover:text-gray-800 border border-gray-200"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -153,18 +157,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
             {/* Navigation Items in Drawer */}
             <div className="space-y-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-2">Main Navigation</div>
+              <div className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-2">Main Navigation</div>
               {mainNavItems.map((item) => {
+                const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
                   <button
                     key={item.id}
                     onClick={() => handleMobileTabClick(item.id as NavTab)}
-                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${isActive
-                      ? 'bg-[#212121] text-[#17C99E] border border-[#17C99E]/40'
-                      : 'text-gray-300 hover:bg-[#212121]'
-                      }`}
+                    className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
+                      isActive
+                        ? 'bg-[#17C99E]/15 text-[#17C99E] border border-[#17C99E]/30'
+                        : 'text-gray-700 hover:bg-gray-100'
+                    }`}
                   >
+                    <Icon className="w-5 h-5" />
                     <span>{item.label}</span>
                   </button>
                 );
@@ -172,25 +179,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               <button
                 onClick={handleAboutClick}
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeTab === 'about'
-                  ? 'bg-[#212121] text-[#17C99E] border border-[#17C99E]/40'
-                  : 'text-gray-300 hover:bg-[#212121]'
-                  }`}
+                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${
+                  activeTab === 'about'
+                    ? 'bg-[#17C99E]/15 text-[#17C99E] border border-[#17C99E]/30'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
               >
+                <Info className="w-5 h-5" />
                 <span>About</span>
               </button>
             </div>
 
             {/* Settings & Profile Button in Drawer */}
-            <div className="pt-4 border-t border-[#2E2E2E]">
+            <div className="pt-4 border-t border-gray-200">
               <button
                 onClick={() => handleMobileTabClick('settings')}
-                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${activeTab === 'settings'
-                  ? 'bg-[#17C99E] text-black'
-                  : 'bg-[#212121] text-gray-200 border border-[#2E2E2E]'
-                  }`}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-xs font-bold transition-all ${
+                  activeTab === 'settings'
+                    ? 'bg-[#17C99E] text-white'
+                    : 'bg-gray-100 text-gray-800 border border-gray-200'
+                }`}
               >
                 <div className="flex items-center space-x-3">
+                  <Settings className="w-4 h-4" />
                   <span>Account & App Settings</span>
                 </div>
                 <ChevronRight className="w-4 h-4" />

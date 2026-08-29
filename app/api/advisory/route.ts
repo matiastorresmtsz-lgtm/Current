@@ -63,14 +63,42 @@ Strict Guidelines:
 5. If the user's portfolio is empty, suggest that they add assets (using the Add Crypto modal or button) to unlock personalized, data-backed portfolio advisory services.
 `;
 
+    // Determine if any user message has attached image media
+    const hasMedia = messages.some((msg: any) => Boolean(msg.mediaUrl));
+
     // Map message thread to Groq/OpenAI compatible schema
     const groqMessages = [
       { role: 'system', content: systemPrompt },
-      ...messages.map((msg: any) => ({
-        role: msg.sender === 'user' ? 'user' : 'assistant',
-        content: msg.text,
-      })),
+      ...messages.map((msg: any) => {
+        if (msg.sender === 'user' && msg.mediaUrl) {
+          return {
+            role: 'user',
+            content: [
+              {
+                type: 'text',
+                text: msg.text && msg.text.trim() !== ''
+                  ? msg.text
+                  : 'Please analyze this uploaded crypto chart/screenshot and provide insights based on my portfolio and market conditions.'
+              },
+              {
+                type: 'image_url',
+                image_url: {
+                  url: msg.mediaUrl
+                }
+              }
+            ]
+          };
+        }
+
+        return {
+          role: msg.sender === 'user' ? 'user' : 'assistant',
+          content: msg.text || '',
+        };
+      }),
     ];
+
+    // Select vision model if media is attached, otherwise default model
+    const selectedModel = hasMedia ? 'llama-3.2-11b-vision-preview' : 'openai/gpt-oss-20b';
 
     // Call Groq API
     const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
@@ -80,7 +108,7 @@ Strict Guidelines:
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'openai/gpt-oss-20b',
+        model: selectedModel,
         messages: groqMessages,
         temperature: 0.5,
         max_tokens: 1000,

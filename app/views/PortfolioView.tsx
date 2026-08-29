@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { useUser } from '@clerk/nextjs';
 import { useNotifications } from '../context/NotificationContext';
 import { Building2, ChevronDown, Coins, DollarSign, Eye, Trash2 } from 'lucide-react';
 import { PortfolioAsset, CryptoCoin } from '../types';
@@ -23,7 +24,6 @@ interface PortfolioViewProps {
   onOpenVisibilityModal: () => void;
   onRemoveHolding: (coinId: string) => void;
   onOpenCoinModal: (coin: CryptoCoin) => void;
-  onOpenShareModal: () => void;
 }
 
 export const PortfolioView: React.FC<PortfolioViewProps> = ({
@@ -33,9 +33,10 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
   onOpenAddCommoditiesModal,
   onOpenVisibilityModal,
   onRemoveHolding,
-  onOpenCoinModal,
-  onOpenShareModal
+  onOpenCoinModal
 }) => {
+  const { user } = useUser();
+  const userName = user ? (user.firstName || user.fullName || '') : '';
   const [accountFilter, setAccountFilter] = useState<'All'>('All');
   const [currency, setCurrency] = useState<Currency>('USD');
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
@@ -96,6 +97,15 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
 
   return (
     <div className="space-y-6">
+
+      {/* Welcome Back Header */}
+      <div className="pt-1 pb-1">
+        <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight flex items-center gap-2">
+          <span>Welcome back{userName ? `, ${userName}` : ''}</span>
+          <span className="inline-block hover:scale-125 transition-transform cursor-pointer">👋</span>
+        </h1>
+
+      </div>
 
       {/* Top Controls Bar - Exact Screenshot Match */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pb-2 border-b border-[#2E2E2E]">

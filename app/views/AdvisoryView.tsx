@@ -12,7 +12,10 @@ import {
   Search,
   TrendingUp,
   Maximize2,
-  Minimize2
+  Minimize2,
+  Paperclip,
+  Image as ImageIcon,
+  X as XIcon
 } from 'lucide-react';
 import { NavTab, PortfolioAsset, CryptoCoin, AIMessage } from '../types';
 
@@ -35,23 +38,31 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
   const [isLoading, setIsLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedMedia, setSelectedMedia] = useState<{ dataUrl: string; name: string; size: string } | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewImageModal, setPreviewImageModal] = useState<string | null>(null);
 
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll chat to the bottom
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  // Handle ESC key for fullscreen & lock body scroll
+  // Handle ESC key for fullscreen & modal & lock body scroll
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isFullscreen) {
-        setIsFullscreen(false);
+      if (e.key === 'Escape') {
+        if (previewImageModal) {
+          setPreviewImageModal(null);
+        } else if (isFullscreen) {
+          setIsFullscreen(false);
+        }
       }
     };
 
-    if (isFullscreen) {
+    if (isFullscreen || previewImageModal) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     } else {
@@ -62,7 +73,83 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [isFullscreen]);
+  }, [isFullscreen, previewImageModal]);
+
+  // Helper to format file size
+  const formatFileSize = (bytes: number) => {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1048576) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / 1048576).toFixed(1)} MB`;
+  };
+
+  // Process file upload & convert to base64 Data URL
+  const processImageFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      alert('Please upload a valid image file (PNG, JPG, WebP, GIF).');
+      return;
+    }
+
+    // Limit to 5MB to avoid payload issues
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image size exceeds 5MB limit. Please choose a smaller image.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target?.result as string;
+      if (dataUrl) {
+        setSelectedMedia({
+          dataUrl,
+          name: file.name,
+          size: formatFileSize(file.size),
+        });
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+  };
+
+  // Clipboard paste support for screenshots
+  const handlePaste = (e: React.ClipboardEvent) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].type.startsWith('image/')) {
+        const file = items[i].getAsFile();
+        if (file) {
+          processImageFile(file);
+          e.preventDefault();
+          break;
+        }
+      }
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      processImageFile(file);
+    }
+  };
 
   // Load welcome message on load
   useEffect(() => {
@@ -206,21 +293,28 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
   };
 
   // Submit chat query to api route
-  const handleSendMessage = async (text: string) => {
-    if (!text.trim() || isLoading) return;
+  const handleSendMessage = async (text: string, mediaToAttach = selectedMedia) => {
+    const hasText = Boolean(text && text.trim());
+    const hasMedia = Boolean(mediaToAttach?.dataUrl);
+
+    if ((!hasText && !hasMedia) || isLoading) return;
 
     setServerError(null);
 
     const userMessage: AIMessage = {
       id: Math.random().toString(),
       sender: 'user',
-      text,
+      text: hasText ? text.trim() : (hasMedia ? 'Please analyze this uploaded crypto chart/screenshot.' : ''),
+      mediaUrl: mediaToAttach?.dataUrl,
+      mediaName: mediaToAttach?.name,
       timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
     };
 
     const updatedMessages = [...messages, userMessage];
     setMessages(updatedMessages);
     setInputValue('');
+    setSelectedMedia(null);
+    if (fileInputRef.current) fileInputRef.current.value = '';
     setIsLoading(true);
 
     try {
@@ -284,18 +378,27 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
       {/* Chat Hub */}
       <div className={isFullscreen ? "w-full max-w-6xl h-full flex flex-col" : "max-w-[900px] mx-auto w-full"}>
         <div
-          className={`bg-[#212121] border border-[#2E2E2E] flex flex-col shadow-2xl overflow-hidden ${
-            isFullscreen ? "h-full rounded-2xl md:rounded-3xl" : "h-[700px] rounded-3xl shadow-xl"
-          }`}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+          onDrop={handleDrop}
+          onPaste={handlePaste}
+          className={`relative bg-[#212121] border flex flex-col shadow-2xl overflow-hidden transition-all ${isDragging ? 'border-[#17C99E] ring-2 ring-[#17C99E]/40' : 'border-[#2E2E2E]'
+            } ${isFullscreen ? "h-full rounded-2xl md:rounded-3xl" : "h-[700px] rounded-3xl shadow-xl"
+            }`}
         >
+          {/* Drag Overlay Indicator */}
+          {isDragging && (
+            <div className="absolute inset-0 z-30 bg-black/80 backdrop-blur-sm flex flex-col items-center justify-center pointer-events-none space-y-2 border-2 border-dashed border-[#17C99E] rounded-3xl">
+              <ImageIcon className="w-10 h-10 text-[#17C99E] animate-bounce" />
+              <p className="text-sm font-bold text-white">Drop your chart or image here</p>
+              <p className="text-xs text-gray-400">Attach screenshot to AI Advisor</p>
+            </div>
+          )}
+
           {/* Chat Header */}
           <div className="bg-black/25 px-6 py-4 border-b border-[#2E2E2E] flex items-center justify-between shrink-0">
             <div className="flex items-center space-x-3">
-              <div className="w-2 h-2 rounded-full bg-[#17C99E] animate-pulse" />
-              <div>
-                <h3 className="text-xs font-black text-white uppercase tracking-wider">Current AI Advisor</h3>
-                <p className="text-[10px] text-gray-400 mt-0.5">Direct line to GPT OSS 20B</p>
-              </div>
+              <h3 className="text-xs font-black text-white uppercase tracking-wider">Current AI</h3>
             </div>
 
             <div className="flex items-center space-x-2">
@@ -305,7 +408,7 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                     setMessages(prev => [prev[0]]);
                     setServerError(null);
                   }}
-                  className="text-[10px] font-bold text-gray-400 hover:text-white flex items-center space-x-1 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/5"
+                  className="text-[10px] font-bold text-gray-400 hover:text-white flex items-center space-x-1 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
                 >
                   <RefreshCw className="w-3 h-3" />
                   <span className="hidden sm:inline">Clear Thread</span>
@@ -320,12 +423,10 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                 {isFullscreen ? (
                   <>
                     <Minimize2 className="w-3.5 h-3.5 text-[#17C99E]" />
-                    <span className="hidden sm:inline">Exit Fullscreen</span>
                   </>
                 ) : (
                   <>
                     <Maximize2 className="w-3.5 h-3.5 text-[#17C99E]" />
-                    <span className="hidden sm:inline">Fullscreen</span>
                   </>
                 )}
               </button>
@@ -356,7 +457,23 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                       ? 'bg-[#2E2E2E] text-gray-200 border border-white/5 rounded-tl-sm'
                       : 'bg-[#17C99E] text-black font-semibold rounded-tr-sm'
                       }`}>
-                      {isAi ? renderMarkdown(msg.text) : msg.text}
+                      {msg.mediaUrl && (
+                        <div className="mb-2.5 overflow-hidden rounded-xl border border-black/15 bg-black/20">
+                          <img
+                            src={msg.mediaUrl}
+                            alt={msg.mediaName || "Uploaded media"}
+                            onClick={() => setPreviewImageModal(msg.mediaUrl || null)}
+                            className="w-full max-h-64 object-contain rounded-xl cursor-pointer hover:opacity-90 transition-opacity bg-black/40"
+                          />
+                          {msg.mediaName && (
+                            <div className="text-[10px] px-2.5 py-1 font-mono text-black/80 truncate flex items-center gap-1 bg-black/10">
+                              <ImageIcon className="w-3 h-3 shrink-0" />
+                              <span className="truncate">{msg.mediaName}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      {isAi ? renderMarkdown(msg.text) : (msg.text ? msg.text : null)}
                     </div>
                     <span className="text-[9px] text-gray-500 font-medium px-1 block text-right">
                       {msg.timestamp}
@@ -379,7 +496,7 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
                       <div className="w-1.5 h-1.5 bg-[#17C99E] rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
                       <div className="w-1.5 h-1.5 bg-[#17C99E] rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
-                    <span className="font-medium pl-1 text-[11px] text-gray-400">Advisor is compiling analysis...</span>
+                    <span className="font-medium pl-1 text-[11px] text-gray-400">Advisor is analyzing chart and data...</span>
                   </div>
                 </div>
               </div>
@@ -429,14 +546,71 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
             </div>
           )}
 
+          {/* Selected Media Preview Bar */}
+          {selectedMedia && (
+            <div className="px-4 py-2.5 bg-black/40 border-t border-[#2E2E2E] flex items-center justify-between gap-3 animate-fade-in">
+              <div className="flex items-center space-x-3 overflow-hidden">
+                <div className="relative shrink-0">
+                  <img
+                    src={selectedMedia.dataUrl}
+                    alt={selectedMedia.name}
+                    className="w-12 h-12 object-cover rounded-xl border border-[#17C99E]/50 cursor-pointer"
+                    onClick={() => setPreviewImageModal(selectedMedia.dataUrl)}
+                  />
+                </div>
+                <div className="truncate">
+                  <div className="text-xs font-bold text-white truncate flex items-center gap-1.5">
+                    <ImageIcon className="w-3.5 h-3.5 text-[#17C99E] shrink-0" />
+                    <span className="truncate">{selectedMedia.name}</span>
+                  </div>
+                  <div className="text-[10px] text-gray-400 mt-0.5">
+                    {selectedMedia.size} • Attached to prompt
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedMedia(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                className="p-1.5 rounded-lg bg-white/5 hover:bg-red-500/20 text-gray-400 hover:text-red-400 border border-white/5 transition-colors shrink-0 cursor-pointer"
+                title="Remove attachment"
+              >
+                <XIcon className="w-4 h-4" />
+              </button>
+            </div>
+          )}
+
           {/* Chat Form Input */}
           <form
             onSubmit={(e) => {
               e.preventDefault();
               handleSendMessage(inputValue);
             }}
-            className="p-4 bg-black/20 border-t border-[#2E2E2E] flex items-center space-x-3.5"
+            className="p-3.5 bg-black/20 border-t border-[#2E2E2E] flex items-center space-x-2.5"
           >
+            {/* Hidden File Input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              className="hidden"
+            />
+
+            {/* Media Upload Attachment Button */}
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={isLoading || portfolio.length === 0}
+              title="Attach chart, screenshot or media (or paste from clipboard with Ctrl+V)"
+              className="p-3 rounded-2xl bg-black/40 hover:bg-[#2A2A2A] text-gray-400 hover:text-[#17C99E] border border-[#2E2E2E] hover:border-[#17C99E]/40 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shrink-0"
+            >
+              <Paperclip className="w-4 h-4" />
+            </button>
+
             <input
               type="text"
               value={inputValue}
@@ -445,14 +619,17 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
               placeholder={
                 portfolio.length === 0
                   ? "Import assets to unlock AI advisor chat..."
-                  : "Ask a question about your portfolio allocations..."
+                  : selectedMedia
+                    ? "Add a question about this image/chart (or press send)..."
+                    : "Ask advisor or paste/upload a chart screenshot..."
               }
               className="flex-1 bg-black/40 border border-[#2E2E2E] focus:border-[#17C99E]/50 rounded-2xl px-4 py-3 text-xs text-white placeholder-gray-500 focus:outline-none transition-all"
             />
+
             <button
               type="submit"
-              disabled={isLoading || !inputValue.trim() || portfolio.length === 0}
-              className={`p-3 rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-md ${!inputValue.trim() || isLoading || portfolio.length === 0
+              disabled={isLoading || (!inputValue.trim() && !selectedMedia) || portfolio.length === 0}
+              className={`p-3 rounded-2xl flex items-center justify-center transition-all cursor-pointer shadow-md shrink-0 ${(!inputValue.trim() && !selectedMedia) || isLoading || portfolio.length === 0
                 ? 'bg-black/25 text-gray-600 border border-[#2E2E2E] cursor-not-allowed'
                 : 'bg-[#17C99E] text-black hover:bg-[#13A682] hover:shadow-[#17C99E]/10'
                 }`}
@@ -465,6 +642,30 @@ export const AdvisoryView: React.FC<AdvisoryViewProps> = ({
 
       </div>
 
+      {/* Lightbox Image Preview Modal */}
+      {previewImageModal && (
+        <div
+          onClick={() => setPreviewImageModal(null)}
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 cursor-zoom-out animate-fade-in"
+        >
+          <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-2xl border border-[#2E2E2E] bg-[#161616]">
+            <button
+              onClick={() => setPreviewImageModal(null)}
+              className="absolute top-3 right-3 z-10 p-2 rounded-full bg-black/70 text-white hover:bg-white hover:text-black transition-colors cursor-pointer"
+            >
+              <XIcon className="w-5 h-5" />
+            </button>
+            <img
+              src={previewImageModal}
+              alt="Expanded chart preview"
+              className="w-full h-full max-h-[85vh] object-contain rounded-2xl"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
+
     </div>
   );
 };
+

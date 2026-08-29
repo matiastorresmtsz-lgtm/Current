@@ -2,13 +2,11 @@
 
 import React, { useState } from 'react';
 import { useUser } from '@clerk/nextjs';
-import { Check, Globe2, LockKeyhole, Mail, Moon, Palette, PenLine, Sun, Trash2, User } from 'lucide-react';
-import { useTheme } from '../context/ThemeContext';
+import { Check, Globe2, LockKeyhole, Mail, Palette, PenLine, Sun, Trash2, User } from 'lucide-react';
 import { useAppSettings, AVAILABLE_COUNTRIES } from '../context/AppSettingsContext';
 
 export const SettingsView: React.FC = () => {
   const [activeSection, setActiveSection] = useState<'account' | 'display'>('account');
-  const { theme, setTheme } = useTheme();
   const { country, setCountry } = useAppSettings();
 
   // Clerk Auth integration
@@ -266,34 +264,17 @@ export const SettingsView: React.FC = () => {
                 <h3 className="text-sm font-bold text-white">Appearance</h3>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div
-                  onClick={() => setTheme('light')}
-                  className={`p-5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center space-y-3 ${
-                    theme === 'light'
-                      ? 'bg-white text-black border-[#17C99E] ring-2 ring-[#17C99E]'
-                      : 'bg-[#161616] text-gray-400 border-[#2E2E2E] hover:border-gray-500'
-                  }`}
-                >
+              <div className="p-5 rounded-2xl border bg-white text-black border-[#17C99E] ring-2 ring-[#17C99E] flex items-center justify-between">
+                <div className="flex items-center space-x-4">
                   <div className="w-12 h-12 rounded-full bg-yellow-400/20 flex items-center justify-center text-yellow-500">
                     <Sun className="h-6 w-6" />
                   </div>
-                  <span className="text-xs font-extrabold">Light Mode</span>
-                </div>
-
-                <div
-                  onClick={() => setTheme('dark')}
-                  className={`p-5 rounded-2xl border cursor-pointer transition-all flex flex-col items-center justify-center space-y-3 ${
-                    theme === 'dark'
-                      ? 'bg-[#161616] text-white border-[#17C99E] ring-2 ring-[#17C99E] shadow-lg shadow-[#17C99E]/10'
-                      : 'bg-[#161616] text-gray-400 border-[#2E2E2E] hover:border-gray-500'
-                  }`}
-                >
-                  <div className="w-12 h-12 rounded-full bg-yellow-500/20 flex items-center justify-center text-yellow-400">
-                    <Moon className="h-6 w-6" />
+                  <div>
+                    <div className="text-sm font-extrabold text-gray-900">Light Mode</div>
+                    <div className="text-xs text-gray-500">Light mode is the default and only active theme</div>
                   </div>
-                  <span className="text-xs font-extrabold">Dark Mode</span>
                 </div>
+                <span className="px-3 py-1 bg-[#17C99E]/10 text-[#17C99E] text-xs font-bold rounded-full border border-[#17C99E]/30">Active</span>
               </div>
             </div>
           </div>
@@ -309,7 +290,7 @@ export const SettingsView: React.FC = () => {
 
             {[
               { id: 'account', label: 'Account', icon: User },
-              { id: 'display', label: 'Display', icon: Moon }
+              { id: 'display', label: 'Display', icon: Sun }
             ].map((item) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Bell, Search, Share2 } from 'lucide-react';
+import { Bell, Search } from 'lucide-react';
 import { SignInButton, SignUpButton, UserButton, useUser } from '@clerk/nextjs';
 import { useNotifications } from '../context/NotificationContext';
 import { CryptoCoin, NavTab } from '../types';
@@ -12,7 +12,6 @@ interface NavbarProps {
   onOpenAddCryptoModal: () => void;
   onOpenCoinModal: (coin: CryptoCoin) => void;
   onSelectTab: (tab: NavTab) => void;
-  onOpenShareModal: () => void;
   holdingsCount: number;
 }
 
@@ -21,7 +20,6 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAddCryptoModal,
   onOpenCoinModal,
   onSelectTab,
-  onOpenShareModal,
   holdingsCount
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -85,7 +83,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const userDisplayName = user ? (user.fullName || user.username || 'Trader') : 'Matias Torres';
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#1D1D1D] border-b border-[#2E2E2E]">
+    <header className="sticky top-0 z-40 w-full bg-white border-b border-gray-200 shadow-sm">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
 
         {/* Brand Logo - Current River Logo */}
@@ -106,12 +104,12 @@ export const Navbar: React.FC<NavbarProps> = ({
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setTimeout(() => setIsSearchFocused(false), 200)}
-              className="w-full bg-[#242424] text-gray-100 placeholder-gray-400 pl-11 pr-9 py-2.5 rounded-lg border border-[#2E2E2E] focus:border-[#17C99E]/60 focus:outline-none text-sm transition-colors"
+              className="w-full bg-gray-100 text-gray-900 placeholder-gray-400 pl-11 pr-9 py-2.5 rounded-lg border border-gray-200 focus:border-[#17C99E]/60 focus:outline-none text-sm transition-colors"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
                 <span className="w-4 h-4" >✕</span>
               </button>
@@ -132,19 +130,19 @@ export const Navbar: React.FC<NavbarProps> = ({
                       onOpenCoinModal(coin);
                       setSearchQuery('');
                     }}
-                    className="flex items-center justify-between p-2.5 hover:bg-[#2A2A2A] rounded-xl cursor-pointer transition-colors"
+                    className="flex items-center justify-between p-2.5 hover:bg-gray-100 rounded-xl cursor-pointer transition-colors"
                   >
                     <div className="flex items-center space-x-3">
                       <img src={coin.icon} alt={coin.name} className="w-7 h-7 rounded-full" />
                       <div>
-                        <div className="text-sm font-semibold text-white flex items-center space-x-1.5">
+                        <div className="text-sm font-semibold text-gray-900 flex items-center space-x-1.5">
                           <span>{coin.name}</span>
                           <span className="text-xs text-gray-400 font-mono">${coin.symbol}</span>
                         </div>
                       </div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-bold text-white">
+                      <div className="text-sm font-bold text-gray-900">
                         ${coin.price < 1 ? coin.price.toFixed(6) : coin.price.toLocaleString()}
                       </div>
                       <div className={`text-xs font-semibold ${coin.change24h >= 0 ? 'text-[#10B981]' : 'text-[#EF4444]'}`}>
@@ -176,18 +174,6 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
           )}
 
-          {/* Share Portfolio Button (only for signed in users) */}
-          {isSignedIn && (
-            <button
-              onClick={onOpenShareModal}
-              title="Share Portfolio"
-              className="flex items-center space-x-1 bg-[#242424] hover:bg-[#2A2A2A] text-[#17C99E] border border-[#2E2E2E] px-3 py-2 rounded-lg text-xs font-bold transition-colors"
-            >
-              <Share2 className="w-4 h-4" />
-              <span className="hidden sm:inline">Share</span>
-            </button>
-          )}
-
           {/* Notifications Bell (only for signed in users) */}
           {isSignedIn && (
             <div className="relative">
@@ -197,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   markAllRead();
                 }}
                 title="Notifications"
-                className="w-9 h-9 bg-[#242424] hover:bg-[#2A2A2A] text-gray-300 hover:text-white border border-[#2E2E2E] rounded-lg flex items-center justify-center transition-colors relative"
+                className="w-9 h-9 bg-white hover:bg-gray-50 text-gray-700 hover:text-black border border-gray-200 rounded-lg flex items-center justify-center transition-colors relative"
               >
                 <Bell className="w-5 h-5" />
                 {unreadNotifications > 0 && (
@@ -210,26 +196,26 @@ export const Navbar: React.FC<NavbarProps> = ({
               {/* Notifications Popover */}
               {showNotifications && (
                 <div className="absolute right-0 mt-3 w-80 sm:w-96 glass-dropdown rounded-2xl p-4 z-50">
-                  <div className="flex items-center justify-between pb-3 border-b border-[#2E2E2E]">
-                    <span className="font-bold text-white text-sm">Notifications</span>
-                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-white">
+                  <div className="flex items-center justify-between pb-3 border-b border-gray-200">
+                    <span className="font-bold text-gray-900 text-sm">Notifications</span>
+                    <button onClick={() => setShowNotifications(false)} className="text-gray-400 hover:text-gray-600">
                       <span className="w-4 h-4" >✕</span>
                     </button>
                   </div>
-                  <div className="divide-y divide-[#2E2E2E] max-h-72 overflow-y-auto">
+                  <div className="divide-y divide-gray-100 max-h-72 overflow-y-auto">
                     {notifications.length === 0 && (
                       <div className="p-4 text-sm text-gray-400">No notifications</div>
                     )}
                     {notifications.map((n) => (
-                      <div key={n.id} className="py-3 px-1 hover:bg-[#242424] rounded-lg transition-colors">
+                      <div key={n.id} className="py-3 px-1 hover:bg-gray-50 rounded-lg transition-colors">
                         <div className="flex items-center justify-between text-xs font-semibold text-[#17C99E]">
                           <span>{n.title}</span>
                           <div className="flex items-center space-x-2">
                             <span className="text-[10px] text-gray-400">{n.time}</span>
-                            <button onClick={() => removeNotification(n.id)} className="text-gray-500 hover:text-white">✕</button>
+                            <button onClick={() => removeNotification(n.id)} className="text-gray-500 hover:text-gray-700">✕</button>
                           </div>
                         </div>
-                        <p className="text-xs text-gray-300 mt-1 leading-relaxed">{n.message}</p>
+                        <p className="text-xs text-gray-600 mt-1 leading-relaxed">{n.message}</p>
                       </div>
                     ))}
                   </div>
@@ -240,10 +226,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Clerk Auth Section */}
           {isSignedIn ? (
-            <div className="flex items-center space-x-2.5 bg-[#242424] px-2.5 py-1.5 rounded-lg border border-[#2E2E2E]">
+            <div className="flex items-center space-x-2.5 bg-white px-2.5 py-1.5 rounded-lg border border-gray-200">
               <UserButton />
               <div className="text-left hidden lg:block pr-1">
-                <div className="text-xs font-bold text-white leading-tight">{userDisplayName}</div>
+                <div className="text-xs font-bold text-gray-900 leading-tight">{userDisplayName}</div>
                 <div className="text-[10px] text-gray-400">{holdingsCount} Holdings</div>
               </div>
             </div>

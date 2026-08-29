@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
-type Theme = 'dark' | 'light';
+type Theme = 'light';
 
 interface ThemeContextValue {
   theme: Theme;
@@ -10,34 +10,27 @@ interface ThemeContextValue {
 }
 
 const ThemeContext = createContext<ThemeContextValue>({
-  theme: 'dark',
+  theme: 'light',
   setTheme: () => {},
 });
 
 export const useTheme = () => useContext(ThemeContext);
 
 function readStoredTheme(): Theme {
-  if (typeof window === 'undefined') return 'dark';
-  const saved = localStorage.getItem('current_theme') ?? localStorage.getItem('stream_theme');
-  return saved === 'light' || saved === 'dark' ? saved : 'dark';
+  return 'light';
 }
 
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>(readStoredTheme);
+  const [theme] = useState<Theme>(readStoredTheme);
 
   useEffect(() => {
     const html = document.documentElement;
-    if (theme === 'light') {
-      html.classList.add('light');
-      html.classList.remove('dark');
-    } else {
-      html.classList.add('dark');
-      html.classList.remove('light');
-    }
-    localStorage.setItem('current_theme', theme);
-  }, [theme]);
+    html.classList.add('light');
+    html.classList.remove('dark');
+    localStorage.setItem('current_theme', 'light');
+  }, []);
 
-  const setTheme = (t: Theme) => setThemeState(t);
+  const setTheme = () => {};
 
   return (
     <ThemeContext.Provider value={{ theme, setTheme }}>
@@ -45,3 +38,4 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     </ThemeContext.Provider>
   );
 };
+

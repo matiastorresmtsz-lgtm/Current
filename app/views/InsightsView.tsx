@@ -13,11 +13,11 @@ interface InsightsViewProps {
 // ---------- Fear & Greed helpers ----------
 const FEAR_GREED = 74;
 const getFearGreedLabel = (v: number) => {
-  if (v <= 24) return { label: 'Extreme Fear', color: '#EF4444' };
-  if (v <= 44) return { label: 'Fear', color: '#F97316' };
-  if (v <= 54) return { label: 'Neutral', color: '#EAB308' };
-  if (v <= 74) return { label: 'Greed', color: '#22C55E' };
-  return { label: 'Extreme Greed', color: '#10B981' };
+  if (v <= 24) return { label: 'Extreme Fear', color: '#17C99E' };
+  if (v <= 44) return { label: 'Fear', color: '#17C99E' };
+  if (v <= 54) return { label: 'Neutral', color: '#17C99E' };
+  if (v <= 74) return { label: 'Greed', color: '#17C99E' };
+  return { label: 'Extreme Greed', color: '#17C99E' };
 };
 
 // ---------- Portfolio Rating Engine ----------
@@ -236,11 +236,11 @@ function computePortfolioRating(
 
 // ---------- Rating color/label helpers ----------
 const getRatingMeta = (score: number) => {
-  if (score >= 85) return { label: 'Excellent', color: '#10B981', bg: 'from-emerald-500/20 to-emerald-500/5', ring: 'border-emerald-500/50' };
-  if (score >= 70) return { label: 'Good', color: '#22C55E', bg: 'from-green-500/20 to-green-500/5', ring: 'border-green-500/40' };
-  if (score >= 55) return { label: 'Fair', color: '#EAB308', bg: 'from-yellow-500/20 to-yellow-500/5', ring: 'border-yellow-500/40' };
-  if (score >= 40) return { label: 'Needs Work', color: '#F97316', bg: 'from-orange-500/20 to-orange-500/5', ring: 'border-orange-500/40' };
-  return { label: 'Poor', color: '#EF4444', bg: 'from-red-500/20 to-red-500/5', ring: 'border-red-500/40' };
+  if (score >= 85) return { label: 'Excellent', color: '#17C99E', bg: 'from-[#17C99E]/20 to-[#17C99E]/5', ring: 'border-[#17C99E]/50' };
+  if (score >= 70) return { label: 'Good', color: '#17C99E', bg: 'from-[#17C99E]/20 to-[#17C99E]/5', ring: 'border-[#17C99E]/40' };
+  if (score >= 55) return { label: 'Fair', color: '#17C99E', bg: 'from-[#17C99E]/20 to-[#17C99E]/5', ring: 'border-[#17C99E]/40' };
+  if (score >= 40) return { label: 'Needs Work', color: '#17C99E', bg: 'from-[#17C99E]/20 to-[#17C99E]/5', ring: 'border-[#17C99E]/40' };
+  return { label: 'Poor', color: '#17C99E', bg: 'from-[#17C99E]/20 to-[#17C99E]/5', ring: 'border-[#17C99E]/40' };
 };
 
 const statusBar = (score: number) => {
@@ -403,9 +403,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                   <div key={f.key} className="flex items-center space-x-2">
                     <span className="text-gray-400 w-24 shrink-0 truncate">{f.label}</span>
                     {statusBar(f.score)}
-                    <span className="text-[10px] font-bold w-7 text-right" style={{
-                      color: f.score >= 70 ? '#10B981' : f.score >= 45 ? '#EAB308' : '#EF4444'
-                    }}>
+                    <span className="text-[10px] font-bold w-7 text-right text-[#17C99E]">
                       {f.score}
                     </span>
                   </div>
@@ -424,11 +422,10 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
             <h3 className="font-extrabold text-white text-base">Portfolio Health Breakdown</h3>
           </div>
           <div className="flex items-center space-x-1.5">
-            <span className="text-xl font-black" style={{ color: meta.color }}>{total}</span>
+            <span className="text-xl font-black text-[#17C99E]">{total}</span>
             <span className="text-gray-400 text-xs font-semibold">/ 100</span>
             <span
-              className="ml-2 text-[10px] font-extrabold px-2 py-0.5 rounded-full border"
-              style={{ color: meta.color, borderColor: meta.color + '50', backgroundColor: meta.color + '18' }}
+              className="ml-2 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-[#17C99E]/30 bg-[#17C99E]/15 text-[#17C99E]"
             >
               {meta.label}
             </span>
@@ -439,7 +436,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
           {factors.map(f => {
             const isExpanded = expandedFactor === f.key;
             const hasTips = f.tips.length > 0;
-            const factorColor = f.status === 'good' ? '#10B981' : f.status === 'warn' ? '#EAB308' : '#EF4444';
+            const factorColor = '#17C99E';
             return (
               <div key={f.key} className="bg-[#242424] border border-white/10 rounded-2xl overflow-hidden">
                 <div className="p-4">
@@ -451,7 +448,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                       </div>
                     </div>
                     <div className="flex items-center gap-3">
-                      <div className="text-sm font-black" style={{ color: factorColor }}>{f.score}</div>
+                      <div className="text-sm font-black text-[#17C99E]">{f.score}</div>
                       <div className="text-xs text-gray-400">/100</div>
                     </div>
                   </div>
@@ -474,7 +471,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                   )}
 
                   {f.status === 'good' && (
-                    <div className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold text-[#10B981]">
+                    <div className="mt-4 inline-flex items-center gap-2 text-[11px] font-bold text-[#17C99E]">
                       <span>Looking great — no action needed right now.</span>
                     </div>
                   )}
@@ -482,13 +479,13 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
 
                 {isExpanded && hasTips && (
                   <div className="border-t border-white/10 bg-[#242424] px-4 py-4">
-                    <div className="flex items-center gap-2 mb-3 text-[11px] uppercase tracking-[0.2em] text-[#EAB308] font-bold">
+                    <div className="flex items-center gap-2 mb-3 text-[11px] uppercase tracking-[0.2em] text-[#17C99E] font-bold">
                       <span>Improvement Steps</span>
                     </div>
                     <ul className="space-y-2">
                       {f.tips.map((tip, i) => (
                         <li key={i} className="flex items-start gap-2.5 text-[11px] text-gray-300">
-                          <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black mt-0.5" style={{ backgroundColor: factorColor + '20', color: factorColor }}>
+                          <span className="shrink-0 w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black mt-0.5 bg-[#17C99E]/20 text-[#17C99E]">
                             {i + 1}
                           </span>
                           <span>{tip}</span>
@@ -507,7 +504,7 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
           <div className="mt-4 bg-[#2A2A2A] border border-[#3E3E3E] rounded-2xl p-5">
             <div className="flex items-center space-x-2 mb-4">
               <h4 className="text-sm font-extrabold text-white">Your Full Improvement Plan</h4>
-              <span className="text-[10px] font-bold bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-500/30 ml-auto">
+              <span className="text-[10px] font-bold bg-[#17C99E]/10 text-[#17C99E] px-2 py-0.5 rounded-full border border-[#17C99E]/30 ml-auto">
                 {factors.filter(f => f.tips.length > 0).length} areas to work on
               </span>
             </div>
@@ -516,13 +513,11 @@ export const InsightsView: React.FC<InsightsViewProps> = ({ portfolio, coins }) 
                 .filter(f => f.tips.length > 0)
                 .sort((a, b) => a.score - b.score) // lowest score first = highest priority
                 .map((f, idx) => {
-                  const factorColor = f.status === 'warn' ? '#EAB308' : '#EF4444';
                   return (
                     <div key={f.key}>
                       <div className="flex items-center space-x-2 mb-1.5">
                         <span
-                          className="text-[10px] font-extrabold px-1.5 py-0.5 rounded"
-                          style={{ backgroundColor: factorColor + '20', color: factorColor }}
+                          className="text-[10px] font-extrabold px-1.5 py-0.5 rounded bg-[#17C99E]/20 text-[#17C99E]"
                         >
                           #{idx + 1} PRIORITY
                         </span>

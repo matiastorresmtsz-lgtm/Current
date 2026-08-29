@@ -103,4 +103,6 @@ export interface AIMessage {
   sender: 'user' | 'ai';
   text: string;
   timestamp: string;
+  mediaUrl?: string;
+  mediaName?: string;
 }

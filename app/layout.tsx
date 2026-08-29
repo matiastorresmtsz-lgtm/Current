@@ -32,7 +32,7 @@ export default function RootLayout({
     <ClerkProvider>
       <html
         lang="en"
-        className="h-full antialiased"
+        className="h-full antialiased light"
       >
         <head>
           <Script
@@ -42,7 +42,7 @@ export default function RootLayout({
             strategy="afterInteractive"
           />
         </head>
-        <body className="min-h-full flex flex-col bg-[#161616] text-gray-100 font-sans">
+        <body className="min-h-full flex flex-col bg-white text-gray-900 font-sans">
           <ThemeProvider>
             <AppSettingsProvider>
               <NotificationProvider>

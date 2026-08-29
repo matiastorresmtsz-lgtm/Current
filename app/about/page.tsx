@@ -3,20 +3,9 @@
 import { useEffect, useState, type MouseEvent } from 'react';
 import Link from 'next/link';
 import { UserButton, useClerk, useUser } from '@clerk/nextjs';
-import { ArrowRight, BarChart3, Building2, Coins, Eye, Globe2, Menu, MessageCircle, Pencil, PieChart, RefreshCw, ScanSearch, Sparkles, Upload, X, Zap } from 'lucide-react';
+import { ArrowRight, BarChart3, Building2, Coins, Eye, Menu, MessageCircle, Pencil, PieChart, ScanSearch, Sparkles, Upload, X, Zap } from 'lucide-react';
 import { animate, motion } from 'motion/react';
 
-const previewMetrics = [
-  { label: 'Today\'s return', value: '-$1,852.24', change: '-0.60%' },
-  { label: 'All-time return', value: '+$53,687.94', change: '+21.05%' },
-];
-
-const previewWatchlist = [
-  ['BTC', 'Bitcoin', '$77,180', '-0.60%'],
-  ['ETH', 'Ethereum', '$2,420.53', '+0.80%'],
-  ['XRP', 'XRP', '$1.47', '+2.70%'],
-  ['SOL', 'Solana', '$93.98', '+1.30%'],
-];
 
 export default function AboutPage() {
   const [isHeaderFloating, setIsHeaderFloating] = useState(false);
@@ -179,69 +168,111 @@ export default function AboutPage() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.55, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            id="platform" 
-            className="relative z-10 mx-auto mt-16 min-h-[430px] w-full max-w-[1120px] overflow-hidden rounded-xl border border-white/70 bg-[#141414]/95 shadow-[0_24px_70px_rgba(22,35,31,0.22)] backdrop-blur-md sm:mt-20 sm:aspect-[2.7/1] sm:min-h-0"
+            id="platform"
+            className="relative z-10 mx-auto mt-16 min-h-[430px] w-full max-w-[1120px] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[0_24px_70px_rgba(22,35,31,0.12)] sm:mt-20 sm:aspect-[2.7/1] sm:min-h-0"
           >
-            <div className="relative flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
+            {/* Browser Chrome Bar */}
+            <div className="relative flex items-center justify-between border-b border-gray-200 bg-gray-50/80 px-4 py-2.5 sm:px-5">
               <div className="flex items-center gap-1.5" aria-hidden="true">
-                <span className="h-2 w-2 rounded-full bg-[#ff6b6b]" />
-                <span className="h-2 w-2 rounded-full bg-[#f3c86a]" />
-                <span className="h-2 w-2 rounded-full bg-[#17C99E]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#ff6b6b]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#f3c86a]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#17C99E]" />
               </div>
-              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md bg-white/10 px-3 py-1 text-[10px] font-semibold text-white/65">currentsocial.xyz</span>
-              <div className="flex items-center gap-2 text-[9px] text-white/55"><span className="hidden sm:inline">+ Add Holding</span><span className="rounded-md bg-[#17C99E] px-2 py-1 font-bold text-black">Share</span><span className="text-sm">◉</span></div>
+              <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-md border border-gray-200 bg-gray-100 px-3 py-1 text-[10px] font-semibold text-gray-500">currentsocial.xyz</span>
+              <div className="flex items-center gap-2 text-[9px] text-gray-400"><span className="hidden sm:inline">+ Add Holding</span><span className="h-5 w-5 rounded-full bg-gray-200" /></div>
             </div>
-            <div className="grid gap-4 p-4 sm:grid-cols-[135px_1fr_205px] sm:p-5">
-              <aside className="hidden border-r border-white/10 pr-4 text-[10px] text-white/45 sm:block">
-                <p className="mb-6 text-xs font-bold text-[#17C99E]">current</p>
-                <p className="flex items-center gap-2 rounded-md border border-[#17C99E]/50 bg-white/10 px-2 py-2 font-semibold text-[#17C99E]"><RefreshCw className="h-3 w-3" />Portfolio</p>
-                <p className="mt-4 flex items-center gap-2 px-2"><BarChart3 className="h-3 w-3" />Markets</p>
-                <p className="mt-4 flex items-center gap-2 px-2"><Zap className="h-3 w-3" />Insights</p>
-                <p className="mt-4 flex items-center gap-2 px-2"><Sparkles className="h-3 w-3" />AI Advisor</p>
-                <div className="my-6 border-t border-white/10" />
-                <p className="mb-3 px-2 text-[9px] font-bold uppercase tracking-wider text-white/35">Topics</p>
-                <p className="flex items-center gap-2 px-2"><PieChart className="h-3 w-3" />ETFs &amp; Inflows</p>
-                <p className="mt-3 flex items-center gap-2 px-2"><Coins className="h-3 w-3" />Passive Income</p>
-                <p className="mt-3 flex items-center gap-2 px-2"><Sparkles className="h-3 w-3" />Beginners</p>
+
+            {/* Dashboard Content */}
+            <div className="grid gap-3 p-4 sm:grid-cols-[52px_1fr_185px] sm:p-5">
+              {/* Left Icon Sidebar */}
+              <aside className="hidden border-r border-gray-200 pr-3 sm:flex flex-col items-center gap-3 pt-1">
+                <span className="mb-3 text-xs font-extrabold text-[#17C99E]">c</span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#17C99E]/15 text-[#17C99E]"><PieChart className="h-3.5 w-3.5" /></span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-400"><Sparkles className="h-3.5 w-3.5" /></span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-400"><Zap className="h-3.5 w-3.5" /></span>
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl text-gray-400"><BarChart3 className="h-3.5 w-3.5" /></span>
               </aside>
+
+              {/* Main Content Area */}
               <div className="min-w-0">
-                <div className="flex items-center gap-3 border-b border-white/10 pb-3 text-[10px] text-white/65">
-                  <span className="border-b-2 border-[#17C99E] pb-3 font-bold text-white">All</span>
-                  <span className="flex items-center gap-1 rounded-full bg-white/10 px-3 py-1"><Globe2 className="h-3 w-3" />USD⌄</span>
-                  <span className="hidden rounded-full bg-white/10 px-3 py-1 md:inline">Showing: All Accounts</span>
-                  <span className="ml-auto hidden text-[#17C99E] md:inline">Goal &nbsp;━━━━━━ 100%</span>
+                {/* Top Controls */}
+                <div className="flex items-center gap-3 border-b border-gray-200 pb-2.5 text-[10px] text-gray-500">
+                  <span className="border-b-2 border-[#17C99E] pb-2.5 font-bold text-gray-900">All</span>
+                  <span className="flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 font-medium text-gray-600">$ USD ⌄</span>
+                  <span className="hidden rounded-full border border-gray-200 bg-gray-50 px-2.5 py-1 text-gray-500 md:inline">Showing: All Accounts</span>
+                  <span className="ml-auto hidden items-center gap-2 text-[9px] md:flex"><span className="text-gray-400">Goal</span><span className="h-1.5 w-24 rounded-full bg-gray-200 overflow-hidden"><span className="block h-full w-full rounded-full bg-[#17C99E]" /></span><span className="text-gray-500">100%</span></span>
                 </div>
-                <div className="mt-4 grid gap-3 lg:grid-cols-[1.1fr_1fr]">
-                  <div className="flex min-h-[190px] items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] p-4">
-                    <div className="relative flex h-36 w-36 items-center justify-center rounded-full border-[18px] border-[#3b82f6] border-r-[#17C99E] border-b-[#3b82f6]">
-                      <div className="absolute text-center"><p className="text-lg font-extrabold text-white">$308,722.95</p><p className="text-[9px] text-white/55">Portfolio Value</p></div>
+
+                {/* Portfolio Grid */}
+                <div className="mt-3 grid gap-2.5 lg:grid-cols-[1.1fr_1fr]">
+                  {/* Donut Chart Card */}
+                  <div className="flex min-h-[170px] items-center justify-center rounded-2xl border border-gray-200 bg-white p-4">
+                    <div className="relative flex h-32 w-32 items-center justify-center">
+                      <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="#e5e7eb" strokeWidth="16" />
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="#3b82f6" strokeWidth="16" strokeDasharray="280 301.59" strokeLinecap="round" />
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="#17C99E" strokeWidth="16" strokeDasharray="18 301.59" strokeDashoffset="-280" strokeLinecap="round" />
+                      </svg>
+                      <div className="absolute text-center">
+                        <p className="text-base font-extrabold text-gray-900">$310,550.78</p>
+                        <p className="text-[8px] text-gray-400">Portfolio Value</p>
+                      </div>
                     </div>
                   </div>
-                  <div className="flex flex-col gap-3">
+
+                  {/* Right Cards Stack */}
+                  <div className="flex flex-col gap-2">
                     <div className="grid grid-cols-2 gap-2">
-                  {previewMetrics.map((metric) => (
-                    <div key={metric.label} className="rounded-lg border border-white/10 bg-white/[0.07] p-3">
-                      <p className="text-[9px] font-semibold uppercase tracking-wide text-white/45">{metric.label}</p>
-                      <p className={`mt-2 text-sm font-extrabold ${metric.value.startsWith('-') ? 'text-[#ff5252]' : 'text-[#17C99E]'}`}>{metric.value}</p>
-                      <p className={`mt-1 text-[10px] font-bold ${metric.value.startsWith('-') ? 'text-[#ff5252]' : 'text-[#17C99E]'}`}>{metric.change} <span className="font-normal text-white/45">Today</span></p>
+                      {/* Today's Return */}
+                      <div className="rounded-2xl border border-gray-200 bg-white p-3">
+                        <p className="text-[8px] font-semibold uppercase tracking-wide text-gray-400">Today&apos;s Return ⌄</p>
+                        <p className="mt-1.5 text-sm font-extrabold text-[#EF4444]">$-6,770.01</p>
+                        <p className="mt-0.5 text-[9px] font-bold text-[#EF4444]">-2.18% <span className="font-normal text-gray-400">Today</span></p>
+                      </div>
+                      {/* All-Time Return */}
+                      <div className="rounded-2xl border border-gray-200 bg-white p-3">
+                        <p className="text-[8px] font-semibold uppercase tracking-wide text-gray-400">All-Time Return</p>
+                        <p className="mt-1.5 text-sm font-extrabold text-[#10B981]">+$55,515.77</p>
+                        <p className="mt-0.5 text-[9px] font-bold text-[#10B981]">+21.77% <span className="font-normal text-gray-400">All time</span></p>
+                      </div>
                     </div>
-                  ))}
-                    </div>
-                    <div className="grid grid-cols-4 gap-1 rounded-lg border border-white/10 bg-white/[0.05] p-3 text-center text-[8px] text-white/55">
-                      <span><Building2 className="mx-auto h-3 w-3" />Add investments</span><span><Coins className="mx-auto h-3 w-3" />Add cash</span><span><Eye className="mx-auto h-3 w-3" />Visibility</span><span><Pencil className="mx-auto h-3 w-3" />Edit portfolio</span>
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-4 gap-1 rounded-2xl border border-gray-200 bg-white p-2.5 text-center text-[7px] text-gray-500">
+                      <span className="flex flex-col items-center gap-1"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#14B8A6]/15 text-[#14B8A6]"><Building2 className="h-3 w-3" /></span>Add Investments</span>
+                      <span className="flex flex-col items-center gap-1"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#EAB308]/15 text-[#EAB308]"><Coins className="h-3 w-3" /></span>Add cash</span>
+                      <span className="flex flex-col items-center gap-1"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#8B5CF6]/15 text-[#8B5CF6]"><Eye className="h-3 w-3" /></span>Visibility</span>
+                      <span className="flex flex-col items-center gap-1"><span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#F97316]/15 text-[#F97316]"><Pencil className="h-3 w-3" /></span>Edit portfolio</span>
                     </div>
                   </div>
                 </div>
-                <div className="mt-4 rounded-lg border border-white/10 bg-white/[0.04] p-3">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-2"><span className="text-sm font-bold text-white">Holdings</span><span className="text-[9px] text-white/45">Sort: <b className="text-white">Total value</b>⌄</span></div>
-                  <div className="mt-3 flex items-center justify-between gap-2 text-[9px]"><span className="flex items-center gap-1 font-bold text-white"><span className="h-2 w-2 rounded-full bg-[#3b82f6]" />BTC <em className="not-italic text-white/45">Bitcoin</em></span><span className="text-white/65">100.00%</span><span className="font-bold text-white">$308,720.00</span><span className="font-bold text-[#17C99E]">+$53,687.00</span></div>
+
+                {/* Holdings Table */}
+                <div className="mt-3 rounded-2xl border border-gray-200 bg-white p-3">
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-2"><span className="text-xs font-bold text-gray-900">Holdings</span><span className="text-[8px] text-gray-400">Sort: <b className="text-gray-700">Total value</b> ⌄</span></div>
+                  <div className="mt-2.5 space-y-2.5">
+                    <div className="flex items-center justify-between gap-2 text-[9px]"><span className="flex items-center gap-1.5"><span className="h-5 w-5 rounded-full bg-[#f7931a] flex items-center justify-center text-[6px] font-bold text-white">₿</span><span><b className="text-gray-900">BTC</b> <span className="text-gray-400">Bitcoin</span></span></span><span className="text-gray-500">100.00%</span><span className="font-bold text-gray-900">$310,548.00</span><span className="font-bold text-[#10B981]">+$55,515.00</span></div>
+                    <div className="flex items-center justify-between gap-2 text-[9px]"><span className="flex items-center gap-1.5"><span className="h-5 w-5 rounded-full bg-[#8B5CF6] flex items-center justify-center text-[6px] font-bold text-white">R</span><span><b className="text-gray-900">RAIN</b> <span className="text-gray-400">Rain</span></span></span><span className="text-gray-500">0.00%</span><span className="font-bold text-gray-900">$0.02</span><span className="font-bold text-[#10B981]">+$0.00</span></div>
+                  </div>
                 </div>
               </div>
-              <aside className="hidden rounded-lg border border-white/10 bg-white/[0.04] p-3 sm:block">
-                <div className="flex items-center justify-between border-b border-white/10 pb-3 text-[10px] font-bold text-white"><span><span className="text-[#17C99E]">◉</span> Watchlist · 4</span><span className="text-[#17C99E]">+ Add</span></div>
-                <div className="space-y-4 pt-4">
-                  {previewWatchlist.map(([symbol, name, price, change]) => (
-                    <div key={symbol} className="flex items-center justify-between gap-2 text-[9px]"><div><b className="text-white">{symbol}</b><p className="text-white/40">{name}</p></div><div className="text-right"><b className="text-white">{price}</b><p className={change.startsWith('-') ? 'text-[#ff5252]' : 'text-[#17C99E]'}>{change}</p></div></div>
+
+              {/* Right Watchlist Sidebar */}
+              <aside className="hidden rounded-2xl border border-gray-200 bg-white p-3 sm:block">
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2.5 text-[10px] font-bold text-gray-900"><span><span className="text-[#17C99E]">◉</span> Watchlist · 6</span><span className="text-[#17C99E]">+ Add</span></div>
+                <div className="space-y-3 pt-3">
+                  {[
+                    ['₿', 'bg-[#f7931a]', 'BTC', 'Bitcoin', '$77,637', '-2.18%'],
+                    ['Ξ', 'bg-[#627eea]', 'ETH', 'Ethereum', '$2,424.93', '-2.19%'],
+                    ['✕', 'bg-gray-900', 'XRP', 'XRP', '$1.38', '-2.36%'],
+                    ['◎', 'bg-gradient-to-r from-[#9945FF] to-[#14F195]', 'SOL', 'Solana', '$183.37', '-2.61%'],
+                  ].map(([icon, bg, symbol, name, price, change]) => (
+                    <div key={symbol} className="flex items-center justify-between gap-1.5 text-[9px]">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`h-5 w-5 flex items-center justify-center rounded-full text-[7px] font-bold text-white ${bg}`}>{icon}</span>
+                        <div><b className="text-gray-900">{symbol}</b><p className="text-gray-400 text-[8px]">{name}</p></div>
+                      </div>
+                      <div className="text-right"><b className="text-gray-900">{price}</b><p className="text-[#EF4444]">{change}</p></div>
+                    </div>
                   ))}
                 </div>
               </aside>
