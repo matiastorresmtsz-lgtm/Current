@@ -130,7 +130,7 @@ export const PortfolioView: React.FC<PortfolioViewProps> = ({
               <ChevronDown className="w-3.5 h-3.5 text-gray-400" />
             </button>
             {showCurrencyDropdown && (
-              <div className="absolute right-0 mt-2 w-44 bg-[#212121] border border-[#2E2E2E] rounded-2xl overflow-hidden shadow-xl z-20">
+              <div className="absolute left-0 mt-2 w-44 bg-[#212121] border border-[#2E2E2E] rounded-2xl overflow-hidden shadow-xl z-30">
                 {(Object.entries(CURRENCY_CONFIG) as [Currency, typeof CURRENCY_CONFIG[Currency]][]).map(([key, cfg]) => (
                   <button
                     key={key}

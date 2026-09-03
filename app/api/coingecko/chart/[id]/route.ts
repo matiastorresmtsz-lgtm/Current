@@ -24,9 +24,10 @@ export async function GET(
     const daysParam = req.nextUrl.searchParams.get('days') || '1';
     const validDays = ['1', '7', '30', '180', '365', 'max'];
     const days = validDays.includes(daysParam) ? daysParam : '1';
+    const intervalParam = (days === 'max' || days === '365' || days === '180') ? '&interval=daily' : '';
 
     const res = await fetch(
-      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}${keyParam}`,
+      `https://api.coingecko.com/api/v3/coins/${id}/market_chart?vs_currency=usd&days=${days}${intervalParam}${keyParam}`,
       { headers, next: { revalidate: 300 } }
     );
 
@@ -34,21 +35,29 @@ export async function GET(
 
     if (res.ok) {
       const data = await res.json();
-      if (data.prices && Array.isArray(data.prices)) {
-        chartData = data.prices.map(([timestamp, price]: [number, number]) => {
+      if (data.prices && Array.isArray(data.prices) && data.prices.length > 0) {
+        let rawPrices = data.prices;
+        // Downsample if dataset is too large for fast smooth Recharts rendering
+        if (rawPrices.length > 120) {
+          const step = Math.ceil(rawPrices.length / 120);
+          rawPrices = rawPrices.filter((_: any, idx: number) => idx % step === 0 || idx === rawPrices.length - 1);
+        }
+
+        chartData = rawPrices.map(([timestamp, price]: [number, number]) => {
           const date = new Date(timestamp);
-          const time = days === '1'
-            ? `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`
-            : days === '7'
-            ? `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()]} ${date.getHours()}:00`
-            : days === '30'
-            ? `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`
-            : days === '180'
-            ? `${date.toLocaleString('default', { month: 'short' })} ${date.getDate()}`
-            : days === '365'
-            ? `${date.toLocaleString('default', { month: 'short' })}`
-            : `${date.getFullYear()}`;
-          return { time, price };
+          let time = '';
+          if (days === '1') {
+            time = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+          } else if (days === '7') {
+            time = `${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][date.getDay()]} ${date.getHours()}:00`;
+          } else if (days === '30' || days === '180') {
+            time = `${date.getDate()} ${date.toLocaleString('default', { month: 'short' })}`;
+          } else if (days === '365') {
+            time = `${date.toLocaleString('default', { month: 'short' })} '${date.getFullYear().toString().slice(2)}`;
+          } else {
+            time = `${date.toLocaleString('default', { month: 'short' })} '${date.getFullYear().toString().slice(2)}`;
+          }
+          return { time, price: parseFloat(price.toFixed(4)) };
         });
       }
     }
