@@ -106,3 +106,23 @@ export interface AIMessage {
   mediaUrl?: string;
   mediaName?: string;
 }
+
+export interface AIShortcut {
+  id: string;
+  name: string;
+  prompt: string;
+  icon: string;
+  isBuiltIn?: boolean;
+  isCustomized?: boolean;
+}
+
+export interface AIThread {
+  id: string;
+  title: string;
+  messages: AIMessage[];
+  createdAt: number;
+  updatedAt: number;
+  styleId?: string;
+}
+
+

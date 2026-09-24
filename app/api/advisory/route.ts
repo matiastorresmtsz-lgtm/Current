@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json();
-    const { messages, portfolio } = body;
+    const { messages, portfolio, aiStyle } = body;
 
     if (!Array.isArray(messages)) {
       return NextResponse.json(
@@ -21,6 +21,15 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    const STYLE_DIRECTIVES: Record<string, string> = {
+      'analyst': 'Persona: Analyst (Professional, balanced, evidence-based analysis with clear, objective financial reasoning).',
+      'deep-research': 'Persona: Deep Research (Detailed analysis covering deep market context, underlying fundamentals, potential risk factors, and thorough explanations).',
+      'data-driven': 'Persona: Data-Driven (Focus heavily on hard metrics, precise numbers, statistical trends, price targets, and asset comparisons first).',
+      'beginner-friendly': 'Persona: Beginner Friendly (Simple explanations without jargon, easy step-by-step clarity, zero complex financial terms, and intuitive analogies).'
+    };
+
+    const selectedStyleDirective = STYLE_DIRECTIVES[aiStyle] || STYLE_DIRECTIVES['analyst'];
 
     // Format portfolio assets to pass to the system prompt
     let portfolioText = '';
@@ -52,11 +61,14 @@ export async function POST(req: NextRequest) {
     const systemPrompt = `You are "Current's AI Portfolio Advisor", a premium and highly competent digital asset strategist and cryptocurrency advisor.
 Your task is to analyze the user's connected portfolio assets, evaluate their risk exposure, suggest rebalancing, explain market narratives, and answer any general or specific cryptocurrency questions.
 
+AI Communication Style Directive:
+${selectedStyleDirective}
+
 Here is the user's connected portfolio data:
 ${portfolioText}
 
 Strict Guidelines:
-1. Provide clear, actionable insights and answers.
+1. Provide clear, actionable insights adhering strictly to the requested Persona Communication Style.
 2. Speak with authority and financial intellect, yet write in a friendly, concise, and accessible style.
 3. Always format your responses cleanly using Markdown (e.g., bold headers, bullet lists, short tables, or inline highlight formatting). Make the visual presentation beautiful.
 4. Keep responses direct and reasonably short (maximum 300 words). Do not repeat long financial disclaimers on every message. One simple warning at the start or a very brief disclaimer if they ask for direct buy/sell advice is sufficient.
